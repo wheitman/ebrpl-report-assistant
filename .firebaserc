@@ -1,0 +1,11 @@
+{
+  "targets": {
+    "ebrpl-reporting": {
+      "hosting": {
+        "report-assistant": [
+          "ebrpl-reporting"
+        ]
+      }
+    }
+  }
+}
