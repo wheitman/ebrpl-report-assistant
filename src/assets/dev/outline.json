@@ -58,7 +58,7 @@
       "sections": [
         {
           "title": "Regular programs",
-          "finePrint": "Presented or co-sponsored by the library. Includes story/crafts, LEGO storytime, Tax Assistance.",
+          "subtitle": "Presented or co-sponsored by the library. Includes story/crafts, LEGO storytime, Tax Assistance.",
           "type": "item-table",
           "columns": [
             { "label": "Division", "type": "division-select" },
@@ -109,7 +109,74 @@
       ]
     },
     {
-      "title": "Other library events"
+      "title": "Other library events",
+      "sections": [
+        {
+          "title": "Room Usage"
+        },
+        {
+          "title": "Civic Groups and Organizations Using Meeting Rooms"
+        },
+        {
+          "title": "Impromptu Groups Meeting in the Library",
+          "subtitle": "Not involved in formal instruction or scheduled tours. Includes group homes, classes, and exam proctoring."
+        }
+      ]
+    },
+    {
+      "title": "Staff presentations and events outside the library",
+      "sections": [
+        {
+          "title": "Speech or lecture"
+        },
+        {
+          "title": "Storytimes or other performances"
+        },
+        {
+          "title": "Booktalks"
+        },
+        {
+          "title": "Research talks"
+        },
+        {
+          "title": "Promotional events"
+        },
+        {
+          "title": "Community meetings attended by staff representing the library"
+        },
+        {
+          "title": "Media presentations",
+          "subtitle": "TV, radio, podcast, etc. Scheduled OR impromptu."
+        }
+      ]
+    },
+    {
+      "title": "Other categories tracked",
+      "sections": [
+        {
+          "title": "Volunteers"
+        },
+        {
+          "title": "Outreach contacts to area businesses and organizations"
+        },
+        {
+          "title": "Displays and exhibits",
+          "subtitle": "Not just for book displays"
+        },
+        {
+          "title": "Drive-thru window total"
+        },
+        {
+          "title": "Books and magazines read in-house"
+        },
+        {
+          "title": "Miscellaneous tracked items"
+        },
+        {
+          "title": "Training - in-house for staff",
+          "subtitle": "Including training via webinar or personal online training. Not including personal Ethics or Sexual Harassment Prevention Training."
+        }
+      ]
     }
   ]
 }

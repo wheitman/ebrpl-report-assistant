@@ -1,1 +1,32 @@
-<p>report works!</p>
+<div class="clr-col" style="width: 90vw;" *ngIf="page$ | async">
+  <h1>{{ (page$ | async)?.title }}</h1>
+  <hr />
+  <h2 *ngFor="let section of (page$ | async)?.sections">{{ section.title }}</h2>
+  <div class="clr-row clr-justify-content-end">
+    <div class="btn-group btn-primary">
+      <button
+        class="btn"
+        [routerLink]="['/report', templateId, pageNumber - 1]"
+        title="Previous page"
+        *ngIf="pageNumber > 1"
+      >
+        <clr-icon shape="arrow" dir="left"></clr-icon>
+      </button>
+      <button
+        *ngIf="pageNumber < pageCount"
+        class="btn"
+        title="Next page"
+        [routerLink]="['/report', templateId, pageNumber + 1]"
+      >
+        <clr-icon shape="arrow" dir="right"></clr-icon>
+      </button>
+      <button
+        *ngIf="pageNumber == pageCount"
+        class="btn btn-success"
+        [routerLink]="['/finish']"
+      >
+        Finish Report
+      </button>
+    </div>
+  </div>
+</div>

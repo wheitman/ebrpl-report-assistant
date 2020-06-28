@@ -11,7 +11,7 @@ import {
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
-  { path: 'report', component: ReportComponent },
+  { path: 'report/:template-id/:page-number', component: ReportComponent },
   {
     path: '',
     component: StartComponent,

@@ -10,6 +10,7 @@ import { StartComponent } from './components/start/start.component';
 import { LoginComponent } from './components/login/login.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { ReportComponent } from './components/report/report.component';
+import { AbstractSection } from './components/sections/abstract-section/abstract-section.component';
 
 @NgModule({
   declarations: [
@@ -18,6 +19,7 @@ import { ReportComponent } from './components/report/report.component';
     LoginComponent,
     NavbarComponent,
     ReportComponent,
+    AbstractSection,
   ],
   imports: [
     BrowserModule,

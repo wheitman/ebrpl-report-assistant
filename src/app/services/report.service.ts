@@ -1,4 +1,7 @@
+import { Page } from './../interfaces/page';
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { AbstractSection } from '../components/sections/abstract-section/abstract-section.component';
 
 @Injectable({
   providedIn: 'root',
@@ -117,24 +120,126 @@ export class ReportService {
       },
       {
         title: 'Other library events',
+        sections: [
+          {
+            title: 'Room Usage',
+          },
+          {
+            title: 'Civic Groups and Organizations Using Meeting Rooms',
+          },
+          {
+            title: 'Impromptu Groups Meeting in the Library',
+            finePrint:
+              'Not involved in formal instruction or scheduled tours. Includes group homes, classes, and exam proctoring.',
+          },
+        ],
+      },
+      {
+        title: 'Staff presentations and events outside the library',
+        sections: [
+          {
+            title: 'Speech or lecture',
+          },
+          {
+            title: 'Storytimes or other performances',
+          },
+          {
+            title: 'Booktalks',
+          },
+          {
+            title: 'Research talks',
+          },
+          {
+            title: 'Promotional events',
+          },
+          {
+            title:
+              'Community meetings attended by staff representing the library',
+          },
+          {
+            title: 'Media presentations',
+            finePrint: 'TV, radio, podcast, etc. Scheduled OR impromptu.',
+          },
+        ],
+      },
+      {
+        title: 'Other categories tracked',
+        sections: [
+          {
+            title: 'Volunteers',
+          },
+          {
+            title: 'Outreach contacts to area businesses and organizations',
+          },
+          {
+            title: 'Displays and exhibits',
+            finePrint: 'Not just for book displays',
+          },
+          {
+            title: 'Drive-thru window total',
+          },
+          {
+            title: 'Books and magazines read in-house',
+          },
+          {
+            title: 'Miscellaneous tracked items',
+          },
+          {
+            title: 'Training - in-house for staff',
+            finePrint:
+              'Including training via webinar or personal online training. Not including personal Ethics or Sexual Harassment Prevention Training.',
+          },
+        ],
       },
     ],
   };
 
-  outlineFileName = 'outline.json';
+  outlineFileName;
+  private foolishTemplateNames: Observable<string[]> = new Observable(
+    (observer) => {
+      let names: string[] = ['Branch Usage'];
+      observer.next(names);
+    }
+  );
 
   constructor() {}
 
-  getTemplatePage(pageNumber: number): Object {
-    if (pageNumber > 0) return this.foolishObj.pages[pageNumber - 1];
-    else return undefined;
+  private sectionObjectToArray(sectionObj: Object[]) {
+    let sectionArray: AbstractSection[] = [];
+    sectionObj.forEach((section) => {
+      sectionArray.push(
+        new AbstractSection(section['title'], section['subtitle'] || null)
+      );
+    });
+    return sectionArray;
+  }
+
+  getTemplatePage(pageNumber: number): Observable<Page> {
+    return new Observable<Page>((observer) => {
+      let pageObj = this.foolishObj.pages[pageNumber - 1];
+      let page: Page = {
+        number: pageNumber,
+        title: pageObj.title,
+        subtitle: pageObj['subtitle'],
+        sections: this.sectionObjectToArray(pageObj.sections),
+      };
+      observer.next(page);
+    });
   }
 
   getTemplateConstant(constantLabel: string): Object {
     return this.foolishObj.contants[constantLabel];
   }
 
-  setOutlineName(fileName: string) {
+  getTemplateNames(): Observable<string[]> {
+    return this.foolishTemplateNames;
+  }
+
+  setCurrentTemplate(fileName: string) {
     this.outlineFileName = fileName;
+  }
+
+  get pageCount() {
+    return this.foolishObj.pages.length;
   }
 }

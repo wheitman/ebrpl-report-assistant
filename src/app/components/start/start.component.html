@@ -1,20 +1,45 @@
 <div class="clr-row clr-justify-content-center" style="width: 95vw;">
   <div class="clr-col-md-4">
     <h1>You can do this.</h1>
-    <clr-dropdown>
+  </div>
+  <div class="clr-break-row"></div>
+  <div class="clr-col-md-4">
+    <clr-dropdown style="width: 100%;">
       <button class="btn btn-primary" clrDropdownTrigger>
-        New Report
+        Create report from template
         <clr-icon shape="caret down"></clr-icon>
       </button>
       <clr-dropdown-menu clrPosition="bottom-left" *clrIfOpen>
-        <button clrDropdownItem routerLink="/report">
-          <clr-icon shape="plus-circle"></clr-icon> From scratch
+        <ng-container *ngFor="let name of templateNames">
+          <button clrDropdownItem [routerLink]="['/report', name, 1]">
+            {{ name }}
+          </button>
+        </ng-container>
+      </clr-dropdown-menu>
+    </clr-dropdown>
+  </div>
+  <div class="clr-break-row"></div>
+  <div class="clr-col-md-4">
+    <clr-dropdown style="width: 100%;">
+      <button class="btn btn-primary" clrDropdownTrigger>
+        Copy an old report
+        <clr-icon shape="caret down"></clr-icon>
+      </button>
+      <clr-dropdown-menu clrPosition="bottom-left" *clrIfOpen>
+        <button clrDropdownItem routerLink="/report/branch-usage/1">
+          <clr-icon shape="plus-circle"></clr-icon> From blank template
         </button>
-        <button clrDropdownItem routerLink="/report">
+        <button clrDropdownItem routerLink="/report/branch-usage/1">
           <clr-icon shape="unarchive"></clr-icon> Based on a previous one
         </button>
       </clr-dropdown-menu>
     </clr-dropdown>
-    <button class="btn btn-outline-primary">View old reports</button>
   </div>
+  <div class="clr-break-row"></div>
+  <div class="clr-col-md-4">
+    <button class="btn btn-outline-primary" style="width: 100%;">
+      View old reports
+    </button>
+  </div>
+  <div class="clr-break-row"></div>
 </div>
