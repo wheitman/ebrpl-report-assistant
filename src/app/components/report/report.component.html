@@ -1,7 +1,12 @@
 <div class="clr-col" style="width: 90vw;" *ngIf="page$ | async">
   <h1>{{ (page$ | async)?.title }}</h1>
   <hr />
-  <h2 *ngFor="let section of (page$ | async)?.sections">{{ section.title }}</h2>
+  <datagrid-section
+    *ngFor="let section of datagrids$ | async"
+    [title]="section.title"
+    [subtitle]="section.subtitle"
+    [templateObj]="section.templateObj"
+  ></datagrid-section>
   <div class="clr-row clr-justify-content-end">
     <div class="btn-group btn-primary">
       <button

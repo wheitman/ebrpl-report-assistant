@@ -1,7 +1,7 @@
-import { AbstractSection } from '../components/sections/abstract-section/abstract-section.component';
+import { SectionInterface } from './sections';
+
 export interface Page {
   title: string;
   subtitle: string;
   number: number;
-  sections: AbstractSection[];
 }

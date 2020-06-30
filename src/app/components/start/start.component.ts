@@ -1,4 +1,4 @@
-import { ReportService } from './../../services/report.service';
+import { TemplateService } from '../../services/template.service';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
@@ -9,7 +9,7 @@ import { Component, OnInit } from '@angular/core';
 export class StartComponent implements OnInit {
   templateNames: string[] = [''];
 
-  constructor(public reportService: ReportService) {}
+  constructor(public reportService: TemplateService) {}
 
   ngOnInit(): void {
     this.reportService.getTemplateNames().subscribe((names) => {

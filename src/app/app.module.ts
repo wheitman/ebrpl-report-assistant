@@ -1,4 +1,4 @@
-import { ReportService } from './services/report.service';
+import { TemplateService } from './services/template.service';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
@@ -11,6 +11,7 @@ import { LoginComponent } from './components/login/login.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { ReportComponent } from './components/report/report.component';
 import { AbstractSection } from './components/sections/abstract-section/abstract-section.component';
+import { DatagridSection } from './components/sections/datagrid-section/datagrid-section.component';
 
 @NgModule({
   declarations: [
@@ -20,6 +21,7 @@ import { AbstractSection } from './components/sections/abstract-section/abstract
     NavbarComponent,
     ReportComponent,
     AbstractSection,
+    DatagridSection,
   ],
   imports: [
     BrowserModule,
@@ -27,7 +29,7 @@ import { AbstractSection } from './components/sections/abstract-section/abstract
     ClarityModule,
     BrowserAnimationsModule,
   ],
-  providers: [ReportService],
+  providers: [TemplateService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

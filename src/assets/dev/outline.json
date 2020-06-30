@@ -59,7 +59,7 @@
         {
           "title": "Regular programs",
           "subtitle": "Presented or co-sponsored by the library. Includes story/crafts, LEGO storytime, Tax Assistance.",
-          "type": "item-table",
+          "type": "datagrid",
           "columns": [
             { "label": "Division", "type": "division-select" },
             { "label": "Date", "type": "date-select" },
@@ -86,25 +86,32 @@
           ]
         },
         {
-          "title": "Storytimes"
+          "title": "Storytimes",
+          "type": "simple-input"
         },
         {
-          "title": "Computer classes"
+          "title": "Computer classes",
+          "type": "datagrid"
         },
         {
-          "title": "Book clubs"
+          "title": "Book clubs",
+          "type": "datagrid"
         },
         {
-          "title": "Tours"
+          "title": "Tours",
+          "type": "datagrid"
         },
         {
-          "title": "Demonstrations"
+          "title": "Demonstrations",
+          "type": "datagrid"
         },
         {
-          "title": "Tutoring"
+          "title": "Tutoring",
+          "type": "datagrid"
         },
         {
-          "title": "Special education"
+          "title": "Special education",
+          "type": "datagrid"
         }
       ]
     },
@@ -112,14 +119,17 @@
       "title": "Other library events",
       "sections": [
         {
-          "title": "Room Usage"
+          "title": "Room Usage",
+          "type": "simple-input"
         },
         {
-          "title": "Civic Groups and Organizations Using Meeting Rooms"
+          "title": "Civic Groups and Organizations Using Meeting Rooms",
+          "type": "simple-input"
         },
         {
           "title": "Impromptu Groups Meeting in the Library",
-          "subtitle": "Not involved in formal instruction or scheduled tours. Includes group homes, classes, and exam proctoring."
+          "subtitle": "Not involved in formal instruction or scheduled tours. Includes group homes, classes, and exam proctoring.",
+          "type": "simple-input"
         }
       ]
     },
@@ -127,26 +137,33 @@
       "title": "Staff presentations and events outside the library",
       "sections": [
         {
-          "title": "Speech or lecture"
+          "title": "Speech or lecture",
+          "type": "simple-input"
         },
         {
-          "title": "Storytimes or other performances"
+          "title": "Storytimes or other performances",
+          "type": "simple-input"
         },
         {
-          "title": "Booktalks"
+          "title": "Booktalks",
+          "type": "simple-input"
         },
         {
-          "title": "Research talks"
+          "title": "Research talks",
+          "type": "simple-input"
         },
         {
-          "title": "Promotional events"
+          "title": "Promotional events",
+          "type": "simple-input"
         },
         {
-          "title": "Community meetings attended by staff representing the library"
+          "title": "Community meetings attended by staff representing the library",
+          "type": "simple-input"
         },
         {
           "title": "Media presentations",
-          "subtitle": "TV, radio, podcast, etc. Scheduled OR impromptu."
+          "subtitle": "TV, radio, podcast, etc. Scheduled OR impromptu.",
+          "type": "simple-input"
         }
       ]
     },
@@ -154,27 +171,34 @@
       "title": "Other categories tracked",
       "sections": [
         {
-          "title": "Volunteers"
+          "title": "Volunteers",
+          "type": "simple-input"
         },
         {
-          "title": "Outreach contacts to area businesses and organizations"
+          "title": "Outreach contacts to area businesses and organizations",
+          "type": "simple-input"
         },
         {
           "title": "Displays and exhibits",
-          "subtitle": "Not just for book displays"
+          "subtitle": "Not just for book displays",
+          "type": "simple-input"
         },
         {
-          "title": "Drive-thru window total"
+          "title": "Drive-thru window total",
+          "type": "simple-input"
         },
         {
-          "title": "Books and magazines read in-house"
+          "title": "Books and magazines read in-house",
+          "type": "simple-input"
         },
         {
-          "title": "Miscellaneous tracked items"
+          "title": "Miscellaneous tracked items",
+          "type": "simple-input"
         },
         {
           "title": "Training - in-house for staff",
-          "subtitle": "Including training via webinar or personal online training. Not including personal Ethics or Sexual Harassment Prevention Training."
+          "subtitle": "Including training via webinar or personal online training. Not including personal Ethics or Sexual Harassment Prevention Training.",
+          "type": "simple-input"
         }
       ]
     }

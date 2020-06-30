@@ -1,6 +1,7 @@
+import { DatagridSection } from './../sections/datagrid-section/datagrid-section.component';
 import { AbstractSection } from './../sections/abstract-section/abstract-section.component';
 import { Observable } from 'rxjs';
-import { ReportService } from './../../services/report.service';
+import { TemplateService } from '../../services/template.service';
 import { Page } from './../../interfaces/page';
 
 import {
@@ -20,9 +21,11 @@ export class ReportComponent implements OnInit {
   pageNumber: number;
   page$: Observable<Page>;
   pageCount: number = 0;
+  page: Page;
+  datagrids$: Observable<DatagridSection[]>;
 
   constructor(
-    private _ReportService: ReportService,
+    private _TemplateService: TemplateService,
     private activeRoute: ActivatedRoute,
     private _Router: Router
   ) {}
@@ -31,17 +34,10 @@ export class ReportComponent implements OnInit {
     this.activeRoute.paramMap.subscribe((params) => {
       this.templateId = params.get('template-id');
       this.pageNumber = +params.get('page-number');
-      this.page$ = this._ReportService.getTemplatePage(this.pageNumber);
-    });
-    this.pageCount = this._ReportService.pageCount;
-  }
+      this.pageCount = this._TemplateService.pageCount;
+      this.page$ = this._TemplateService.getTemplatePage(this.pageNumber);
 
-  nextPage() {
-    this._Router.navigate(['/report', 'Branch Usage', this.pageNumber + 1]);
-    console.log('click');
-  }
-  previousPage() {
-    this._Router.navigate(['/report', 'Branch Usage', this.pageNumber - 1]);
-    console.log('clock');
+      this.datagrids$ = this._TemplateService.getDatagrids(this.pageNumber);
+    });
   }
 }

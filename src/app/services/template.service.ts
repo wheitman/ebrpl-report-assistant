@@ -1,12 +1,14 @@
-import { Page } from './../interfaces/page';
-import { Injectable } from '@angular/core';
+import { DatagridSection } from './../components/sections/datagrid-section/datagrid-section.component';
+import { Page } from '../interfaces/page';
+import { SectionInterface } from '../interfaces/sections';
+import { Injectable, ChangeDetectorRef } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AbstractSection } from '../components/sections/abstract-section/abstract-section.component';
 
 @Injectable({
   providedIn: 'root',
 })
-export class ReportService {
+export class TemplateService {
   private foolishObj = {
     contants: {
       divisions: [
@@ -67,9 +69,9 @@ export class ReportService {
         sections: [
           {
             title: 'Regular programs',
-            finePrint:
+            subtitle:
               'Presented or co-sponsored by the library. Includes story/crafts, LEGO storytime, Tax Assistance.',
-            type: 'item-table',
+            type: 'datagrid',
             columns: [
               { label: 'Division', type: 'division-select' },
               { label: 'Date', type: 'date-select' },
@@ -97,24 +99,31 @@ export class ReportService {
           },
           {
             title: 'Storytimes',
+            type: 'simple-input',
           },
           {
             title: 'Computer classes',
+            type: 'datagrid',
           },
           {
             title: 'Book clubs',
+            type: 'datagrid',
           },
           {
             title: 'Tours',
+            type: 'datagrid',
           },
           {
             title: 'Demonstrations',
+            type: 'datagrid',
           },
           {
             title: 'Tutoring',
+            type: 'datagrid',
           },
           {
             title: 'Special education',
+            type: 'datagrid',
           },
         ],
       },
@@ -123,14 +132,17 @@ export class ReportService {
         sections: [
           {
             title: 'Room Usage',
+            type: 'simple-input',
           },
           {
             title: 'Civic Groups and Organizations Using Meeting Rooms',
+            type: 'simple-input',
           },
           {
             title: 'Impromptu Groups Meeting in the Library',
-            finePrint:
+            subtitle:
               'Not involved in formal instruction or scheduled tours. Includes group homes, classes, and exam proctoring.',
+            type: 'simple-input',
           },
         ],
       },
@@ -139,26 +151,33 @@ export class ReportService {
         sections: [
           {
             title: 'Speech or lecture',
+            type: 'simple-input',
           },
           {
             title: 'Storytimes or other performances',
+            type: 'simple-input',
           },
           {
             title: 'Booktalks',
+            type: 'simple-input',
           },
           {
             title: 'Research talks',
+            type: 'simple-input',
           },
           {
             title: 'Promotional events',
+            type: 'simple-input',
           },
           {
             title:
               'Community meetings attended by staff representing the library',
+            type: 'simple-input',
           },
           {
             title: 'Media presentations',
-            finePrint: 'TV, radio, podcast, etc. Scheduled OR impromptu.',
+            subtitle: 'TV, radio, podcast, etc. Scheduled OR impromptu.',
+            type: 'simple-input',
           },
         ],
       },
@@ -167,27 +186,34 @@ export class ReportService {
         sections: [
           {
             title: 'Volunteers',
+            type: 'simple-input',
           },
           {
             title: 'Outreach contacts to area businesses and organizations',
+            type: 'simple-input',
           },
           {
             title: 'Displays and exhibits',
-            finePrint: 'Not just for book displays',
+            subtitle: 'Not just for book displays',
+            type: 'simple-input',
           },
           {
             title: 'Drive-thru window total',
+            type: 'simple-input',
           },
           {
             title: 'Books and magazines read in-house',
+            type: 'simple-input',
           },
           {
             title: 'Miscellaneous tracked items',
+            type: 'simple-input',
           },
           {
             title: 'Training - in-house for staff',
-            finePrint:
+            subtitle:
               'Including training via webinar or personal online training. Not including personal Ethics or Sexual Harassment Prevention Training.',
+            type: 'simple-input',
           },
         ],
       },
@@ -204,16 +230,6 @@ export class ReportService {
 
   constructor() {}
 
-  private sectionObjectToArray(sectionObj: Object[]) {
-    let sectionArray: AbstractSection[] = [];
-    sectionObj.forEach((section) => {
-      sectionArray.push(
-        new AbstractSection(section['title'], section['subtitle'] || null)
-      );
-    });
-    return sectionArray;
-  }
-
   getTemplatePage(pageNumber: number): Observable<Page> {
     return new Observable<Page>((observer) => {
       let pageObj = this.foolishObj.pages[pageNumber - 1];
@@ -221,10 +237,32 @@ export class ReportService {
         number: pageNumber,
         title: pageObj.title,
         subtitle: pageObj['subtitle'],
-        sections: this.sectionObjectToArray(pageObj.sections),
       };
       observer.next(page);
     });
+  }
+
+  getDatagrids(pageNumber: number): Observable<DatagridSection[]> {
+    pageNumber--;
+    return new Observable<DatagridSection[]>((observer) => {
+      let sections = this.foolishObj.pages[pageNumber].sections;
+      let datagrids: DatagridSection[] = [];
+      sections.forEach((section) => {
+        if (section.type == 'datagrid') {
+          let datagrid: DatagridSection = new DatagridSection();
+          datagrid.title = section.title || null;
+          datagrid.subtitle = section.subtitle || null;
+          datagrid.templateObj = section;
+          console.log(section['columns']);
+          datagrids.push(datagrid);
+        }
+      });
+      observer.next(datagrids);
+    });
+  }
+
+  getSectionCount(pageNumber: number) {
+    return this.foolishObj.pages[pageNumber - 1].sections.length;
   }
 
   getTemplateConstant(constantLabel: string): Object {
