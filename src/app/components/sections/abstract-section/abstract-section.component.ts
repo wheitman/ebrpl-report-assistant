@@ -19,6 +19,7 @@ export class AbstractSection implements OnInit {
   @Input() public subtitle: string = null;
   @Input() public data: any = null;
   @Input() public templateObj: Object = {};
+  @Input() public constants: Object = {};
 
   constructor() {}
 

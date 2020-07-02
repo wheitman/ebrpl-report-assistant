@@ -12,6 +12,8 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { ReportComponent } from './components/report/report.component';
 import { AbstractSection } from './components/sections/abstract-section/abstract-section.component';
 import { DatagridSection } from './components/sections/datagrid-section/datagrid-section.component';
+import { ReactiveFormsModule } from '@angular/forms';
+import { DivisionSelectComponent } from './components/controls/division-select/division-select.component';
 
 @NgModule({
   declarations: [
@@ -22,12 +24,14 @@ import { DatagridSection } from './components/sections/datagrid-section/datagrid
     ReportComponent,
     AbstractSection,
     DatagridSection,
+    DivisionSelectComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     ClarityModule,
     BrowserAnimationsModule,
+    ReactiveFormsModule,
   ],
   providers: [TemplateService],
   bootstrap: [AppComponent],

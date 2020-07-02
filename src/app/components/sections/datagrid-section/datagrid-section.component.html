@@ -5,7 +5,178 @@
     >Nothing to see here. To add more content, use the controls
     below.</clr-dg-placeholder
   >
-  <clr-dg-column *clrDgItems="let column of columns">{{
+  <clr-dg-column *clrDgItems="let column of _interface.columns">{{
     column.label
   }}</clr-dg-column>
+  <clr-dg-row *ngFor="let row of data; index as i">
+    <clr-dg-action-overflow>
+      <button class="action-item" (click)="openEditModal(i)">Edit</button>
+      <button class="action-item" (click)="deleteRow(i)">Delete</button>
+    </clr-dg-action-overflow>
+    <clr-dg-cell *ngFor="let cell of row">
+      <span *ngIf="!isTagObj(cell); else tagRenderer">
+        {{ cell }}
+      </span>
+      <ng-template #tagRenderer>
+        <span *ngFor="let tag of cell">
+          <clr-icon [attr.shape]="tag.icon" title="{{ tag.label }}"></clr-icon>
+        </span>
+      </ng-template>
+    </clr-dg-cell>
+  </clr-dg-row>
+  <clr-dg-footer>
+    <div class="btn-group btn-link btn-sm">
+      <button class="btn" (click)="addModalOpened = true">Add new</button>
+    </div>
+  </clr-dg-footer>
 </clr-datagrid>
+<clr-modal #addModal [(clrModalOpen)]="addModalOpened">
+  <h3 class="modal-title">Add to "{{ title }}"</h3>
+  <div class="modal-body">
+    <clr-alert
+      [clrAlertType]="'success'"
+      [(clrAlertClosed)]="!showItemAddConfirmation"
+    >
+      <clr-alert-item>
+        <span class="alert-text">Item successfully added.</span>
+      </clr-alert-item>
+    </clr-alert>
+    <form
+      clrForm
+      [formGroup]="formGroup"
+      *ngFor="let column of _interface.columns; index as i"
+      clrLayout="vertical"
+    >
+      <clr-date-container *ngIf="isType(column, 'date-select')">
+        <label for="">{{ column["label"] }}</label>
+        <input type="date" clrDate [formControl]="formArray.controls[i]" />
+      </clr-date-container>
+      <clr-select-container *ngIf="isType(column, 'division-select')">
+        <label for="">{{ column["label"] }}</label>
+        <select clrSelect [formControl]="formArray.controls[i]">
+          <option
+            [value]="division.label"
+            *ngFor="let division of constants['divisions']"
+          >
+            {{ division.label }}</option
+          >
+        </select>
+      </clr-select-container>
+      <clr-input-container *ngIf="isType(column, 'text')">
+        <label for="">{{ column["label"] }}</label>
+        <input clrInput type="text" [formControl]="formArray.controls[i]" />
+      </clr-input-container>
+      <clr-input-container *ngIf="isType(column, 'number')">
+        <label for="">{{ column["label"] }}</label>
+        <input clrInput type="number" [formControl]="formArray.controls[i]" />
+      </clr-input-container>
+      <clr-checkbox-container *ngIf="isType(column, 'tag-select')">
+        <label for="">{{ column["label"] }}</label>
+        <clr-checkbox-wrapper
+          *ngFor="let tag of templateObj['section']['tags']; index as j"
+        >
+          <input
+            type="checkbox"
+            clrCheckbox
+            [formControl]="getCheckboxControl(i, j)"
+          />
+          <label
+            ><clr-icon [attr.shape]="tag.icon"></clr-icon>{{ tag.label }}</label
+          >
+        </clr-checkbox-wrapper>
+      </clr-checkbox-container>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline" (click)="addModalCancel()">
+      Cancel
+    </button>
+    <button
+      type="button"
+      class="btn btn-primary"
+      (click)="addAnother()"
+      [disabled]="formArray.invalid"
+    >
+      Save and add another
+    </button>
+    <button
+      type="button"
+      class="btn btn-success"
+      (click)="finishAddModal()"
+      [disabled]="formArray.invalid"
+    >
+      Save and finish
+    </button>
+  </div>
+</clr-modal>
+<clr-modal #editModal [(clrModalOpen)]="editModalOpened">
+  <h3 class="modal-title">Edit item</h3>
+  <div class="modal-body">
+    <!-- <clr-alert
+      [clrAlertType]="'success'"
+      [(clrAlertClosed)]="!showItemAddConfirmation"
+    >
+      <clr-alert-item>
+        <span class="alert-text">Item successfully added.</span>
+      </clr-alert-item>
+    </clr-alert> -->
+    <form
+      clrForm
+      [formGroup]="formGroup"
+      *ngFor="let column of _interface.columns; index as i"
+      clrLayout="vertical"
+    >
+      <clr-date-container *ngIf="isType(column, 'date-select')">
+        <label for="">{{ column["label"] }}</label>
+        <input type="date" clrDate [formControl]="formArray.controls[i]" />
+      </clr-date-container>
+      <clr-select-container *ngIf="isType(column, 'division-select')">
+        <label for="">{{ column["label"] }}</label>
+        <select clrSelect [formControl]="formArray.controls[i]">
+          <option
+            [value]="division.label"
+            *ngFor="let division of constants['divisions']"
+          >
+            {{ division.label }}</option
+          >
+        </select>
+      </clr-select-container>
+      <clr-input-container *ngIf="isType(column, 'text')">
+        <label for="">{{ column["label"] }}</label>
+        <input clrInput type="text" [formControl]="formArray.controls[i]" />
+      </clr-input-container>
+      <clr-input-container *ngIf="isType(column, 'number')">
+        <label for="">{{ column["label"] }}</label>
+        <input clrInput type="number" [formControl]="formArray.controls[i]" />
+      </clr-input-container>
+      <clr-checkbox-container *ngIf="isType(column, 'tag-select')">
+        <label for="">{{ column["label"] }}</label>
+        <clr-checkbox-wrapper
+          *ngFor="let tag of templateObj['section']['tags']; index as j"
+        >
+          <input
+            type="checkbox"
+            clrCheckbox
+            [formControl]="getCheckboxControl(i, j)"
+          />
+          <label
+            ><clr-icon [attr.shape]="tag.icon"></clr-icon>{{ tag.label }}</label
+          >
+        </clr-checkbox-wrapper>
+      </clr-checkbox-container>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline" (click)="addModalCancel()">
+      Cancel
+    </button>
+    <button
+      type="button"
+      class="btn btn-success"
+      (click)="finishEdits()"
+      [disabled]="formArray.invalid"
+    >
+      Apply
+    </button>
+  </div>
+</clr-modal>

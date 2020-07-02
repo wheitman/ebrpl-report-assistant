@@ -80,51 +80,51 @@ export class TemplateService {
               { label: 'Tags', type: 'tag-select' },
             ],
             tags: [
-              { label: 'STEM/STEAM', icon: 'oi-beaker' },
+              { label: 'STEM/STEAM', icon: 'flask' },
               {
                 label: 'Subject related to Digital Literacy/Database Use',
-                icon: 'oi-list-rich',
+                icon: 'network-globe',
               },
               {
                 label: 'Subject related to Health and Wellness',
-                icon: 'oi-heart',
+                icon: 'heart',
               },
               {
                 label: 'Portable device (including iPads and laptops)',
-                icon: 'oi-phone',
+                icon: 'devices',
               },
-              { label: 'Digital lab program', icon: 'oi-code' },
-              { label: 'Innovation/Maker Space', icon: 'oi-lightbulb' },
+              { label: 'Digital lab program', icon: 'terminal' },
+              { label: 'Innovation/Maker Space', icon: 'atom' },
             ],
           },
-          {
-            title: 'Storytimes',
-            type: 'simple-input',
-          },
-          {
-            title: 'Computer classes',
-            type: 'datagrid',
-          },
-          {
-            title: 'Book clubs',
-            type: 'datagrid',
-          },
-          {
-            title: 'Tours',
-            type: 'datagrid',
-          },
-          {
-            title: 'Demonstrations',
-            type: 'datagrid',
-          },
-          {
-            title: 'Tutoring',
-            type: 'datagrid',
-          },
-          {
-            title: 'Special education',
-            type: 'datagrid',
-          },
+          // {
+          //   title: 'Storytimes',
+          //   type: 'simple-input',
+          // },
+          // {
+          //   title: 'Computer classes',
+          //   type: 'datagrid',
+          // },
+          // {
+          //   title: 'Book clubs',
+          //   type: 'datagrid',
+          // },
+          // {
+          //   title: 'Tours',
+          //   type: 'datagrid',
+          // },
+          // {
+          //   title: 'Demonstrations',
+          //   type: 'datagrid',
+          // },
+          // {
+          //   title: 'Tutoring',
+          //   type: 'datagrid',
+          // },
+          // {
+          //   title: 'Special education',
+          //   type: 'datagrid',
+          // },
         ],
       },
       {
@@ -242,6 +242,10 @@ export class TemplateService {
     });
   }
 
+  getConstant(constantName: string) {
+    return this.foolishObj.contants[constantName];
+  }
+
   getDatagrids(pageNumber: number): Observable<DatagridSection[]> {
     pageNumber--;
     return new Observable<DatagridSection[]>((observer) => {
@@ -252,8 +256,10 @@ export class TemplateService {
           let datagrid: DatagridSection = new DatagridSection();
           datagrid.title = section.title || null;
           datagrid.subtitle = section.subtitle || null;
-          datagrid.templateObj = section;
-          console.log(section['columns']);
+          datagrid.templateObj = {
+            section: section,
+            constants: this.foolishObj.contants,
+          };
           datagrids.push(datagrid);
         }
       });
