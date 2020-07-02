@@ -7,6 +7,7 @@ import {
   ChangeDetectionStrategy,
   ViewRef,
 } from '@angular/core';
+import { FormArray } from '@angular/forms';
 
 @Component({
   selector: 'abstract-section',
@@ -20,6 +21,7 @@ export class AbstractSection implements OnInit {
   @Input() public data: any = null;
   @Input() public templateObj: Object = {};
   @Input() public constants: Object = {};
+  @Input() public order: number;
 
   constructor() {}
 
@@ -32,5 +34,20 @@ export class AbstractSection implements OnInit {
 
   getTitle(): string {
     return this.title;
+  }
+
+  isType(obj: Object, type: string) {
+    if (obj['type'] == type) {
+      return true;
+    } else false;
+  }
+
+  getCheckboxControl(
+    arrayIndex: number,
+    subarrayIndex: number,
+    array: FormArray
+  ) {
+    let checkboxArray = array.controls[arrayIndex] as FormArray;
+    return checkboxArray.controls[subarrayIndex];
   }
 }

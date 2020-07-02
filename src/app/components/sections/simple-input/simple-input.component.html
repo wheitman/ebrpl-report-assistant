@@ -1,0 +1,47 @@
+<h1>{{ title }}</h1>
+<h5 class="subtitle" *ngIf="subtitle">{{ subtitle }}</h5>
+<form
+  clrForm
+  [formGroup]="formGroup"
+  *ngFor="let input of inputs; index as i"
+  clrLayout="compact"
+>
+  <clr-date-container *ngIf="isType(input, 'date-select')">
+    <label for="">{{ input["label"] }}</label>
+    <input type="date" clrDate [formControl]="formArray.controls[i]" />
+  </clr-date-container>
+  <clr-select-container *ngIf="isType(input, 'division-select')">
+    <label for="">{{ input["label"] }}</label>
+    <select clrSelect [formControl]="formArray.controls[i]">
+      <option
+        [value]="division.label"
+        *ngFor="let division of constants['divisions']"
+      >
+        {{ division.label }}</option
+      >
+    </select>
+  </clr-select-container>
+  <clr-input-container *ngIf="isType(input, 'text')">
+    <label for="">{{ input["label"] }}</label>
+    <input clrInput type="text" [formControl]="formArray.controls[i]" />
+  </clr-input-container>
+  <clr-input-container *ngIf="isType(input, 'number')">
+    <label for="">{{ input["label"] }}</label>
+    <input clrInput type="number" [formControl]="formArray.controls[i]" />
+  </clr-input-container>
+  <clr-checkbox-container *ngIf="isType(input, 'tag-select')">
+    <label for="">{{ input["label"] }}</label>
+    <clr-checkbox-wrapper
+      *ngFor="let tag of templateObj['section']['tags']; index as j"
+    >
+      <input
+        type="checkbox"
+        clrCheckbox
+        [formControl]="getCheckboxControl(i, j, formArray)"
+      />
+      <label
+        ><clr-icon [attr.shape]="tag.icon"></clr-icon>{{ tag.label }}</label
+      >
+    </clr-checkbox-wrapper>
+  </clr-checkbox-container>
+</form>

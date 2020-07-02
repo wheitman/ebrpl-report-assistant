@@ -1,5 +1,5 @@
 <h1>{{ title }}</h1>
-<h5 class="subtitle">{{ subtitle }}</h5>
+<h5 class="subtitle" *ngIf="subtitle">{{ subtitle }}</h5>
 <clr-datagrid>
   <clr-dg-placeholder
     >Nothing to see here. To add more content, use the controls
@@ -78,7 +78,7 @@
           <input
             type="checkbox"
             clrCheckbox
-            [formControl]="getCheckboxControl(i, j)"
+            [formControl]="getCheckboxControl(i, j, formArray)"
           />
           <label
             ><clr-icon [attr.shape]="tag.icon"></clr-icon>{{ tag.label }}</label
@@ -157,7 +157,7 @@
           <input
             type="checkbox"
             clrCheckbox
-            [formControl]="getCheckboxControl(i, j)"
+            [formControl]="getCheckboxControl(i, j, formArray)"
           />
           <label
             ><clr-icon [attr.shape]="tag.icon"></clr-icon>{{ tag.label }}</label

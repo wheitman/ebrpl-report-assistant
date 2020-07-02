@@ -1,3 +1,4 @@
+import { SimpleInputSection } from './../components/sections/simple-input/simple-input.component';
 import { DatagridSection } from './../components/sections/datagrid-section/datagrid-section.component';
 import { Page } from '../interfaces/page';
 import { SectionInterface } from '../interfaces/sections';
@@ -97,34 +98,89 @@ export class TemplateService {
               { label: 'Innovation/Maker Space', icon: 'atom' },
             ],
           },
-          // {
-          //   title: 'Storytimes',
-          //   type: 'simple-input',
-          // },
-          // {
-          //   title: 'Computer classes',
-          //   type: 'datagrid',
-          // },
-          // {
-          //   title: 'Book clubs',
-          //   type: 'datagrid',
-          // },
-          // {
-          //   title: 'Tours',
-          //   type: 'datagrid',
-          // },
-          // {
-          //   title: 'Demonstrations',
-          //   type: 'datagrid',
-          // },
-          // {
-          //   title: 'Tutoring',
-          //   type: 'datagrid',
-          // },
-          // {
-          //   title: 'Special education',
-          //   type: 'datagrid',
-          // },
+          {
+            title: 'Storytimes',
+            type: 'simple-input',
+            inputs: [
+              { label: 'Number of programs', type: 'number' },
+              { label: 'Attendance', type: 'number' },
+            ],
+          },
+          {
+            title: 'Computer classes',
+            subtitle:
+              'Includes teaching or using computer applications, digital literacy, etc.',
+            type: 'datagrid',
+            columns: [
+              { label: 'Division', type: 'division-select' },
+              { label: 'Date', type: 'date-select' },
+              { label: 'Title', type: 'text' },
+              { label: 'Attendance', type: 'number' },
+              { label: 'Hours', type: 'number' },
+              { label: 'Tags', type: 'tag-select' },
+            ],
+            tags: [
+              {
+                label: 'Portable device (including iPads and laptops)',
+                icon: 'devices',
+              },
+              { label: 'Digital lab program', icon: 'terminal' },
+              { label: 'Innovation/Maker Space', icon: 'atom' },
+            ],
+          },
+          {
+            title: 'Book clubs',
+            subtitle: 'Held in the library, sponsored by the library',
+            type: 'datagrid',
+            columns: [
+              { label: 'Division', type: 'division-select' },
+              { label: 'Date', type: 'date-select' },
+              { label: 'Club/title or topic', type: 'text' },
+              { label: 'Attendance', type: 'number' },
+            ],
+          },
+          {
+            title: 'Tours',
+            type: 'datagrid',
+            columns: [
+              { label: 'Division', type: 'division-select' },
+              { label: 'Date', type: 'date-select' },
+              { label: 'Group and topic (if any)', type: 'text' },
+              { label: 'Attendance', type: 'number' },
+            ],
+          },
+          {
+            title: 'Demonstrations',
+            type: 'datagrid',
+            columns: [
+              { label: 'Division', type: 'division-select' },
+              { label: 'Date', type: 'date-select' },
+              { label: 'Title', type: 'text' },
+              { label: 'Attendance', type: 'number' },
+            ],
+          },
+          {
+            title: 'Tutoring',
+            subtitle:
+              'Takes place in the library, but not organized or taught by the library',
+            type: 'datagrid',
+            columns: [
+              { label: 'Division', type: 'division-select' },
+              { label: 'Number of sessions', type: 'number' },
+              { label: 'Attendance', type: 'number' },
+            ],
+          },
+          {
+            title: 'Special education',
+            subtitle:
+              "Occupational instruction classes 'working' for you or group home visiting the library. Not a formal tour.",
+            type: 'datagrid',
+            columns: [
+              { label: 'Division', type: 'division-select' },
+              { label: 'Number of sessesions', type: 'number' },
+              { label: 'Attendance', type: 'number' },
+            ],
+          },
         ],
       },
       {
@@ -251,11 +307,12 @@ export class TemplateService {
     return new Observable<DatagridSection[]>((observer) => {
       let sections = this.foolishObj.pages[pageNumber].sections;
       let datagrids: DatagridSection[] = [];
-      sections.forEach((section) => {
+      sections.forEach((section, index) => {
         if (section.type == 'datagrid') {
           let datagrid: DatagridSection = new DatagridSection();
           datagrid.title = section.title || null;
           datagrid.subtitle = section.subtitle || null;
+          datagrid.order = index;
           datagrid.templateObj = {
             section: section,
             constants: this.foolishObj.contants,
@@ -264,6 +321,28 @@ export class TemplateService {
         }
       });
       observer.next(datagrids);
+    });
+  }
+
+  getSimpleInputs(pageNumber: number): Observable<SimpleInputSection[]> {
+    pageNumber--;
+    return new Observable<SimpleInputSection[]>((observer) => {
+      let sections = this.foolishObj.pages[pageNumber].sections;
+      let simpleInputs: SimpleInputSection[] = [];
+      sections.forEach((section, index) => {
+        if (section.type == 'simple-input') {
+          let simpleInput: SimpleInputSection = new SimpleInputSection();
+          simpleInput.title = section.title || null;
+          simpleInput.subtitle = section.subtitle || null;
+          simpleInput.order = index;
+          simpleInput.templateObj = {
+            section: section,
+            constants: this.foolishObj.contants,
+          };
+          simpleInputs.push(simpleInput);
+        }
+      });
+      observer.next(simpleInputs);
     });
   }
 

@@ -14,6 +14,7 @@ import { AbstractSection } from './components/sections/abstract-section/abstract
 import { DatagridSection } from './components/sections/datagrid-section/datagrid-section.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { DivisionSelectComponent } from './components/controls/division-select/division-select.component';
+import { SimpleInputSection } from './components/sections/simple-input/simple-input.component';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import { DivisionSelectComponent } from './components/controls/division-select/d
     AbstractSection,
     DatagridSection,
     DivisionSelectComponent,
+    SimpleInputSection,
   ],
   imports: [
     BrowserModule,

@@ -135,12 +135,6 @@ export class DatagridSection extends AbstractSection implements OnInit {
     this.formArray.push(new FormControl(''));
   }
 
-  isType(col: Object, type: string) {
-    if (col['type'] == type) {
-      return true;
-    } else false;
-  }
-
   addRowFromFormArray() {
     let row = [];
     this._interface.columns.forEach((col, index) => {
@@ -215,11 +209,6 @@ export class DatagridSection extends AbstractSection implements OnInit {
   addModalCancel() {
     this.addModalOpened = false;
     this.formArray.reset();
-  }
-
-  getCheckboxControl(arrayIndex: number, subarrayIndex: number) {
-    let checkboxArray = this.formArray.controls[arrayIndex] as FormArray;
-    return checkboxArray.controls[subarrayIndex];
   }
 
   isTagObj(obj) {

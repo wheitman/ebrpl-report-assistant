@@ -87,31 +87,83 @@
         },
         {
           "title": "Storytimes",
-          "type": "simple-input"
+          "type": "simple-input",
+          "inputs": [
+            { "label": "Number of programs", "type": "number" },
+            { "label": "Attendance", "type": "number" }
+          ]
         },
         {
           "title": "Computer classes",
-          "type": "datagrid"
+          "subtitle": "Includes teaching or using computer applications, digital literacy, etc.",
+          "type": "datagrid",
+          "columns": [
+            { "label": "Division", "type": "division-select" },
+            { "label": "Date", "type": "date-select" },
+            { "label": "Title", "type": "text" },
+            { "label": "Attendance", "type": "number" },
+            { "label": "Hours", "type": "number" },
+            { "label": "Tags", "type": "tag-select" }
+          ],
+          "tags": [
+            {
+              "label": "Portable device (including iPads and laptops)",
+              "icon": "devices"
+            },
+            { "label": "Digital lab program", "icon": "terminal" },
+            { "label": "Innovation/Maker Space", "icon": "atom" }
+          ]
         },
         {
           "title": "Book clubs",
-          "type": "datagrid"
+          "subtitle": "Held in the library, sponsored by the library",
+          "type": "datagrid",
+          "columns": [
+            { "label": "Division", "type": "division-select" },
+            { "label": "Date", "type": "date-select" },
+            { "label": "Club/title or topic", "type": "text" },
+            { "label": "Attendance", "type": "number" }
+          ]
         },
         {
           "title": "Tours",
-          "type": "datagrid"
+          "type": "datagrid",
+          "columns": [
+            { "label": "Division", "type": "division-select" },
+            { "label": "Date", "type": "date-select" },
+            { "label": "Group and topic (if any)", "type": "text" },
+            { "label": "Attendance", "type": "number" }
+          ]
         },
         {
           "title": "Demonstrations",
-          "type": "datagrid"
+          "type": "datagrid",
+          "columns": [
+            { "label": "Division", "type": "division-select" },
+            { "label": "Date", "type": "date-select" },
+            { "label": "Title", "type": "text" },
+            { "label": "Attendance", "type": "number" }
+          ]
         },
         {
           "title": "Tutoring",
-          "type": "datagrid"
+          "subtitle": "Takes place in the library, but not organized or taught by the library",
+          "type": "datagrid",
+          "columns": [
+            { "label": "Division", "type": "division-select" },
+            { "label": "Number of sessions", "type": "number" },
+            { "label": "Attendance", "type": "number" }
+          ]
         },
         {
           "title": "Special education",
-          "type": "datagrid"
+          "subtitle": "Occupational instruction classes 'working' for you or group home visiting the library. Not a formal tour.",
+          "type": "datagrid",
+          "columns": [
+            { "label": "Division", "type": "division-select" },
+            { "label": "Number of sessesions", "type": "number" },
+            { "label": "Attendance", "type": "number" }
+          ]
         }
       ]
     },

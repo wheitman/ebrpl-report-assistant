@@ -10,6 +10,7 @@ import {
   ɵangular_packages_core_core_bj,
 } from '@angular/core';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
+import { SimpleInputSection } from '../sections/simple-input/simple-input.component';
 
 @Component({
   selector: 'app-report',
@@ -23,6 +24,7 @@ export class ReportComponent implements OnInit {
   pageCount: number = 0;
   page: Page;
   datagrids$: Observable<DatagridSection[]>;
+  simpleInputs$: Observable<SimpleInputSection[]>;
 
   constructor(
     private _TemplateService: TemplateService,
@@ -38,6 +40,9 @@ export class ReportComponent implements OnInit {
       this.page$ = this._TemplateService.getTemplatePage(this.pageNumber);
 
       this.datagrids$ = this._TemplateService.getDatagrids(this.pageNumber);
+      this.simpleInputs$ = this._TemplateService.getSimpleInputs(
+        this.pageNumber
+      );
     });
   }
 }
