@@ -97,6 +97,62 @@ export class TemplateService {
               { label: 'Digital lab program', icon: 'terminal' },
               { label: 'Innovation/Maker Space', icon: 'atom' },
             ],
+            data: [
+              [
+                '20-Somethings',
+                '07/07/2020',
+                'Dating in Olden Times',
+                22,
+                [{ label: 'Digital lab program', icon: 'terminal' }],
+              ],
+              [
+                'Adults',
+                '07/22/2020',
+                'Wine Tasting Workshop',
+                12,
+                [
+                  {
+                    label: 'Subject related to Digital Literacy/Database Use',
+                    icon: 'network-globe',
+                  },
+                ],
+              ],
+              [
+                'Adults',
+                '07/31/2020',
+                'Peppa Pig Playtime',
+                33,
+                [
+                  {
+                    label: 'Portable device (including iPads and laptops)',
+                    icon: 'devices',
+                  },
+                ],
+              ],
+            ],
+            rawRowValues: [
+              [
+                '20-Somethings',
+                '07/07/2020',
+                'Dating in Olden Times',
+                22,
+                [null, null, null, null, true, null],
+              ],
+              [
+                'Adults',
+                '07/22/2020',
+                'Wine Tasting Workshop',
+                12,
+                [null, true, null, null, null, null],
+              ],
+              [
+                'Adults',
+                '07/31/2020',
+                'Peppa Pig Playtime',
+                33,
+                [null, null, null, true, null, null],
+              ],
+            ],
           },
           {
             title: 'Storytimes',
@@ -296,6 +352,23 @@ export class TemplateService {
       };
       observer.next(page);
     });
+  }
+
+  getPageTitles(): string[] {
+    let pageTitles: string[] = [];
+    this.foolishObj.pages.forEach((page) => {
+      pageTitles.push(page.title);
+    });
+    return pageTitles;
+  }
+
+  getPageSubtitles(): string[] {
+    let pageSubtitles: string[] = [];
+    this.foolishObj.pages.forEach((page) => {
+      if (page['subtitle']) pageSubtitles.push(page['subtitle']);
+      else pageSubtitles.push(undefined);
+    });
+    return pageSubtitles;
   }
 
   getConstant(constantName: string) {

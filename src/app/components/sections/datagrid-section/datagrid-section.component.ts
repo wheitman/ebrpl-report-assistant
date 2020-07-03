@@ -49,62 +49,19 @@ export class DatagridSection extends AbstractSection implements OnInit {
   ngOnInit(): void {
     this._interface = this.objToDgInterface(this.templateObj['section']);
     this.constants = this.templateObj['constants'] || undefined;
-    this.data = [
-      [
-        '20-Somethings',
-        '07/07/2020',
-        'Dating in Modern Times',
-        22,
-        [{ label: 'Digital lab program', icon: 'terminal' }],
-      ],
-      [
-        'Adults',
-        '07/22/2020',
-        'Wine Tasting Workshop',
-        12,
-        [
-          {
-            label: 'Subject related to Digital Literacy/Database Use',
-            icon: 'network-globe',
-          },
-        ],
-      ],
-      [
-        'Adults',
-        '07/31/2020',
-        'Peppa Pig Playtime',
-        33,
-        [
-          {
-            label: 'Portable device (including iPads and laptops)',
-            icon: 'devices',
-          },
-        ],
-      ],
-    ];
-    this.rawRowValues = [
-      [
-        '20-Somethings',
-        '07/07/2020',
-        'Dating in Modern Times',
-        22,
-        [null, null, null, null, true, null],
-      ],
-      [
-        'Adults',
-        '07/22/2020',
-        'Wine Tasting Workshop',
-        12,
-        [null, true, null, null, null, null],
-      ],
-      [
-        'Adults',
-        '07/31/2020',
-        'Peppa Pig Playtime',
-        33,
-        [null, null, null, true, null, null],
-      ],
-    ]; // array of rows
+    console.log(this.templateObj);
+    if (
+      this.templateObj['section']['data'] &&
+      this.templateObj['section']['rawRowValues']
+    ) {
+      this.data = this.templateObj['section']['data'];
+      console.log('Using predef');
+      console.log(this.data);
+      this.rawRowValues = this.templateObj['section']['rawRowValues'];
+    } else {
+      this.data = [];
+      this.rawRowValues = [];
+    }
     this.buildFormFromInterface();
     this.formGroup = new FormGroup({
       array: this.formArray,

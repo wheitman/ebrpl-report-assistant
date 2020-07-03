@@ -11,6 +11,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { SimpleInputSection } from '../sections/simple-input/simple-input.component';
+import { ClrTimelineStepState } from '@clr/angular';
 
 @Component({
   selector: 'app-report',
@@ -22,7 +23,8 @@ export class ReportComponent implements OnInit {
   pageNumber: number;
   page$: Observable<Page>;
   pageCount: number = 0;
-  page: Page;
+  pageTitles: String[] = [];
+  pageSubtitles: String[] = [];
   datagrids$: Observable<DatagridSection[]>;
   simpleInputs$: Observable<SimpleInputSection[]>;
 
@@ -38,11 +40,20 @@ export class ReportComponent implements OnInit {
       this.pageNumber = +params.get('page-number');
       this.pageCount = this._TemplateService.pageCount;
       this.page$ = this._TemplateService.getTemplatePage(this.pageNumber);
-
+      this.pageTitles = this._TemplateService.getPageTitles();
+      this.pageSubtitles = this._TemplateService.getPageSubtitles();
       this.datagrids$ = this._TemplateService.getDatagrids(this.pageNumber);
       this.simpleInputs$ = this._TemplateService.getSimpleInputs(
         this.pageNumber
       );
     });
+  }
+
+  getPageButtonClass(pageNumber: number) {
+    if (pageNumber == this.pageNumber) return 'btn btn-primary';
+    else return 'btn';
+  }
+  pageCompleted(pageNumber: number) {
+    return true;
   }
 }
