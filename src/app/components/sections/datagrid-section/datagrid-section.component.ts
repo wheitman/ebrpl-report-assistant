@@ -49,14 +49,11 @@ export class DatagridSection extends AbstractSection implements OnInit {
   ngOnInit(): void {
     this._interface = this.objToDgInterface(this.templateObj['section']);
     this.constants = this.templateObj['constants'] || undefined;
-    console.log(this.templateObj);
     if (
       this.templateObj['section']['data'] &&
       this.templateObj['section']['rawRowValues']
     ) {
       this.data = this.templateObj['section']['data'];
-      console.log('Using predef');
-      console.log(this.data);
       this.rawRowValues = this.templateObj['section']['rawRowValues'];
     } else {
       this.data = [];
@@ -107,22 +104,17 @@ export class DatagridSection extends AbstractSection implements OnInit {
       }
     });
     this.rawRowValues.push(this.formArray.getRawValue());
-    console.log(this.formArray.getRawValue());
     this.data.push(row);
   }
 
   deleteRow(index: number) {
-    console.log('Deleting row ' + index);
     (this.data as Array<any>).splice(index, 1);
-    console.log(this.data);
   }
 
   finishAddModal() {
     this.addModalOpened = false;
     this.addRowFromFormArray();
     this.formArray.reset();
-    console.log(this.data);
-    console.log(this.rawRowValues);
   }
 
   openEditModal(rowIndex: number) {

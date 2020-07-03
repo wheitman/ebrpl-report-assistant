@@ -21,4 +21,7 @@ export class ResponseService {
     pageNumber--;
     return this.foolishPageStatuses[pageNumber];
   }
+  getAllPageStatuses() {
+    return this.foolishPageStatuses;
+  }
 }

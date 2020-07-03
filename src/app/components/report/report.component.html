@@ -13,48 +13,70 @@
     [subtitle]="section.subtitle"
     [templateObj]="section.templateObj"
   ></simple-input>
-  <div
-    class="clr-row clr-justify-content-center stickybar clr-align-items-center"
-  >
-    <button
-      type="button"
-      class="btn btn-icon btn-link"
-      aria-label="previous page"
-      [disabled]="pageNumber == 1"
-      [routerLink]="['/report', templateId, pageNumber - 1]"
-    >
-      <clr-icon shape="angle" dir="left"></clr-icon>
-    </button>
-    <clr-button-group>
-      <clr-button
-        [class]="getPageButtonClass(i + 1)"
-        *ngFor="let pageTitle of pageTitles; index as i"
-        [routerLink]="['/report', templateId, i + 1]"
-        >{{ i + 1 }}
-        <clr-icon
-          shape="check"
-          *ngIf="pageCompleted(i + 1)"
-          title="Marked complete"
-        ></clr-icon
-      ></clr-button>
-    </clr-button-group>
-    <button
-      type="button"
-      class="btn btn-icon btn-link"
-      aria-label="next page"
-      *ngIf="pageNumber < pageCount"
-      [routerLink]="['/report', templateId, pageNumber + 1]"
-    >
-      <clr-icon shape="angle" dir="right"></clr-icon>
-    </button>
-    <button
-      type="button"
-      class="btn btn-icon btn-success"
-      aria-label="next page"
-      *ngIf="pageNumber == pageCount"
-      [routerLink]="['/report', templateId, pageNumber + 1]"
-    >
-      Finish report<clr-icon shape="angle" dir="right"></clr-icon>
-    </button>
+  <div class="stickybar clr-row">
+    <div class="clr-col-10">
+      <div class="clr-row clr-justify-content-center clr-align-items-center">
+        <button
+          type="button"
+          class="btn btn-icon btn-link"
+          aria-label="previous page"
+          [disabled]="pageNumber == 1"
+          [routerLink]="['/report', templateId, pageNumber - 1]"
+        >
+          <clr-icon shape="angle" dir="left"></clr-icon>
+        </button>
+        <clr-button-group>
+          <clr-button
+            [class]="getPageButtonClass(i + 1)"
+            *ngFor="let pageTitle of pageTitles; index as i"
+            [routerLink]="['/report', templateId, i + 1]"
+            >{{ i + 1 }}
+            <clr-icon
+              shape="check"
+              *ngIf="pageCompletions[i]"
+              title="Marked complete"
+            ></clr-icon
+          ></clr-button>
+        </clr-button-group>
+        <button
+          type="button"
+          class="btn btn-icon btn-link"
+          aria-label="next page"
+          *ngIf="pageNumber < pageCount"
+          [routerLink]="['/report', templateId, pageNumber + 1]"
+        >
+          <clr-icon shape="angle" dir="right"></clr-icon>
+        </button>
+        <button
+          type="button"
+          class="btn btn-success"
+          aria-label="next page"
+          *ngIf="reportFullyComplete"
+          [routerLink]="['/report', templateId, pageNumber + 1]"
+        >
+          Finish report<clr-icon shape="step-forward-2"></clr-icon>
+        </button>
+      </div>
+    </div>
+    <div class="clr-col">
+      <clr-toggle-container #markCompleteToggle>
+        <label class="p6" style="margin-top: 0.3rem;">Mark this page:</label>
+        <clr-toggle-wrapper>
+          <input
+            type="checkbox"
+            clrToggle
+            value="option1"
+            name="options"
+            [formControl]="markCompleteControl"
+          />
+          <label *ngIf="currentPageComplete; else incompleteLabel"
+            >Complete</label
+          >
+          <ng-template #incompleteLabel>
+            <label>Incomplete</label>
+          </ng-template>
+        </clr-toggle-wrapper>
+      </clr-toggle-container>
+    </div>
   </div>
 </div>

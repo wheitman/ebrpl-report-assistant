@@ -37,7 +37,6 @@ export class SimpleInputSection extends AbstractSection implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(this.templateObj);
     this.inputs = this.templateObj['section']['inputs'];
     this.buildForm();
     this.formGroup = new FormGroup({

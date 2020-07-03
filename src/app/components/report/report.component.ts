@@ -1,6 +1,8 @@
+import { FormControl } from '@angular/forms';
+import { ResponseService } from './../../services/response.service';
 import { DatagridSection } from './../sections/datagrid-section/datagrid-section.component';
 import { AbstractSection } from './../sections/abstract-section/abstract-section.component';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { TemplateService } from '../../services/template.service';
 import { Page } from './../../interfaces/page';
 
@@ -12,6 +14,7 @@ import {
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { SimpleInputSection } from '../sections/simple-input/simple-input.component';
 import { ClrTimelineStepState } from '@clr/angular';
+import { ThrowStmt } from '@angular/compiler';
 
 @Component({
   selector: 'app-report',
@@ -28,8 +31,13 @@ export class ReportComponent implements OnInit {
   datagrids$: Observable<DatagridSection[]>;
   simpleInputs$: Observable<SimpleInputSection[]>;
 
+  markCompleteControl = new FormControl();
+  pageStatuses: string[];
+  pageCompletions: boolean[] = [];
+
   constructor(
     private _TemplateService: TemplateService,
+    private _ResponseService: ResponseService,
     private activeRoute: ActivatedRoute,
     private _Router: Router
   ) {}
@@ -46,7 +54,37 @@ export class ReportComponent implements OnInit {
       this.simpleInputs$ = this._TemplateService.getSimpleInputs(
         this.pageNumber
       );
+
+      //get all saved page statuses
+      this.pageStatuses = this._ResponseService.getAllPageStatuses();
+
+      //set the toggle to the current page status
+      if (this.pageStatuses[this.pageNumber - 1] === 'complete') {
+        this.markCompleteControl.setValue(true);
+      } else this.markCompleteControl.setValue(false);
+
+      //update the page status as the toggle changes
+      this.markCompleteControl.valueChanges.subscribe((value) => {
+        console.log(value);
+        if (value === true) {
+          this.pageStatuses[this.pageNumber - 1] = 'complete';
+          this._ResponseService.setPageStatus(this.pageNumber, 'complete');
+          this.updatePageCompletions();
+        } else {
+          this.pageStatuses[this.pageNumber - 1] = 'incomplete';
+          this._ResponseService.setPageStatus(this.pageNumber, 'incomplete');
+          this.updatePageCompletions();
+        }
+      });
+
+      this.updatePageCompletions();
     });
+  }
+
+  get currentPageComplete(): boolean {
+    if (this._ResponseService.getPageStatus(this.pageNumber) === 'complete') {
+      return true;
+    } else return false;
   }
 
   getPageButtonClass(pageNumber: number) {
@@ -54,6 +92,27 @@ export class ReportComponent implements OnInit {
     else return 'btn';
   }
   pageCompleted(pageNumber: number) {
-    return true;
+    if (this._ResponseService.getPageStatus(pageNumber) === 'complete')
+      return true;
+    else return false;
+  }
+  updatePageCompletions() {
+    this.pageCompletions = [];
+    this.pageStatuses.forEach((status, index) => {
+      if (status === 'complete') {
+        this.pageCompletions.push(true);
+      } else {
+        this.pageCompletions.push(false);
+      }
+    });
+  }
+
+  get reportFullyComplete() {
+    let fullyComplete = true;
+    this.pageCompletions.forEach((elem) => {
+      //if one page is incomplete, the whole report is too!
+      if (elem === false) fullyComplete = false;
+    });
+    return fullyComplete;
   }
 }

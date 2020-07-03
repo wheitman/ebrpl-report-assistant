@@ -7,3 +7,8 @@
   background-color: whitesmoke;
   border-top: 1px solid rgb(168, 159, 159);
 }
+
+clr-toggle-container {
+  margin: 0;
+  user-select: none;
+}
