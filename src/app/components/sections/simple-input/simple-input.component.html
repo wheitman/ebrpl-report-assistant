@@ -4,7 +4,7 @@
   clrForm
   [formGroup]="formGroup"
   *ngFor="let input of inputs; index as i"
-  clrLayout="compact"
+  clrLayout="vertical"
 >
   <clr-date-container *ngIf="isType(input, 'date-select')">
     <label for="">{{ input["label"] }}</label>
@@ -21,6 +21,8 @@
       >
     </select>
   </clr-select-container>
+  <month-select *ngIf="isType(input, 'month-select')" [label]="input['label']">
+  </month-select>
   <clr-input-container *ngIf="isType(input, 'text')">
     <label for="">{{ input["label"] }}</label>
     <input clrInput type="text" [formControl]="formArray.controls[i]" />
@@ -44,4 +46,8 @@
       >
     </clr-checkbox-wrapper>
   </clr-checkbox-container>
+  <clr-textarea-container *ngIf="isType(input, 'textarea')">
+    <label>{{ input["label"] }}</label>
+    <textarea clrTextarea name="description" required></textarea>
+  </clr-textarea-container>
 </form>

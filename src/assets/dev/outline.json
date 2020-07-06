@@ -51,7 +51,17 @@
       }
     ]
   },
-
+  "meta": {
+    "title": "Basic information",
+    "type": "simple-input",
+    "inputs": [
+      { "label": "This report is for the month of:", "type": "month-select" },
+      {
+        "label": "Additional info (optional):",
+        "type": "textarea"
+      }
+    ]
+  },
   "pages": [
     {
       "title": "Programs in the library",

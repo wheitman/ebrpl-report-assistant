@@ -30,6 +30,7 @@ export class ReportComponent implements OnInit {
   pageSubtitles: String[] = [];
   datagrids$: Observable<DatagridSection[]>;
   simpleInputs$: Observable<SimpleInputSection[]>;
+  startPage$: Observable<SimpleInputSection>;
 
   markCompleteControl = new FormControl();
   pageStatuses: string[];
@@ -54,6 +55,8 @@ export class ReportComponent implements OnInit {
       this.simpleInputs$ = this._TemplateService.getSimpleInputs(
         this.pageNumber
       );
+
+      this.startPage$ = this._TemplateService.getStart();
 
       //get all saved page statuses
       this.pageStatuses = this._ResponseService.getAllPageStatuses();
@@ -114,5 +117,9 @@ export class ReportComponent implements OnInit {
       if (elem === false) fullyComplete = false;
     });
     return fullyComplete;
+  }
+
+  get isStartPage() {
+    return this.pageNumber === 0;
   }
 }

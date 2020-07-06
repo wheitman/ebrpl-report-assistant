@@ -2,3 +2,9 @@ img {
   max-height: 2rem;
   padding-right: 0.5rem;
 }
+.reportTitle {
+  width: 30vw;
+  height: 60px;
+  position: absolute;
+  left: 35vw;
+}

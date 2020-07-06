@@ -1,0 +1,20 @@
+<form [formGroup]="formGroup">
+  <label for="" class="p4">{{ label }}</label>
+  <div class="clr-row clr-align-items-start" style="margin: 0;">
+    <select clrSelect class="clr-col" formControlName="monthInput">
+      <option [value]="month" *ngFor="let month of _months">
+        {{ month }}</option
+      >
+    </select>
+    <clr-input-container class="clr-col">
+      <input
+        clrInput
+        style="margin-left: 0.5rem;"
+        type="number"
+        placeholder="Year"
+        formControlName="yearInput"
+      />
+      <clr-control-error>Does this year make sense?</clr-control-error>
+    </clr-input-container>
+  </div>
+</form>

@@ -1,31 +1,60 @@
-<div class="clr-col" style="width: 90vw;" *ngIf="page$ | async">
-  <h1>({{ pageNumber }}/{{ pageCount }}) {{ (page$ | async)?.title }}</h1>
-  <hr />
-  <datagrid-section
-    *ngFor="let section of datagrids$ | async"
-    [title]="section.title"
-    [subtitle]="section.subtitle"
-    [templateObj]="section.templateObj"
-  ></datagrid-section>
-  <simple-input
-    *ngFor="let section of simpleInputs$ | async"
-    [title]="section.title"
-    [subtitle]="section.subtitle"
-    [templateObj]="section.templateObj"
-  ></simple-input>
+<div class="topDiv clr-col">
+  <div *ngIf="isStartPage" class="clr-row clr-justify-content-center">
+    <div class="clr-col-md-4">
+      <h1>Let's begin.</h1>
+      <hr />
+      <simple-input
+        *ngIf="startPage$ | async"
+        [title]="(startPage$ | async).title"
+        [subtitle]="(startPage$ | async).subtitle"
+        [templateObj]="(startPage$ | async).templateObj"
+      >
+      </simple-input>
+      <div class="clr-row"></div>
+    </div>
+    <div class="clr-break-row"></div>
+    <div class="clr-col-md-4 clr-align-self-end" style="color: red;">
+      Footer!
+    </div>
+  </div>
+  <div class="clr-row">
+    <div class="clr-col" style="width: 100%;" *ngIf="pageNumber > 0">
+      <h1>({{ pageNumber }}/{{ pageCount }}) {{ (page$ | async)?.title }}</h1>
+      <hr />
+      <datagrid-section
+        *ngFor="let section of datagrids$ | async"
+        [title]="section.title"
+        [subtitle]="section.subtitle"
+        [templateObj]="section.templateObj"
+      ></datagrid-section>
+      <simple-input
+        *ngFor="let section of simpleInputs$ | async"
+        [title]="section.title"
+        [subtitle]="section.subtitle"
+        [templateObj]="section.templateObj"
+      ></simple-input>
+      <div style="height: 48px;"></div>
+    </div>
+  </div>
   <div class="stickybar clr-row">
-    <div class="clr-col-10">
+    <div class="clr-col-8 clr-col-md-10">
       <div class="clr-row clr-justify-content-center clr-align-items-center">
         <button
           type="button"
           class="btn btn-icon btn-link"
           aria-label="previous page"
-          [disabled]="pageNumber == 1"
+          [disabled]="pageNumber < 1"
           [routerLink]="['/report', templateId, pageNumber - 1]"
         >
           <clr-icon shape="angle" dir="left"></clr-icon>
         </button>
         <clr-button-group>
+          <clr-button
+            [routerLink]="['/report', templateId, 0]"
+            [class]="getPageButtonClass(0)"
+          >
+            <clr-icon shape="home"></clr-icon>
+          </clr-button>
           <clr-button
             [class]="getPageButtonClass(i + 1)"
             *ngFor="let pageTitle of pageTitles; index as i"
@@ -58,7 +87,7 @@
         </button>
       </div>
     </div>
-    <div class="clr-col">
+    <div class="clr-col-4 clr-col-md-2">
       <clr-toggle-container #markCompleteToggle>
         <label class="p6" style="margin-top: 0.3rem;">Mark this page:</label>
         <clr-toggle-wrapper>

@@ -11,7 +11,7 @@
       </button>
       <clr-dropdown-menu clrPosition="bottom-left" *clrIfOpen>
         <ng-container *ngFor="let name of templateNames">
-          <button clrDropdownItem [routerLink]="['/report', name, 1]">
+          <button clrDropdownItem [routerLink]="['/report', name, 0]">
             {{ name }}
           </button>
         </ng-container>

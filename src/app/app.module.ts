@@ -15,6 +15,7 @@ import { DatagridSection } from './components/sections/datagrid-section/datagrid
 import { ReactiveFormsModule } from '@angular/forms';
 import { DivisionSelectComponent } from './components/controls/division-select/division-select.component';
 import { SimpleInputSection } from './components/sections/simple-input/simple-input.component';
+import { MonthSelectComponent } from './components/controls/month-select/month-select.component';
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import { SimpleInputSection } from './components/sections/simple-input/simple-in
     DatagridSection,
     DivisionSelectComponent,
     SimpleInputSection,
+    MonthSelectComponent,
   ],
   imports: [
     BrowserModule,

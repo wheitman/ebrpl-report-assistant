@@ -63,7 +63,17 @@ export class TemplateService {
         },
       ],
     },
-
+    meta: {
+      title: 'Basic information',
+      type: 'simple-input',
+      inputs: [
+        { label: 'This report is for the month of:', type: 'month-select' },
+        {
+          label: 'Additional info (optional):',
+          type: 'textarea',
+        },
+      ],
+    },
     pages: [
       {
         title: 'Programs in the library',
@@ -101,7 +111,7 @@ export class TemplateService {
               [
                 '20-Somethings',
                 '07/07/2020',
-                'Dating in Olden Times',
+                'Dating in Modern Times',
                 22,
                 [{ label: 'Digital lab program', icon: 'terminal' }],
               ],
@@ -341,6 +351,20 @@ export class TemplateService {
   );
 
   constructor() {}
+
+  getStart(): Observable<SimpleInputSection> {
+    let startObj = this.foolishObj.meta;
+    return new Observable<SimpleInputSection>((observer) => {
+      let simpleInput: SimpleInputSection = new SimpleInputSection();
+      simpleInput.title = startObj.title || null;
+      simpleInput.subtitle = startObj['subtitle'] || null;
+      simpleInput.templateObj = {
+        section: startObj,
+        constants: this.foolishObj.contants,
+      };
+      observer.next(simpleInput);
+    });
+  }
 
   getTemplatePage(pageNumber: number): Observable<Page> {
     return new Observable<Page>((observer) => {
