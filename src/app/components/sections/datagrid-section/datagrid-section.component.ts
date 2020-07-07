@@ -22,7 +22,6 @@ export class DatagridSection extends AbstractSection implements OnInit {
   formGroup: FormGroup;
   formLabels: string[] = [];
   _interface: DatagridInterface;
-  rawRowValues: any[];
 
   addModalOpened: boolean = false;
   editModalOpened: boolean = false;
@@ -49,15 +48,10 @@ export class DatagridSection extends AbstractSection implements OnInit {
   ngOnInit(): void {
     this._interface = this.objToDgInterface(this.templateObj['section']);
     this.constants = this.templateObj['constants'] || undefined;
-    if (
-      this.templateObj['section']['data'] &&
-      this.templateObj['section']['rawRowValues']
-    ) {
+    if (this.templateObj['section']['data']) {
       this.data = this.templateObj['section']['data'];
-      this.rawRowValues = this.templateObj['section']['rawRowValues'];
     } else {
       this.data = [];
-      this.rawRowValues = [];
     }
     this.buildFormFromInterface();
     this.formGroup = new FormGroup({
@@ -103,7 +97,6 @@ export class DatagridSection extends AbstractSection implements OnInit {
         row.push(this.formArray.at(index).value);
       }
     });
-    this.rawRowValues.push(this.formArray.getRawValue());
     this.data.push(row);
   }
 
@@ -119,9 +112,41 @@ export class DatagridSection extends AbstractSection implements OnInit {
 
   openEditModal(rowIndex: number) {
     this.selectedRow = rowIndex;
-    this.formArray.setValue(this.rawRowValues[rowIndex]);
+    let editData = this.data[rowIndex];
+
+    this.formArray.setValue(this.convertToFormValues(editData));
     this.editModalOpened = true;
   }
+
+  convertToFormValues(dataRow): any[] {
+    let formVals: any[] = [];
+    //check if any column contains tags
+    dataRow.forEach((col, index) => {
+      if (this._interface.columns[index]['type'] === 'tag-select') {
+        let templateTags: Object[] = this.templateObj['section']['tags'];
+        let rowTags: Object[] = col;
+        let tagVals: boolean[] = [];
+        let templateLabels: string[] = [];
+        templateTags.forEach((tag: Object) => {
+          templateLabels.push(tag['label']);
+        });
+        let rowLabels: string[] = [];
+        rowTags.forEach((tag: Object) => {
+          rowLabels.push(tag['label']);
+        });
+        templateLabels.forEach((templateLabel) => {
+          if (rowLabels.includes(templateLabel)) {
+            tagVals.push(true);
+          } else tagVals.push(false);
+        });
+        formVals.push(tagVals);
+      } else {
+        formVals.push(col);
+      }
+    });
+    return formVals;
+  }
+
   finishEdits() {
     this.editModalOpened = false;
     this.editRow(this.selectedRow);
@@ -161,7 +186,14 @@ export class DatagridSection extends AbstractSection implements OnInit {
   }
 
   isTagObj(obj) {
-    if (obj[0] && obj[0]['label'] && obj[0]['icon']) return true;
+    if (
+      obj !== null &&
+      obj !== undefined &&
+      obj[0] &&
+      obj[0]['label'] &&
+      obj[0]['icon']
+    )
+      return true;
     else return false;
   }
 

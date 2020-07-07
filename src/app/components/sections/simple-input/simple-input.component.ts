@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { AbstractSection } from '../abstract-section/abstract-section.component';
 import { FormArray, FormGroup, FormControl, Validators } from '@angular/forms';
+import { ResponseService } from 'src/app/services/response.service';
 
 @Component({
   selector: 'simple-input',
@@ -12,6 +13,7 @@ export class SimpleInputSection extends AbstractSection implements OnInit {
   formGroup: FormGroup;
   formLabels: string[] = [];
   inputs: Array<Object>;
+  @Output() valueChanged = new EventEmitter<Object>();
 
   constructor() {
     super();
@@ -30,6 +32,10 @@ export class SimpleInputSection extends AbstractSection implements OnInit {
           checkboxArray.push(new FormControl());
         });
         this.formArray.push(checkboxArray);
+      } else if (input['type'] === 'month-select') {
+        this.formArray.push(
+          new FormControl({ month: 'January', year: '2020' })
+        );
       } else {
         this.formArray.push(new FormControl('', [Validators.required]));
       }
@@ -37,12 +43,19 @@ export class SimpleInputSection extends AbstractSection implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(this.templateObj);
     this.inputs = this.templateObj['section']['inputs'];
     this.buildForm();
+    this.data = this.templateObj['section'];
     this.formGroup = new FormGroup({
       array: this.formArray,
     });
-    console.log('Title: ' + this.title);
+    this.formArray.valueChanges.subscribe((newData) => {
+      let dataObj = this.templateObj['section'];
+      this.inputs.forEach((input, index) => {
+        dataObj['inputs'][index]['value'] = newData[index];
+      });
+      // ResponseService.reportMetaObject = dataObj;
+      this.valueChanged.emit(dataObj);
+    });
   }
 }

@@ -1,8 +1,17 @@
 .topDiv {
   width: 100vw !important;
-  min-height: 100vh;
+  height: 100%;
   margin: 0 !important;
   padding: 0 !important;
+}
+
+.startSection {
+  height: calc(100% - 48px);
+}
+
+.sectionCol {
+  width: 100% !important;
+  padding: 0 48px !important;
 }
 
 .stickybar {

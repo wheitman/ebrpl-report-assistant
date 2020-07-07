@@ -15,6 +15,7 @@ import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { SimpleInputSection } from '../sections/simple-input/simple-input.component';
 import { ClrTimelineStepState } from '@clr/angular';
 import { ThrowStmt } from '@angular/compiler';
+import { Report } from 'src/app/interfaces/report';
 
 @Component({
   selector: 'app-report',
@@ -24,7 +25,10 @@ import { ThrowStmt } from '@angular/compiler';
 export class ReportComponent implements OnInit {
   templateId: string;
   pageNumber: number;
+  reportID: string;
+
   page$: Observable<Page>;
+  report: Report;
   pageCount: number = 0;
   pageTitles: String[] = [];
   pageSubtitles: String[] = [];
@@ -47,6 +51,25 @@ export class ReportComponent implements OnInit {
     this.activeRoute.paramMap.subscribe((params) => {
       this.templateId = params.get('template-id');
       this.pageNumber = +params.get('page-number');
+      this.reportID = params.get('report-id');
+
+      //catch incomplete path, create a fresh report
+      if (this.reportID === null) {
+        ResponseService.generateNewReport(this.templateId).subscribe(
+          (report) => {
+            this.report = report;
+            this.reportID = report.id;
+            this.pageNumber = 0; //start at 'Start' page (0)
+            this._Router.navigate([
+              'report',
+              this.templateId,
+              this.reportID,
+              this.pageNumber,
+            ]);
+          }
+        );
+      }
+
       this.pageCount = this._TemplateService.pageCount;
       this.page$ = this._TemplateService.getTemplatePage(this.pageNumber);
       this.pageTitles = this._TemplateService.getPageTitles();
@@ -59,7 +82,7 @@ export class ReportComponent implements OnInit {
       this.startPage$ = this._TemplateService.getStart();
 
       //get all saved page statuses
-      this.pageStatuses = this._ResponseService.getAllPageStatuses();
+      this.pageStatuses = ResponseService.getAllPageStatuses();
 
       //set the toggle to the current page status
       if (this.pageStatuses[this.pageNumber - 1] === 'complete') {
@@ -71,11 +94,11 @@ export class ReportComponent implements OnInit {
         console.log(value);
         if (value === true) {
           this.pageStatuses[this.pageNumber - 1] = 'complete';
-          this._ResponseService.setPageStatus(this.pageNumber, 'complete');
+          ResponseService.setPageStatus(this.pageNumber, 'complete');
           this.updatePageCompletions();
         } else {
           this.pageStatuses[this.pageNumber - 1] = 'incomplete';
-          this._ResponseService.setPageStatus(this.pageNumber, 'incomplete');
+          ResponseService.setPageStatus(this.pageNumber, 'incomplete');
           this.updatePageCompletions();
         }
       });
@@ -85,7 +108,7 @@ export class ReportComponent implements OnInit {
   }
 
   get currentPageComplete(): boolean {
-    if (this._ResponseService.getPageStatus(this.pageNumber) === 'complete') {
+    if (ResponseService.getPageStatus(this.pageNumber) === 'complete') {
       return true;
     } else return false;
   }
@@ -95,8 +118,7 @@ export class ReportComponent implements OnInit {
     else return 'btn';
   }
   pageCompleted(pageNumber: number) {
-    if (this._ResponseService.getPageStatus(pageNumber) === 'complete')
-      return true;
+    if (ResponseService.getPageStatus(pageNumber) === 'complete') return true;
     else return false;
   }
   updatePageCompletions() {
@@ -121,5 +143,10 @@ export class ReportComponent implements OnInit {
 
   get isStartPage() {
     return this.pageNumber === 0;
+  }
+
+  submitMetaObj(formData: Object) {
+    console.log(formData);
+    ResponseService.reportMetaObject = formData;
   }
 }

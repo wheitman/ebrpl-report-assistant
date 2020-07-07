@@ -1,5 +1,8 @@
 <div class="topDiv clr-col">
-  <div *ngIf="isStartPage" class="clr-row clr-justify-content-center">
+  <div
+    *ngIf="isStartPage"
+    class="clr-row clr-justify-content-center startSection"
+  >
     <div class="clr-col-md-4">
       <h1>Let's begin.</h1>
       <hr />
@@ -8,17 +11,28 @@
         [title]="(startPage$ | async).title"
         [subtitle]="(startPage$ | async).subtitle"
         [templateObj]="(startPage$ | async).templateObj"
+        (valueChanged)="submitMetaObj($event)"
       >
       </simple-input>
       <div class="clr-row"></div>
     </div>
     <div class="clr-break-row"></div>
-    <div class="clr-col-md-4 clr-align-self-end" style="color: red;">
-      Footer!
+    <div class="clr-col-md-4">
+      <button class="btn btn-success">
+        Save and continue
+      </button>
+    </div>
+    <div class="clr-break-row"></div>
+    <div class="clr-col-md-4 clr-align-self-end">
+      <clr-icon shape="help-info"></clr-icon
+      ><em>Try the buttons below for navigation.</em>
     </div>
   </div>
-  <div class="clr-row">
-    <div class="clr-col" style="width: 100%;" *ngIf="pageNumber > 0">
+  <div class="clr-row clr-justify-content-center">
+    <div
+      class="clr-col clr-col-lg-10 clr-col-xl-8 sectionCol"
+      *ngIf="pageNumber > 0"
+    >
       <h1>({{ pageNumber }}/{{ pageCount }}) {{ (page$ | async)?.title }}</h1>
       <hr />
       <datagrid-section
@@ -44,13 +58,13 @@
           class="btn btn-icon btn-link"
           aria-label="previous page"
           [disabled]="pageNumber < 1"
-          [routerLink]="['/report', templateId, pageNumber - 1]"
+          [routerLink]="['/report', templateId, reportID, pageNumber - 1]"
         >
           <clr-icon shape="angle" dir="left"></clr-icon>
         </button>
         <clr-button-group>
           <clr-button
-            [routerLink]="['/report', templateId, 0]"
+            [routerLink]="['/report', templateId, reportID, 0]"
             [class]="getPageButtonClass(0)"
           >
             <clr-icon shape="home"></clr-icon>
@@ -58,7 +72,7 @@
           <clr-button
             [class]="getPageButtonClass(i + 1)"
             *ngFor="let pageTitle of pageTitles; index as i"
-            [routerLink]="['/report', templateId, i + 1]"
+            [routerLink]="['/report', templateId, reportID, i + 1]"
             >{{ i + 1 }}
             <clr-icon
               shape="check"
@@ -72,7 +86,7 @@
           class="btn btn-icon btn-link"
           aria-label="next page"
           *ngIf="pageNumber < pageCount"
-          [routerLink]="['/report', templateId, pageNumber + 1]"
+          [routerLink]="['/report', templateId, reportID, pageNumber + 1]"
         >
           <clr-icon shape="angle" dir="right"></clr-icon>
         </button>
@@ -81,7 +95,7 @@
           class="btn btn-success"
           aria-label="next page"
           *ngIf="reportFullyComplete"
-          [routerLink]="['/report', templateId, pageNumber + 1]"
+          [routerLink]="['/report', templateId, reportID, pageNumber + 1]"
         >
           Finish report<clr-icon shape="step-forward-2"></clr-icon>
         </button>
