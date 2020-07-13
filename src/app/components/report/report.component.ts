@@ -160,6 +160,10 @@ export class ReportComponent implements OnInit {
   }
 
   updateSection(sectionIndex: number, sectionObject: Object) {
-    ResponseService.setSection(this.pageNumber, sectionIndex, sectionObject);
+    ResponseService.setSection(
+      this.pageNumber - 1,
+      sectionIndex,
+      sectionObject
+    );
   }
 }

@@ -43,6 +43,7 @@ export class ResponseService {
       console.log(
         ResponseService._report.pages[pageIndex]['sections'][sectionIndex]
       );
+      console.log(ResponseService._report);
     } else {
       console.error(
         "[ResponseService] Couldn't edit section. Is the report opened?"
