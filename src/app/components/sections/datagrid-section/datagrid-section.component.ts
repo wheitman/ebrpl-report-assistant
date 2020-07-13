@@ -1,5 +1,5 @@
 import { DatagridInterface } from './../../../interfaces/sections';
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { AbstractSection } from '../abstract-section/abstract-section.component';
 import { __makeTemplateObject } from 'tslib';
 import {
@@ -22,6 +22,8 @@ export class DatagridSection extends AbstractSection implements OnInit {
   formGroup: FormGroup;
   formLabels: string[] = [];
   _interface: DatagridInterface;
+
+  @Output() sectionChanged = new EventEmitter<Object>();
 
   addModalOpened: boolean = false;
   editModalOpened: boolean = false;
@@ -49,10 +51,11 @@ export class DatagridSection extends AbstractSection implements OnInit {
     this._interface = this.objToDgInterface(this.templateObj['section']);
     this.constants = this.templateObj['constants'] || undefined;
     if (this.templateObj['section']['data']) {
-      this.data = this.templateObj['section']['data'];
+      this._interface.data = this.templateObj['section']['data'];
     } else {
-      this.data = [];
+      this._interface.data = [];
     }
+    this.sectionChanged.emit(this._interface);
     this.buildFormFromInterface();
     this.formGroup = new FormGroup({
       array: this.formArray,
@@ -97,11 +100,13 @@ export class DatagridSection extends AbstractSection implements OnInit {
         row.push(this.formArray.at(index).value);
       }
     });
-    this.data.push(row);
+    this._interface.data.push(row);
+    this.sectionChanged.emit(this._interface);
   }
 
   deleteRow(index: number) {
-    (this.data as Array<any>).splice(index, 1);
+    (this._interface.data as Array<any>).splice(index, 1);
+    this.sectionChanged.emit(this._interface);
   }
 
   finishAddModal() {
@@ -112,7 +117,7 @@ export class DatagridSection extends AbstractSection implements OnInit {
 
   openEditModal(rowIndex: number) {
     this.selectedRow = rowIndex;
-    let editData = this.data[rowIndex];
+    let editData = this._interface.data[rowIndex];
 
     this.formArray.setValue(this.convertToFormValues(editData));
     this.editModalOpened = true;
@@ -165,13 +170,14 @@ export class DatagridSection extends AbstractSection implements OnInit {
         row.push(this.formArray.at(index).value);
       }
     });
-    this.data[rowIndex] = row;
+    this._interface.data[rowIndex] = row;
+    this.sectionChanged.emit(this._interface);
   }
 
   addAnother() {
     this.addRowFromFormArray();
     this.formArray.reset();
-    console.log(this.data);
+    console.log(this._interface.data);
 
     //show a confirmation banner, then hide after 3 seconds
     this.showItemAddConfirmation = true;

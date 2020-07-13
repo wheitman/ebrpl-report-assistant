@@ -55,7 +55,9 @@ export class ReportComponent implements OnInit {
 
       //catch incomplete path, create a fresh report
       if (this.reportID === null) {
-        ResponseService.openReport(this.templateId);
+        ResponseService.openReport(this.templateId).subscribe((observer) => {
+          this._Router.navigate(['report', this.templateId, observer.id, 0]);
+        });
       }
 
       this.pageCount = this._TemplateService.pageCount;
@@ -69,7 +71,7 @@ export class ReportComponent implements OnInit {
 
       this.startPage$ = this._TemplateService.getStart();
 
-      if (!ResponseService.reportLoaded) {
+      if (!ResponseService.reportOpened) {
         console.warn('Report not loaded. Loading ' + this.reportID + ' now.');
         ResponseService.openReport(this.templateId, this.reportID);
       }
@@ -155,5 +157,9 @@ export class ReportComponent implements OnInit {
       this.reportID,
       this.pageNumber + 1,
     ]);
+  }
+
+  updateSection(sectionIndex: number, sectionObject: Object) {
+    ResponseService.setSection(this.pageNumber, sectionIndex, sectionObject);
   }
 }

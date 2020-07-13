@@ -40,6 +40,13 @@ export class ResponseService {
       (ResponseService._report.pages[pageIndex] as Page).sections[
         sectionIndex
       ] = sectionObj;
+      console.log(
+        ResponseService._report.pages[pageIndex]['sections'][sectionIndex]
+      );
+    } else {
+      console.error(
+        "[ResponseService] Couldn't edit section. Is the report opened?"
+      );
     }
   }
 
@@ -69,6 +76,7 @@ export class ResponseService {
       localStorage.getItem(ResponseService.localStorageKey)
     );
     console.log(ResponseService._report);
+    ResponseService._reportOpened = true;
 
     ResponseService.reportChanged();
     return ResponseService.report$;
@@ -134,10 +142,6 @@ export class ResponseService {
     ResponseService._reportOpened = true;
   }
 
-  static get reportLoaded() {
-    return ResponseService._reportOpened;
-  }
-
   static get reportObservable() {
     return ResponseService.report$;
   }
@@ -175,7 +179,7 @@ export class ResponseService {
     ResponseService.reportChanged();
   }
 
-  get reportOpened() {
+  static get reportOpened() {
     return ResponseService._reportOpened;
   }
 }

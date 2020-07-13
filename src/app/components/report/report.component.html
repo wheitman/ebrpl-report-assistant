@@ -44,6 +44,8 @@
         [title]="section.title"
         [subtitle]="section.subtitle"
         [templateObj]="section.templateObj"
+        [order]="section.order"
+        (sectionChanged)="updateSection(section.order, $event)"
       ></datagrid-section>
       <simple-input
         *ngFor="let section of simpleInputs$ | async"

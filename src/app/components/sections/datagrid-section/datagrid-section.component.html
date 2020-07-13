@@ -8,7 +8,7 @@
   <clr-dg-column *clrDgItems="let column of _interface.columns">{{
     column.label
   }}</clr-dg-column>
-  <clr-dg-row *ngFor="let row of data; index as i">
+  <clr-dg-row *ngFor="let row of _interface.data; index as i">
     <clr-dg-action-overflow>
       <button class="action-item" (click)="openEditModal(i)">Edit</button>
       <button class="action-item" (click)="deleteRow(i)">Delete</button>
