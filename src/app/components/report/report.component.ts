@@ -26,6 +26,7 @@ export class ReportComponent implements OnInit {
   templateId: string;
   pageNumber: number;
   reportID: string;
+  metaObj: Object;
 
   page$: Observable<Page>;
   report: Report;
@@ -37,7 +38,6 @@ export class ReportComponent implements OnInit {
   startPage$: Observable<SimpleInputSection>;
 
   markCompleteControl = new FormControl();
-  pageStatuses: string[];
   pageCompletions: boolean[] = [];
 
   constructor(
@@ -55,19 +55,7 @@ export class ReportComponent implements OnInit {
 
       //catch incomplete path, create a fresh report
       if (this.reportID === null) {
-        ResponseService.generateNewReport(this.templateId).subscribe(
-          (report) => {
-            this.report = report;
-            this.reportID = report.id;
-            this.pageNumber = 0; //start at 'Start' page (0)
-            this._Router.navigate([
-              'report',
-              this.templateId,
-              this.reportID,
-              this.pageNumber,
-            ]);
-          }
-        );
+        ResponseService.openReport(this.templateId);
       }
 
       this.pageCount = this._TemplateService.pageCount;
@@ -81,23 +69,30 @@ export class ReportComponent implements OnInit {
 
       this.startPage$ = this._TemplateService.getStart();
 
-      //get all saved page statuses
-      this.pageStatuses = ResponseService.getAllPageStatuses();
-
+      if (!ResponseService.reportLoaded) {
+        console.warn('Report not loaded. Loading ' + this.reportID + ' now.');
+        ResponseService.openReport(this.templateId, this.reportID);
+      }
+      ResponseService.reportObservable.subscribe((observer) => {
+        this.report = observer;
+        this.report.pageStatuses = observer.pageStatuses;
+        if (this.report.pageStatuses[this.pageNumber - 1] === 'complete') {
+          this.markCompleteControl.setValue(true);
+        } else this.markCompleteControl.setValue(false);
+      });
       //set the toggle to the current page status
-      if (this.pageStatuses[this.pageNumber - 1] === 'complete') {
+      if (this.report.pageStatuses[this.pageNumber - 1] === 'complete') {
         this.markCompleteControl.setValue(true);
       } else this.markCompleteControl.setValue(false);
 
       //update the page status as the toggle changes
       this.markCompleteControl.valueChanges.subscribe((value) => {
-        console.log(value);
         if (value === true) {
-          this.pageStatuses[this.pageNumber - 1] = 'complete';
+          this.report.pageStatuses[this.pageNumber - 1] = 'complete';
           ResponseService.setPageStatus(this.pageNumber, 'complete');
           this.updatePageCompletions();
         } else {
-          this.pageStatuses[this.pageNumber - 1] = 'incomplete';
+          this.report.pageStatuses[this.pageNumber - 1] = 'incomplete';
           ResponseService.setPageStatus(this.pageNumber, 'incomplete');
           this.updatePageCompletions();
         }
@@ -108,7 +103,10 @@ export class ReportComponent implements OnInit {
   }
 
   get currentPageComplete(): boolean {
-    if (ResponseService.getPageStatus(this.pageNumber) === 'complete') {
+    if (
+      this.report &&
+      this.report.pageStatuses[this.pageNumber] === 'complete'
+    ) {
       return true;
     } else return false;
   }
@@ -118,12 +116,12 @@ export class ReportComponent implements OnInit {
     else return 'btn';
   }
   pageCompleted(pageNumber: number) {
-    if (ResponseService.getPageStatus(pageNumber) === 'complete') return true;
+    if (this.report.pageStatuses[this.pageNumber] === 'complete') return true;
     else return false;
   }
   updatePageCompletions() {
     this.pageCompletions = [];
-    this.pageStatuses.forEach((status, index) => {
+    this.report.pageStatuses.forEach((status, index) => {
       if (status === 'complete') {
         this.pageCompletions.push(true);
       } else {
@@ -145,8 +143,17 @@ export class ReportComponent implements OnInit {
     return this.pageNumber === 0;
   }
 
-  submitMetaObj(formData: Object) {
+  setMetaObj(formData: Object) {
     console.log(formData);
-    ResponseService.reportMetaObject = formData;
+    this.metaObj = formData;
+  }
+  finishStartPage() {
+    ResponseService.parseMetaObject(this.metaObj);
+    this._Router.navigate([
+      'report',
+      this.templateId,
+      this.reportID,
+      this.pageNumber + 1,
+    ]);
   }
 }

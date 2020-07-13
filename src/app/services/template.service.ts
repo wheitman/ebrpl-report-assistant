@@ -485,6 +485,7 @@ export class TemplateService {
         number: pageNumber,
         title: pageObj.title,
         subtitle: pageObj['subtitle'],
+        sections: undefined,
       };
       observer.next(page);
     });
@@ -573,5 +574,9 @@ export class TemplateService {
 
   get pageCount() {
     return this.foolishObj.pages.length;
+  }
+
+  static getTemplatePageCount(templateID: string) {
+    return 4;
   }
 }

@@ -7,4 +7,12 @@ img {
   height: 60px;
   position: absolute;
   left: 35vw;
+  display: flex;
+  align-items: center;
+}
+
+.titleText {
+  margin: auto;
+  text-align: center;
+  color: gray;
 }

@@ -11,14 +11,18 @@
         [title]="(startPage$ | async).title"
         [subtitle]="(startPage$ | async).subtitle"
         [templateObj]="(startPage$ | async).templateObj"
-        (valueChanged)="submitMetaObj($event)"
+        (valueChanged)="setMetaObj($event)"
       >
       </simple-input>
       <div class="clr-row"></div>
     </div>
     <div class="clr-break-row"></div>
     <div class="clr-col-md-4">
-      <button class="btn btn-success">
+      <button
+        class="btn btn-success"
+        [disabled]="!metaObj"
+        (click)="finishStartPage()"
+      >
         Save and continue
       </button>
     </div>

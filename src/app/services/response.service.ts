@@ -1,43 +1,99 @@
-import { Observable, Subscriber } from 'rxjs';
+import { Page } from './../interfaces/page';
+import { TemplateService } from './template.service';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { Report } from '../interfaces/report';
-import { NgIf } from '@angular/common';
-import { report } from 'process';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ResponseService {
-  static foolishPageStatuses: string[] = [
-    'incomplete',
-    'incomplete',
-    'incomplete',
-    'incomplete',
-  ];
-  private static _reportMetaObj: Object;
-
-  static report$: Observable<Report>;
-  static reportObserver: Subscriber<Report>;
-  static _report: Report = {
+  private static report$: BehaviorSubject<Report>;
+  private static localStorageKey: string = 'LOCALREPORT';
+  private static _reportOpened: boolean;
+  private static _report: Report = {
+    pageCount: undefined,
     id: undefined,
+    templateID: undefined,
     title: undefined,
+    pageStatuses: undefined,
+    pages: [],
   };
 
-  constructor() {}
-
-  static setPageStatus(pageNumber: number, status: string) {
-    pageNumber--;
-    ResponseService.foolishPageStatuses[pageNumber] = status;
-  }
-  static getPageStatus(pageNumber: number) {
-    pageNumber--;
-    return ResponseService.foolishPageStatuses[pageNumber];
-  }
-  static getAllPageStatuses() {
-    return ResponseService.foolishPageStatuses;
+  constructor() {
+    ResponseService._reportOpened = false;
+    ResponseService.report$ = new BehaviorSubject<Report>(
+      ResponseService._report //send undefined _report at first
+    );
   }
 
-  static generateID(length) {
+  static setSection(
+    pageIndex: number,
+    sectionIndex: number,
+    sectionObj: Object
+  ) {
+    if (
+      ResponseService._reportOpened &&
+      ResponseService._report.pages[pageIndex]
+    ) {
+      // set the section
+      (ResponseService._report.pages[pageIndex] as Page).sections[
+        sectionIndex
+      ] = sectionObj;
+    }
+  }
+
+  static closeReport() {
+    ResponseService._reportOpened = false;
+    ResponseService._report = null;
+    console.log('The report has been closed');
+  }
+
+  /*
+  Sets the _report object
+  
+  If no reportID is specified, a new one is generated and a blank
+  report is retrieved
+
+  IDs are in a 3-digit alphanumeric format. 238,328 combinations.
+  Case sensitive!
+  */
+  static openReport(templateID: string, reportID?: string): Observable<Report> {
+    //FIXME: make serverside, delete all this!
+    // ResponseService._report = JSON.parse(
+    //   localStorage.getItem(ResponseService.localStorageKey)
+    // );
+    // ResponseService.generateExampleReport();
+    // ResponseService.saveLocally();
+    ResponseService._report = JSON.parse(
+      localStorage.getItem(ResponseService.localStorageKey)
+    );
+    console.log(ResponseService._report);
+
+    ResponseService.reportChanged();
+    return ResponseService.report$;
+  }
+
+  private static saveToServer() {
+    //skeleton
+  }
+
+  private static saveLocally() {
+    if (ResponseService._report.id) {
+      localStorage.setItem(
+        ResponseService.localStorageKey,
+        JSON.stringify(ResponseService._report)
+      );
+      console.log('Saved locally');
+    }
+  }
+
+  static setPageStatus(pageIndex: number, status: string) {
+    ResponseService._report.pageStatuses[pageIndex] = status;
+  }
+
+  //FIXME: make serverside, delete this
+  private static generateID(length) {
     var result = '';
     var characters =
       'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -47,44 +103,79 @@ export class ResponseService {
     }
     return result;
   }
-
-  // IDs are in a 3-digit alphanumeric format. 238,328 combinations.
-  // Case sensitive!
-  static generateNewReport(templateID: string): Observable<Report> {
-    //TODO: make serverside
-    this.report$ = new Observable<Report>((observer) => {
-      this._report.id = this.generateID(3);
-      observer.next(ResponseService._report);
-      this.reportObserver = observer;
-    });
-    return this.report$;
+  private static generateExampleReport() {
+    console.warn('Generating example report...');
+    ResponseService._report = {
+      pageCount: 4,
+      id: 'EXA',
+      templateID: 'Branch Usage',
+      title: 'October 2019',
+      pageStatuses: ['incomplete', 'incomplete', 'incomplete', 'incomplete'],
+      pages: [
+        {
+          title: 'Programs in the library',
+          sections: [{}, {}, {}, {}, {}, {}, {}, {}],
+        },
+        {
+          title: 'Other library events',
+          sections: [{}, {}, {}],
+        },
+        {
+          title: 'Staff presentations and events outside the library',
+          sections: [{}, {}, {}, {}, {}, {}, {}],
+        },
+        {
+          title: 'Other categories tracked',
+          sections: [{}, {}, {}, {}, {}, {}, {}],
+        },
+      ],
+    };
+    console.log(ResponseService._report);
+    ResponseService._reportOpened = true;
   }
 
-  private static dateObjToString(obj): string {
-    return obj['month'] + ' ' + obj['year'];
+  static get reportLoaded() {
+    return ResponseService._reportOpened;
   }
 
-  static set reportMetaObject(newObj) {
-    ResponseService._reportMetaObj = newObj;
+  static get reportObservable() {
+    return ResponseService.report$;
+  }
+
+  private static reportChanged() {
+    ResponseService.report$.next(ResponseService._report);
+    ResponseService.saveLocally();
+  }
+
+  static parseMetaObject(newObj) {
     newObj['inputs'].forEach((input) => {
       let key = input['properties']['response-key'];
+      // set coverage date property
       if (key === 'report-coverage-date') {
-        ResponseService._report.coverageDate = ResponseService.dateObjToString(
-          input['value']
-        );
+        let dateString = input['value']['month'] + ' ' + input['value']['year'];
+        ResponseService._report.coverageDate = input['value'];
+        // set additional info
       } else if (key === 'report-additional-info') {
         ResponseService._report.additionalInfo = input['value'];
       }
 
+      //set title property
       if (input['properties']['set-title']) {
-        ResponseService._report.title = input['value'];
+        // if it's a date, convert to a proper string first
+        if (key === 'report-coverage-date') {
+          let dateString =
+            input['value']['month'] + ' ' + input['value']['year'];
+          ResponseService._report.title = dateString;
+        } else {
+          ResponseService._report.title = input['value'];
+        }
       }
     });
-    this.reportObserver.next(ResponseService._report);
-    console.log(ResponseService._report.coverageDate);
+    // broadcast updated report to Subject
+    ResponseService.reportChanged();
   }
 
-  static get reportTitle(): string {
-    return ResponseService._report.title;
+  get reportOpened() {
+    return ResponseService._reportOpened;
   }
 }

@@ -5,8 +5,8 @@
       <span class="title">Report Assistant</span>
     </a>
   </div>
-  <div class="reportTitle">
-    {{ reportTitle }}
+  <div class="reportTitle" *ngIf="reportTitle">
+    <p class="titleText">{{ templateID }}: {{ reportTitle }}</p>
   </div>
   <div class="header-actions">
     <clr-dropdown>

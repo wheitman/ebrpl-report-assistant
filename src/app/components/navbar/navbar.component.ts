@@ -8,10 +8,15 @@ import { ResponseService } from 'src/app/services/response.service';
 })
 export class NavbarComponent implements OnInit {
   reportTitle: string;
+  templateID: string;
 
   constructor(_ResponseService: ResponseService) {}
 
   ngOnInit(): void {
-    this.reportTitle = ResponseService.reportTitle;
+    ResponseService.reportObservable.subscribe((observer) => {
+      console.log(observer);
+      this.reportTitle = observer.title;
+      this.templateID = observer.templateID;
+    });
   }
 }
