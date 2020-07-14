@@ -32,8 +32,8 @@
       *ngIf="pageNumber > 0"
     >
       <h1>
-        ({{ pageNumber }}/{{ report.pages.length }})
-        {{ (page$ | async)?.title }}
+        ({{ pageNumber }}/{{ pageCount }})
+        {{ pageTitle }}
       </h1>
       <hr />
       <datagrid-section
@@ -67,7 +67,7 @@
         >
           <clr-icon shape="angle" dir="left"></clr-icon>
         </button>
-        <clr-button-group>
+        <clr-button-group *ngIf="report">
           <clr-button
             [routerLink]="['/report', templateId, reportID, 0]"
             [class]="getPageButtonClass(0)"
@@ -76,7 +76,7 @@
           </clr-button>
           <clr-button
             [class]="getPageButtonClass(i + 1)"
-            *ngFor="let pageTitle of pageTitles; index as i"
+            *ngFor="let page of report.pages; index as i"
             [routerLink]="['/report', templateId, reportID, i + 1]"
             >{{ i + 1 }}
             <clr-icon
@@ -90,7 +90,7 @@
           type="button"
           class="btn btn-icon btn-link"
           aria-label="next page"
-          *ngIf="pageNumber < report.pages.length"
+          *ngIf="pageNumber < pageCount"
           [routerLink]="['/report', templateId, reportID, pageNumber + 1]"
         >
           <clr-icon shape="angle" dir="right"></clr-icon>

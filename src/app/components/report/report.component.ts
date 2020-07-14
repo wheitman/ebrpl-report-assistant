@@ -1,4 +1,3 @@
-import { TemplateService } from './../../services/template.service';
 import {
   SectionInterface,
   DatagridInterface,
@@ -17,6 +16,7 @@ import { SimpleInputSection } from '../sections/simple-input/simple-input.compon
 import { ClrTimelineStepState } from '@clr/angular';
 import { ThrowStmt } from '@angular/compiler';
 import { Report } from 'src/app/interfaces/report';
+import { report } from 'process';
 
 @Component({
   selector: 'app-report',
@@ -29,24 +29,16 @@ export class ReportComponent implements OnInit, OnDestroy {
   reportID: string;
   metaObj: Object;
 
-  page$: Observable<Page>;
   report: Report;
-  pageCount: number = 0;
-  pageTitles: String[] = [];
-  pageSubtitles: String[] = [];
   datagrids: DatagridSection[] = [];
   simpleInputs: SimpleInputSection[] = [];
   startPage$: Observable<SimpleInputSection>;
+  startPage: SimpleInputSection;
 
   markCompleteControl = new FormControl();
   pageCompletions: boolean[] = [];
 
-  constructor(
-    private _TemplateService: TemplateService,
-    private _ResponseService: ResponseService,
-    private activeRoute: ActivatedRoute,
-    private _Router: Router
-  ) {}
+  constructor(private activeRoute: ActivatedRoute, private _Router: Router) {}
 
   ngOnInit(): void {
     this.activeRoute.paramMap.subscribe((params) => {
@@ -62,13 +54,6 @@ export class ReportComponent implements OnInit, OnDestroy {
         });
       }
 
-      this.pageCount = this._TemplateService.pageCount;
-      this.page$ = this._TemplateService.getTemplatePage(this.pageNumber);
-      this.pageTitles = this._TemplateService.getPageTitles();
-      this.pageSubtitles = this._TemplateService.getPageSubtitles();
-
-      this.startPage$ = this._TemplateService.getStart();
-
       if (!ResponseService.reportOpened) {
         console.warn('Report not loaded. Loading ' + this.reportID + ' now.');
         ResponseService.openReport(this.templateId, this.reportID);
@@ -76,6 +61,12 @@ export class ReportComponent implements OnInit, OnDestroy {
       ResponseService.reportObservable.subscribe((observer) => {
         this.report = observer;
         if (observer) {
+          this.startPage = new SimpleInputSection();
+          console.log(this.report);
+          let metaSection = this.report.metaSection as SimpleInputInterface;
+          this.startPage.title = metaSection.title;
+          this.startPage.subtitle = metaSection.subtitle || null;
+          this.startPage.interface = metaSection;
           this.report.pageStatuses = observer.pageStatuses || null;
 
           //set initial value of completion toggle (bottom corner)
@@ -186,10 +177,20 @@ export class ReportComponent implements OnInit, OnDestroy {
   }
 
   getConstants() {
-    return TemplateService.getConstants();
+    return ResponseService.getConstants();
   }
 
   ngOnDestroy() {
     ResponseService.closeReport();
+  }
+
+  get pageTitle() {
+    if (this.report) return this.report.pages[this.pageNumber - 1]['title'];
+    else return '';
+  }
+  get pageCount() {
+    if (this.report) {
+      return this.report.pages.length;
+    } else return 0;
   }
 }
