@@ -27,20 +27,37 @@ export class SimpleInputSection extends AbstractSection implements OnInit {
       console.error('No inputs were found for ' + this.title);
       return;
     }
-    this.inputs.forEach((input) => {
+    this.inputs.forEach((input, index) => {
       this.formLabels.push(input['label']);
-      if (input['type'] === 'tag-select') {
-        let checkboxArray = new FormArray([]);
-        this.interface.tags.forEach((tag) => {
-          checkboxArray.push(new FormControl());
-        });
-        this.formArray.push(checkboxArray);
-      } else if (input['type'] === 'month-select') {
-        this.formArray.push(
-          new FormControl({ month: 'January', year: '2020' })
-        );
+
+      //if saved data exists, fill the form with that to start
+      if (this.interface.data) {
+        let savedData = this.interface.data;
+        if (input['type'] === 'tag-select') {
+          let checkboxArray = new FormArray([]);
+          this.interface.tags.forEach((tag) => {
+            checkboxArray.push(new FormControl(savedData[index]));
+          });
+          this.formArray.push(checkboxArray);
+        } else if (input['type'] === 'month-select') {
+          this.formArray.push(new FormControl(savedData[index]));
+        } else {
+          this.formArray.push(new FormControl(savedData[index]));
+        }
       } else {
-        this.formArray.push(new FormControl('', [Validators.required]));
+        if (input['type'] === 'tag-select') {
+          let checkboxArray = new FormArray([]);
+          this.interface.tags.forEach((tag) => {
+            checkboxArray.push(new FormControl());
+          });
+          this.formArray.push(checkboxArray);
+        } else if (input['type'] === 'month-select') {
+          this.formArray.push(
+            new FormControl({ month: 'January', year: '2020' })
+          );
+        } else {
+          this.formArray.push(new FormControl('', [Validators.required]));
+        }
       }
     });
   }
@@ -53,7 +70,8 @@ export class SimpleInputSection extends AbstractSection implements OnInit {
     });
     this.formArray.valueChanges.subscribe((newData) => {
       // ResponseService.reportMetaObject = dataObj;
-      this.sectionChanged.emit(newData);
+      this.interface.data = newData;
+      this.sectionChanged.emit(this.interface);
     });
   }
 }

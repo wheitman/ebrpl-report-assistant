@@ -87,6 +87,7 @@ export class ReportComponent implements OnInit, OnDestroy {
           this.simpleInputs.length = 0;
           observer.pages[this.pageNumber - 1]['sections'].forEach(
             (sectionInterface, index) => {
+              console.log(sectionInterface);
               if (sectionInterface.type === 'datagrid') {
                 let dg = new DatagridSection();
                 dg.interface = sectionInterface as DatagridInterface;
@@ -160,11 +161,11 @@ export class ReportComponent implements OnInit, OnDestroy {
     return this.pageNumber === 0;
   }
 
-  setMetaObj(formData: Object) {
+  setMetaObj(formInterface: SimpleInputInterface) {
     this.report.metaSection['inputs'].forEach((inputObj, index) => {
-      inputObj['value'] = formData[index];
+      inputObj['value'] = formInterface.data[index];
     });
-    this.metaObj = formData;
+    this.metaObj = formInterface.data;
   }
   finishStartPage() {
     ResponseService.parseMetaObject(this.report.metaSection);
