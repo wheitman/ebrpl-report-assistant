@@ -1,16 +1,17 @@
+import { TemplateService } from './../../services/template.service';
+import {
+  SectionInterface,
+  DatagridInterface,
+  SimpleInputInterface,
+} from './../../interfaces/sections';
 import { FormControl } from '@angular/forms';
 import { ResponseService } from './../../services/response.service';
 import { DatagridSection } from './../sections/datagrid-section/datagrid-section.component';
 import { AbstractSection } from './../sections/abstract-section/abstract-section.component';
 import { Observable, of } from 'rxjs';
-import { TemplateService } from '../../services/template.service';
 import { Page } from './../../interfaces/page';
 
-import {
-  Component,
-  OnInit,
-  ɵangular_packages_core_core_bj,
-} from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { SimpleInputSection } from '../sections/simple-input/simple-input.component';
 import { ClrTimelineStepState } from '@clr/angular';
@@ -22,7 +23,7 @@ import { Report } from 'src/app/interfaces/report';
   templateUrl: './report.component.html',
   styleUrls: ['./report.component.css'],
 })
-export class ReportComponent implements OnInit {
+export class ReportComponent implements OnInit, OnDestroy {
   templateId: string;
   pageNumber: number;
   reportID: string;
@@ -33,8 +34,8 @@ export class ReportComponent implements OnInit {
   pageCount: number = 0;
   pageTitles: String[] = [];
   pageSubtitles: String[] = [];
-  datagrids$: Observable<DatagridSection[]>;
-  simpleInputs$: Observable<SimpleInputSection[]>;
+  datagrids: DatagridSection[] = [];
+  simpleInputs: SimpleInputSection[] = [];
   startPage$: Observable<SimpleInputSection>;
 
   markCompleteControl = new FormControl();
@@ -56,7 +57,8 @@ export class ReportComponent implements OnInit {
       //catch incomplete path, create a fresh report
       if (this.reportID === null) {
         ResponseService.openReport(this.templateId).subscribe((observer) => {
-          this._Router.navigate(['report', this.templateId, observer.id, 0]);
+          if (observer)
+            this._Router.navigate(['report', this.templateId, observer.id, 0]);
         });
       }
 
@@ -64,10 +66,6 @@ export class ReportComponent implements OnInit {
       this.page$ = this._TemplateService.getTemplatePage(this.pageNumber);
       this.pageTitles = this._TemplateService.getPageTitles();
       this.pageSubtitles = this._TemplateService.getPageSubtitles();
-      this.datagrids$ = this._TemplateService.getDatagrids(this.pageNumber);
-      this.simpleInputs$ = this._TemplateService.getSimpleInputs(
-        this.pageNumber
-      );
 
       this.startPage$ = this._TemplateService.getStart();
 
@@ -77,29 +75,46 @@ export class ReportComponent implements OnInit {
       }
       ResponseService.reportObservable.subscribe((observer) => {
         this.report = observer;
-        this.report.pageStatuses = observer.pageStatuses;
-        if (this.report.pageStatuses[this.pageNumber - 1] === 'complete') {
-          this.markCompleteControl.setValue(true);
-        } else this.markCompleteControl.setValue(false);
+        if (observer) {
+          this.report.pageStatuses = observer.pageStatuses || null;
+
+          //set initial value of completion toggle (bottom corner)
+          if (this.report.pageStatuses[this.pageNumber - 1] === 'complete') {
+            this.markCompleteControl.setValue(true);
+          } else this.markCompleteControl.setValue(false);
+
+          this.datagrids.length = 0;
+          this.simpleInputs.length = 0;
+          observer.pages[this.pageNumber - 1]['sections'].forEach(
+            (sectionInterface, index) => {
+              if (sectionInterface.type === 'datagrid') {
+                let dg = new DatagridSection();
+                dg.interface = sectionInterface as DatagridInterface;
+                dg.order = index;
+                this.datagrids.push(dg);
+              } else if (sectionInterface.type === 'simple-input') {
+                let si = new SimpleInputSection();
+                si.interface = sectionInterface as SimpleInputInterface;
+                si.order = index;
+                this.simpleInputs.push(si);
+              }
+            }
+          );
+        }
       });
-      //set the toggle to the current page status
-      if (this.report.pageStatuses[this.pageNumber - 1] === 'complete') {
-        this.markCompleteControl.setValue(true);
-      } else this.markCompleteControl.setValue(false);
 
       //update the page status as the toggle changes
       this.markCompleteControl.valueChanges.subscribe((value) => {
         if (value === true) {
           this.report.pageStatuses[this.pageNumber - 1] = 'complete';
-          ResponseService.setPageStatus(this.pageNumber, 'complete');
+          ResponseService.setPageStatus(this.pageNumber - 1, 'complete');
           this.updatePageCompletions();
         } else {
           this.report.pageStatuses[this.pageNumber - 1] = 'incomplete';
-          ResponseService.setPageStatus(this.pageNumber, 'incomplete');
+          ResponseService.setPageStatus(this.pageNumber - 1, 'incomplete');
           this.updatePageCompletions();
         }
       });
-
       this.updatePageCompletions();
     });
   }
@@ -146,11 +161,13 @@ export class ReportComponent implements OnInit {
   }
 
   setMetaObj(formData: Object) {
-    console.log(formData);
+    this.report.metaSection['inputs'].forEach((inputObj, index) => {
+      inputObj['value'] = formData[index];
+    });
     this.metaObj = formData;
   }
   finishStartPage() {
-    ResponseService.parseMetaObject(this.metaObj);
+    ResponseService.parseMetaObject(this.report.metaSection);
     this._Router.navigate([
       'report',
       this.templateId,
@@ -159,11 +176,19 @@ export class ReportComponent implements OnInit {
     ]);
   }
 
-  updateSection(sectionIndex: number, sectionObject: Object) {
+  updateSection(sectionIndex: number, sectionObject: SectionInterface) {
     ResponseService.setSection(
       this.pageNumber - 1,
       sectionIndex,
       sectionObject
     );
+  }
+
+  getConstants() {
+    return TemplateService.getConstants();
+  }
+
+  ngOnDestroy() {
+    ResponseService.closeReport();
   }
 }

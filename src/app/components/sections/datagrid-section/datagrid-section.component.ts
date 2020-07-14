@@ -1,3 +1,4 @@
+import { TemplateService } from './../../../services/template.service';
 import { DatagridInterface } from './../../../interfaces/sections';
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { AbstractSection } from '../abstract-section/abstract-section.component';
@@ -21,9 +22,10 @@ export class DatagridSection extends AbstractSection implements OnInit {
   formArray = new FormArray([]);
   formGroup: FormGroup;
   formLabels: string[] = [];
-  _interface: DatagridInterface;
 
   @Output() sectionChanged = new EventEmitter<Object>();
+  @Input() interface: DatagridInterface;
+  @Input() constants: Object;
 
   addModalOpened: boolean = false;
   editModalOpened: boolean = false;
@@ -34,28 +36,7 @@ export class DatagridSection extends AbstractSection implements OnInit {
     super();
   }
 
-  objToDgInterface(obj) {
-    let newInterface: DatagridInterface = {
-      title: obj['title'] || null,
-      subtitle: obj['subtitle'] || null,
-      columns: obj['columns'],
-      data: undefined,
-      type: obj['type'],
-      index: undefined,
-      complete: false,
-    };
-    return newInterface;
-  }
-
   ngOnInit(): void {
-    this._interface = this.objToDgInterface(this.templateObj['section']);
-    this.constants = this.templateObj['constants'] || undefined;
-    if (this.templateObj['section']['data']) {
-      this._interface.data = this.templateObj['section']['data'];
-    } else {
-      this._interface.data = [];
-    }
-    this.sectionChanged.emit(this._interface);
     this.buildFormFromInterface();
     this.formGroup = new FormGroup({
       array: this.formArray,
@@ -63,16 +44,19 @@ export class DatagridSection extends AbstractSection implements OnInit {
   }
 
   buildFormFromInterface() {
-    let cols = this._interface.columns;
+    let cols = (this.interface as DatagridInterface).columns;
     if (!cols) {
-      console.error('No column values were supplied to ' + this.title);
+      console.error(this.interface);
+      console.error(
+        'No column values were supplied to ' + this.interface.title
+      );
       return;
     }
     cols.forEach((column) => {
       this.formLabels.push(column['label']);
       if (column['type'] === 'tag-select') {
         let checkboxArray = new FormArray([]);
-        this.templateObj['section']['tags'].forEach((tag) => {
+        (this.interface as DatagridInterface).tags.forEach((tag) => {
           checkboxArray.push(new FormControl());
         });
         this.formArray.push(checkboxArray);
@@ -88,10 +72,10 @@ export class DatagridSection extends AbstractSection implements OnInit {
 
   addRowFromFormArray() {
     let row = [];
-    this._interface.columns.forEach((col, index) => {
+    (this.interface as DatagridInterface).columns.forEach((col, index) => {
       if (col['type'] === 'tag-select') {
         let tags: Object[] = [];
-        this.templateObj['section']['tags'].forEach((tag, j) => {
+        (this.interface as DatagridInterface).tags.forEach((tag, j) => {
           if ((this.formArray.at(index) as FormArray).at(j).value === true)
             tags.push(tag);
         });
@@ -100,13 +84,14 @@ export class DatagridSection extends AbstractSection implements OnInit {
         row.push(this.formArray.at(index).value);
       }
     });
-    this._interface.data.push(row);
-    this.sectionChanged.emit(this._interface);
+    console.log(this.interface);
+    this.interface.data.push(row);
+    this.sectionChanged.emit(this.interface);
   }
 
   deleteRow(index: number) {
-    (this._interface.data as Array<any>).splice(index, 1);
-    this.sectionChanged.emit(this._interface);
+    (this.interface.data as Array<any>).splice(index, 1);
+    this.sectionChanged.emit(this.interface);
   }
 
   finishAddModal() {
@@ -117,7 +102,7 @@ export class DatagridSection extends AbstractSection implements OnInit {
 
   openEditModal(rowIndex: number) {
     this.selectedRow = rowIndex;
-    let editData = this._interface.data[rowIndex];
+    let editData = this.interface.data[rowIndex];
 
     this.formArray.setValue(this.convertToFormValues(editData));
     this.editModalOpened = true;
@@ -127,8 +112,11 @@ export class DatagridSection extends AbstractSection implements OnInit {
     let formVals: any[] = [];
     //check if any column contains tags
     dataRow.forEach((col, index) => {
-      if (this._interface.columns[index]['type'] === 'tag-select') {
-        let templateTags: Object[] = this.templateObj['section']['tags'];
+      if (
+        (this.interface as DatagridInterface).columns[index]['type'] ===
+        'tag-select'
+      ) {
+        let templateTags: Object[] = (this.interface as DatagridInterface).tags;
         let rowTags: Object[] = col;
         let tagVals: boolean[] = [];
         let templateLabels: string[] = [];
@@ -158,10 +146,10 @@ export class DatagridSection extends AbstractSection implements OnInit {
   }
   editRow(rowIndex: number) {
     let row = [];
-    this._interface.columns.forEach((col, index) => {
+    (this.interface as DatagridInterface).columns.forEach((col, index) => {
       if (col['type'] === 'tag-select') {
         let tags: Object[] = [];
-        this.templateObj['section']['tags'].forEach((tag, j) => {
+        (this.interface as DatagridInterface).tags.forEach((tag, j) => {
           if ((this.formArray.at(index) as FormArray).at(j).value === true)
             tags.push(tag);
         });
@@ -170,14 +158,19 @@ export class DatagridSection extends AbstractSection implements OnInit {
         row.push(this.formArray.at(index).value);
       }
     });
-    this._interface.data[rowIndex] = row;
-    this.sectionChanged.emit(this._interface);
+    this.interface.data[rowIndex] = row;
+    this.sectionChanged.emit(this.interface);
+  }
+
+  openAddModal() {
+    this.addModalOpened = true;
+    console.log(this.constants['divisions']);
   }
 
   addAnother() {
     this.addRowFromFormArray();
     this.formArray.reset();
-    console.log(this._interface.data);
+    console.log(this.interface.data);
 
     //show a confirmation banner, then hide after 3 seconds
     this.showItemAddConfirmation = true;

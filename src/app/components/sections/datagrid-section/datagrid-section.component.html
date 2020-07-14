@@ -1,14 +1,14 @@
-<h1>{{ title }}</h1>
+<h1>{{ interface.title }}</h1>
 <h5 class="subtitle" *ngIf="subtitle">{{ subtitle }}</h5>
 <clr-datagrid>
   <clr-dg-placeholder
     >Nothing to see here. To add more content, use the controls
     below.</clr-dg-placeholder
   >
-  <clr-dg-column *clrDgItems="let column of _interface.columns">{{
+  <clr-dg-column *clrDgItems="let column of interface.columns">{{
     column.label
   }}</clr-dg-column>
-  <clr-dg-row *ngFor="let row of _interface.data; index as i">
+  <clr-dg-row *ngFor="let row of interface.data; index as i">
     <clr-dg-action-overflow>
       <button class="action-item" (click)="openEditModal(i)">Edit</button>
       <button class="action-item" (click)="deleteRow(i)">Delete</button>
@@ -26,12 +26,12 @@
   </clr-dg-row>
   <clr-dg-footer>
     <div class="btn-group btn-link btn-sm">
-      <button class="btn" (click)="addModalOpened = true">Add new</button>
+      <button class="btn" (click)="openAddModal()">Add new</button>
     </div>
   </clr-dg-footer>
 </clr-datagrid>
 <clr-modal #addModal [(clrModalOpen)]="addModalOpened">
-  <h3 class="modal-title">Add to "{{ title }}"</h3>
+  <h3 class="modal-title">Add to "{{ interface.title }}"</h3>
   <div class="modal-body">
     <clr-alert
       [clrAlertType]="'success'"
@@ -44,7 +44,7 @@
     <form
       clrForm
       [formGroup]="formGroup"
-      *ngFor="let column of _interface.columns; index as i"
+      *ngFor="let column of interface.columns; index as i"
       clrLayout="vertical"
     >
       <clr-date-container *ngIf="isType(column, 'date-select')">
@@ -72,9 +72,7 @@
       </clr-input-container>
       <clr-checkbox-container *ngIf="isType(column, 'tag-select')">
         <label for="">{{ column["label"] }}</label>
-        <clr-checkbox-wrapper
-          *ngFor="let tag of templateObj['section']['tags']; index as j"
-        >
+        <clr-checkbox-wrapper *ngFor="let tag of interface.tags; index as j">
           <input
             type="checkbox"
             clrCheckbox
@@ -123,7 +121,7 @@
     <form
       clrForm
       [formGroup]="formGroup"
-      *ngFor="let column of _interface.columns; index as i"
+      *ngFor="let column of interface.columns; index as i"
       clrLayout="vertical"
     >
       <clr-date-container *ngIf="isType(column, 'date-select')">
@@ -151,9 +149,7 @@
       </clr-input-container>
       <clr-checkbox-container *ngIf="isType(column, 'tag-select')">
         <label for="">{{ column["label"] }}</label>
-        <clr-checkbox-wrapper
-          *ngFor="let tag of templateObj['section']['tags']; index as j"
-        >
+        <clr-checkbox-wrapper *ngFor="let tag of interface.tags; index as j">
           <input
             type="checkbox"
             clrCheckbox

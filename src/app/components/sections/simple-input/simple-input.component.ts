@@ -1,4 +1,5 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { SimpleInputInterface } from './../../../interfaces/sections';
+import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { AbstractSection } from '../abstract-section/abstract-section.component';
 import { FormArray, FormGroup, FormControl, Validators } from '@angular/forms';
 import { ResponseService } from 'src/app/services/response.service';
@@ -13,7 +14,9 @@ export class SimpleInputSection extends AbstractSection implements OnInit {
   formGroup: FormGroup;
   formLabels: string[] = [];
   inputs: Array<Object>;
-  @Output() valueChanged = new EventEmitter<Object>();
+  @Input() interface: SimpleInputInterface;
+  @Input() constants: Object;
+  @Output() sectionChanged = new EventEmitter<Object>();
 
   constructor() {
     super();
@@ -28,7 +31,7 @@ export class SimpleInputSection extends AbstractSection implements OnInit {
       this.formLabels.push(input['label']);
       if (input['type'] === 'tag-select') {
         let checkboxArray = new FormArray([]);
-        this.templateObj['section']['tags'].forEach((tag) => {
+        this.interface.tags.forEach((tag) => {
           checkboxArray.push(new FormControl());
         });
         this.formArray.push(checkboxArray);
@@ -43,19 +46,14 @@ export class SimpleInputSection extends AbstractSection implements OnInit {
   }
 
   ngOnInit(): void {
-    this.inputs = this.templateObj['section']['inputs'];
+    this.inputs = (this.interface as SimpleInputInterface).inputs;
     this.buildForm();
-    this.data = this.templateObj['section'];
     this.formGroup = new FormGroup({
       array: this.formArray,
     });
     this.formArray.valueChanges.subscribe((newData) => {
-      let dataObj = this.templateObj['section'];
-      this.inputs.forEach((input, index) => {
-        dataObj['inputs'][index]['value'] = newData[index];
-      });
       // ResponseService.reportMetaObject = dataObj;
-      this.valueChanged.emit(dataObj);
+      this.sectionChanged.emit(newData);
     });
   }
 }

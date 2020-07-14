@@ -1,3 +1,4 @@
+import { Report } from 'src/app/interfaces/report';
 import { Component, OnInit } from '@angular/core';
 import { ResponseService } from 'src/app/services/response.service';
 
@@ -7,16 +8,14 @@ import { ResponseService } from 'src/app/services/response.service';
   styleUrls: ['./navbar.component.css'],
 })
 export class NavbarComponent implements OnInit {
-  reportTitle: string;
-  templateID: string;
+  report: Report;
 
   constructor(_ResponseService: ResponseService) {}
 
   ngOnInit(): void {
     ResponseService.reportObservable.subscribe((observer) => {
-      console.log(observer);
-      this.reportTitle = observer.title;
-      this.templateID = observer.templateID;
+      this.report = observer;
+      console.warn(this.report);
     });
   }
 }

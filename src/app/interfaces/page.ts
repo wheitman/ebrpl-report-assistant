@@ -4,5 +4,5 @@ export interface Page {
   title: string;
   subtitle: string;
   number?: number;
-  sections: Object[];
+  sections: SectionInterface[];
 }

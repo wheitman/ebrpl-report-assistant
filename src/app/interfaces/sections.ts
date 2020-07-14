@@ -1,20 +1,17 @@
-export enum SectionType {
-  Datagrid,
-  SimpleInput,
-}
-
 export interface SectionInterface {
   title: string;
-
   data: any;
-  type: SectionType;
+  type: string;
   index: number;
-  complete: boolean;
   subtitle?: string;
   extras?: Object;
+  tags?: Object[];
 }
 
 export interface DatagridInterface extends SectionInterface {
   columns: Object[];
-  tags?: Object[];
+}
+
+export interface SimpleInputInterface extends SectionInterface {
+  inputs: Object[];
 }

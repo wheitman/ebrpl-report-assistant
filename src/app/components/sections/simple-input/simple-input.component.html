@@ -1,4 +1,4 @@
-<h1>{{ title }}</h1>
+<h1>{{ interface.title }}</h1>
 <h5 class="subtitle" *ngIf="subtitle">{{ subtitle }}</h5>
 <form
   clrForm
@@ -37,9 +37,7 @@
   </clr-input-container>
   <clr-checkbox-container *ngIf="isType(input, 'tag-select')">
     <label for="">{{ input["label"] }}</label>
-    <clr-checkbox-wrapper
-      *ngFor="let tag of templateObj['section']['tags']; index as j"
-    >
+    <clr-checkbox-wrapper *ngFor="let tag of interface.tags; index as j">
       <input
         type="checkbox"
         clrCheckbox

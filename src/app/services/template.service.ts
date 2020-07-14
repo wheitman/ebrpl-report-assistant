@@ -1,3 +1,4 @@
+import { SimpleInputInterface } from './../interfaces/sections';
 import { SimpleInputSection } from './../components/sections/simple-input/simple-input.component';
 import { DatagridSection } from './../components/sections/datagrid-section/datagrid-section.component';
 import { Page } from '../interfaces/page';
@@ -10,7 +11,7 @@ import { AbstractSection } from '../components/sections/abstract-section/abstrac
   providedIn: 'root',
 })
 export class TemplateService {
-  private foolishObj = {
+  private static foolishObj = {
     contants: {
       divisions: [
         { label: 'Adults', code: 'AD' },
@@ -465,14 +466,18 @@ export class TemplateService {
   constructor() {}
 
   getStart(): Observable<SimpleInputSection> {
-    let startObj = this.foolishObj['meta-section'];
+    let startObj = TemplateService.foolishObj['meta-section'];
     return new Observable<SimpleInputSection>((observer) => {
       let simpleInput: SimpleInputSection = new SimpleInputSection();
       simpleInput.title = startObj.title || null;
       simpleInput.subtitle = startObj['subtitle'] || null;
-      simpleInput.templateObj = {
-        section: startObj,
-        constants: this.foolishObj.contants,
+      (simpleInput.interface as SimpleInputInterface) = {
+        title: startObj['title'] || null,
+        type: startObj['type'] || null,
+        data: [],
+        index: 0,
+        tags: startObj['tags'] || null,
+        inputs: startObj['inputs'],
       };
       observer.next(simpleInput);
     });
@@ -480,7 +485,7 @@ export class TemplateService {
 
   getTemplatePage(pageNumber: number): Observable<Page> {
     return new Observable<Page>((observer) => {
-      let pageObj = this.foolishObj.pages[pageNumber - 1];
+      let pageObj = TemplateService.foolishObj.pages[pageNumber - 1];
       let page: Page = {
         number: pageNumber,
         title: pageObj.title,
@@ -493,7 +498,7 @@ export class TemplateService {
 
   getPageTitles(): string[] {
     let pageTitles: string[] = [];
-    this.foolishObj.pages.forEach((page) => {
+    TemplateService.foolishObj.pages.forEach((page) => {
       pageTitles.push(page.title);
     });
     return pageTitles;
@@ -501,21 +506,25 @@ export class TemplateService {
 
   getPageSubtitles(): string[] {
     let pageSubtitles: string[] = [];
-    this.foolishObj.pages.forEach((page) => {
+    TemplateService.foolishObj.pages.forEach((page) => {
       if (page['subtitle']) pageSubtitles.push(page['subtitle']);
       else pageSubtitles.push(undefined);
     });
     return pageSubtitles;
   }
 
-  getConstant(constantName: string) {
-    return this.foolishObj.contants[constantName];
+  static getConstant(constantName: string) {
+    return TemplateService.foolishObj.contants[constantName];
+  }
+
+  static getConstants() {
+    return TemplateService.foolishObj.contants;
   }
 
   getDatagrids(pageNumber: number): Observable<DatagridSection[]> {
     pageNumber--;
     return new Observable<DatagridSection[]>((observer) => {
-      let sections = this.foolishObj.pages[pageNumber].sections;
+      let sections = TemplateService.foolishObj.pages[pageNumber].sections;
       let datagrids: DatagridSection[] = [];
       sections.forEach((section, index) => {
         if (section.type == 'datagrid') {
@@ -523,10 +532,7 @@ export class TemplateService {
           datagrid.title = section.title || null;
           datagrid.subtitle = section.subtitle || null;
           datagrid.order = index;
-          datagrid.templateObj = {
-            section: section,
-            constants: this.foolishObj.contants,
-          };
+          datagrid.interface = section;
           datagrids.push(datagrid);
         }
       });
@@ -537,7 +543,7 @@ export class TemplateService {
   getSimpleInputs(pageNumber: number): Observable<SimpleInputSection[]> {
     pageNumber--;
     return new Observable<SimpleInputSection[]>((observer) => {
-      let sections = this.foolishObj.pages[pageNumber].sections;
+      let sections = TemplateService.foolishObj.pages[pageNumber].sections;
       let simpleInputs: SimpleInputSection[] = [];
       sections.forEach((section, index) => {
         if (section.type == 'simple-input') {
@@ -545,10 +551,8 @@ export class TemplateService {
           simpleInput.title = section.title || null;
           simpleInput.subtitle = section.subtitle || null;
           simpleInput.order = index;
-          simpleInput.templateObj = {
-            section: section,
-            constants: this.foolishObj.contants,
-          };
+          simpleInput.interface = section;
+          simpleInput.inputs = section['inputs'];
           simpleInputs.push(simpleInput);
         }
       });
@@ -557,11 +561,11 @@ export class TemplateService {
   }
 
   getSectionCount(pageNumber: number) {
-    return this.foolishObj.pages[pageNumber - 1].sections.length;
+    return TemplateService.foolishObj.pages[pageNumber - 1].sections.length;
   }
 
   getTemplateConstant(constantLabel: string): Object {
-    return this.foolishObj.contants[constantLabel];
+    return TemplateService.foolishObj.contants[constantLabel];
   }
 
   getTemplateNames(): Observable<string[]> {
@@ -573,7 +577,7 @@ export class TemplateService {
   }
 
   get pageCount() {
-    return this.foolishObj.pages.length;
+    return TemplateService.foolishObj.pages.length;
   }
 
   static getTemplatePageCount(templateID: string) {

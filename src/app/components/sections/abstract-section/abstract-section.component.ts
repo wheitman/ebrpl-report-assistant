@@ -1,3 +1,4 @@
+import { SectionInterface } from './../../../interfaces/sections';
 import {
   Component,
   OnInit,
@@ -19,7 +20,7 @@ export class AbstractSection implements OnInit {
   @Input() public title: string = 'error';
   @Input() public subtitle: string = null;
   @Input() public data: any = null;
-  @Input() public templateObj: Object = {};
+  @Input() public interface: SectionInterface;
   @Input() public constants: Object = {};
   @Input() public order: number;
 

@@ -7,5 +7,6 @@ export interface Report {
   additionalInfo?: string;
   pageStatuses: string[];
   pageCount: number;
+  metaSection: Object;
   pages: Array<Object>;
 }
