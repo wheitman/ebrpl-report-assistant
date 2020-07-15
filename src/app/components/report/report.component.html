@@ -7,8 +7,8 @@
       <h1>Let's begin.</h1>
       <hr />
       <simple-input
-        *ngIf="startPage$ | async"
-        [interface]="(startPage$ | async).interface"
+        *ngIf="startPage"
+        [interface]="startPage.interface"
         (sectionChanged)="setMetaObj($event)"
       >
       </simple-input>
@@ -99,8 +99,9 @@
           type="button"
           class="btn btn-success"
           aria-label="next page"
-          *ngIf="reportFullyComplete"
-          [routerLink]="['/report', templateId, reportID, pageNumber + 1]"
+          [disabled]="!reportFullyComplete"
+          (click)="submitReport()"
+          [clrLoading]="submitButtonState"
         >
           Finish report<clr-icon shape="step-forward-2"></clr-icon>
         </button>

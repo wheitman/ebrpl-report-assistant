@@ -7,23 +7,40 @@ import {
   canActivate,
   redirectUnauthorizedTo,
   AngularFireAuthGuard,
+  redirectLoggedInTo,
+  emailVerified,
+  loggedIn,
 } from '@angular/fire/auth-guard';
-
+import * as firebase from 'firebase';
+import { AngularFireAuth } from '@angular/fire/auth';
+import { map } from 'rxjs/operators';
+const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['login']);
+const rejectUnverified = () => emailVerified;
+map((user) => {
+  console.log(user);
+});
 const routes: Routes = [
-  { path: 'login', component: LoginComponent },
   {
     path: 'report/:template-id/:report-id/:page-number',
     component: ReportComponent,
+    canActivate: [AngularFireAuthGuard],
+    data: { authGuardPipe: rejectUnverified },
   },
   {
     path: 'report/:template-id',
     component: ReportComponent,
+    canActivate: [AngularFireAuthGuard],
+    data: { authGuardPipe: rejectUnverified },
   },
   {
     path: '',
     component: StartComponent,
-    // canActivate: [AngularFireAuthGuard],
-    // data: { authGuardPipe: redirectUnauthorizedTo(['login']) },
+    canActivate: [AngularFireAuthGuard],
+    data: { authGuardPipe: redirectUnauthorizedToLogin },
+  },
+  {
+    path: 'login',
+    component: LoginComponent,
   },
 ];
 

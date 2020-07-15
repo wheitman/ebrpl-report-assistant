@@ -9,18 +9,22 @@
     <p class="titleText">{{ report.templateID }}: {{ report.title }}</p>
   </div>
   <div class="header-actions">
-    <clr-dropdown>
+    <clr-dropdown *ngIf="auth.user | async as user; else logIn">
       <button
         class="nav-text"
         clrDropdownTrigger
         aria-label="open user profile"
       >
-        LOGIN
+        <clr-icon shape="user"></clr-icon>
+        {{ user.email }}
       </button>
       <clr-dropdown-menu *clrIfOpen clrPosition="bottom-right">
         <a href="..." clrDropdownItem>Preferences</a>
-        <a href="..." clrDropdownItem>Log out</a>
+        <a (click)="logout()" clrDropdownItem>Log out</a>
       </clr-dropdown-menu>
     </clr-dropdown>
+    <ng-template #logIn>
+      <a class="nav-link nav-text" (click)="login()">LOGIN</a>
+    </ng-template>
   </div>
 </header>

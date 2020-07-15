@@ -1,10 +1,11 @@
+import { environment } from './../environments/environment';
 import { TemplateService } from './services/template.service';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { ClarityModule } from '@clr/angular';
+import { ClarityModule, ClrDropdown } from '@clr/angular';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { StartComponent } from './components/start/start.component';
 import { LoginComponent } from './components/login/login.component';
@@ -16,6 +17,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { DivisionSelectComponent } from './components/controls/division-select/division-select.component';
 import { SimpleInputSection } from './components/sections/simple-input/simple-input.component';
 import { MonthSelectComponent } from './components/controls/month-select/month-select.component';
+import { AngularFireModule } from '@angular/fire';
 
 @NgModule({
   declarations: [
@@ -36,6 +38,7 @@ import { MonthSelectComponent } from './components/controls/month-select/month-s
     ClarityModule,
     BrowserAnimationsModule,
     ReactiveFormsModule,
+    AngularFireModule.initializeApp(environment.firebase),
   ],
   providers: [TemplateService],
   bootstrap: [AppComponent],

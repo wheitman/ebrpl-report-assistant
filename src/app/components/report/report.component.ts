@@ -13,10 +13,11 @@ import { Page } from './../../interfaces/page';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { SimpleInputSection } from '../sections/simple-input/simple-input.component';
-import { ClrTimelineStepState } from '@clr/angular';
+import { ClrTimelineStepState, ClrLoadingState } from '@clr/angular';
 import { ThrowStmt } from '@angular/compiler';
 import { Report } from 'src/app/interfaces/report';
 import { report } from 'process';
+import { columnStateFactory } from '@clr/angular/data/datagrid/providers/column-state.provider';
 
 @Component({
   selector: 'app-report',
@@ -32,11 +33,11 @@ export class ReportComponent implements OnInit, OnDestroy {
   report: Report;
   datagrids: DatagridSection[] = [];
   simpleInputs: SimpleInputSection[] = [];
-  startPage$: Observable<SimpleInputSection>;
   startPage: SimpleInputSection;
 
   markCompleteControl = new FormControl();
   pageCompletions: boolean[] = [];
+  submitButtonState: ClrLoadingState = ClrLoadingState.DEFAULT;
 
   constructor(private activeRoute: ActivatedRoute, private _Router: Router) {}
 
@@ -58,11 +59,10 @@ export class ReportComponent implements OnInit, OnDestroy {
         console.warn('Report not loaded. Loading ' + this.reportID + ' now.');
         ResponseService.openReport(this.templateId, this.reportID);
       }
+      this.startPage = new SimpleInputSection();
       ResponseService.reportObservable.subscribe((observer) => {
         this.report = observer;
         if (observer) {
-          this.startPage = new SimpleInputSection();
-          console.log(this.report);
           let metaSection = this.report.metaSection as SimpleInputInterface;
           this.startPage.title = metaSection.title;
           this.startPage.subtitle = metaSection.subtitle || null;
@@ -76,22 +76,25 @@ export class ReportComponent implements OnInit, OnDestroy {
 
           this.datagrids.length = 0;
           this.simpleInputs.length = 0;
-          observer.pages[this.pageNumber - 1]['sections'].forEach(
-            (sectionInterface, index) => {
-              console.log(sectionInterface);
-              if (sectionInterface.type === 'datagrid') {
-                let dg = new DatagridSection();
-                dg.interface = sectionInterface as DatagridInterface;
-                dg.order = index;
-                this.datagrids.push(dg);
-              } else if (sectionInterface.type === 'simple-input') {
-                let si = new SimpleInputSection();
-                si.interface = sectionInterface as SimpleInputInterface;
-                si.order = index;
-                this.simpleInputs.push(si);
+
+          //the start page exists outside 'pages[]' so we have to check
+          if (observer.pages[this.pageNumber - 1]) {
+            observer.pages[this.pageNumber - 1]['sections'].forEach(
+              (sectionInterface, index) => {
+                if (sectionInterface.type === 'datagrid') {
+                  let dg = new DatagridSection();
+                  dg.interface = sectionInterface as DatagridInterface;
+                  dg.order = index;
+                  this.datagrids.push(dg);
+                } else if (sectionInterface.type === 'simple-input') {
+                  let si = new SimpleInputSection();
+                  si.interface = sectionInterface as SimpleInputInterface;
+                  si.order = index;
+                  this.simpleInputs.push(si);
+                }
               }
-            }
-          );
+            );
+          }
         }
       });
 
@@ -141,10 +144,14 @@ export class ReportComponent implements OnInit, OnDestroy {
 
   get reportFullyComplete() {
     let fullyComplete = true;
-    this.pageCompletions.forEach((elem) => {
-      //if one page is incomplete, the whole report is too!
-      if (elem === false) fullyComplete = false;
-    });
+    if (this.report) {
+      this.report.pageStatuses.forEach((elem) => {
+        //if one page is incomplete, the whole report is too!
+        if (elem !== 'complete') {
+          fullyComplete = false;
+        }
+      });
+    }
     return fullyComplete;
   }
 
@@ -192,5 +199,14 @@ export class ReportComponent implements OnInit, OnDestroy {
     if (this.report) {
       return this.report.pages.length;
     } else return 0;
+  }
+
+  submitReport() {
+    console.log('[R Comp] Submitting report...');
+    this.submitButtonState = ClrLoadingState.LOADING;
+    setTimeout(() => {
+      console.log('Submitted foolishly!');
+      this.submitButtonState = ClrLoadingState.SUCCESS;
+    }, 3000);
   }
 }

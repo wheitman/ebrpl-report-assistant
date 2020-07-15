@@ -88,13 +88,7 @@ export class ResponseService {
       id: 'EXA',
       templateID: 'Branch Usage',
       title: 'May 2020',
-      pageStatuses: [
-        'incomplete',
-        'incomplete',
-        'incomplete',
-        'incomplete',
-        'incomplete',
-      ],
+      pageStatuses: ['incomplete', 'incomplete', 'incomplete', 'incomplete'],
       metaSection: {
         title: 'Basic information',
         type: 'simple-input',
