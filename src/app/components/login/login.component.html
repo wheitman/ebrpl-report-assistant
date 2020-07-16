@@ -4,8 +4,12 @@
       <section class="title">
         <h3 class="welcome">Welcome to the</h3>
         EBRPL Report Assistant
-        <h5 class="hint">
+        <h5 class="hint" *ngIf="!resetVisible">
           Use your staff email to sign in, or create a new account now
+        </h5>
+        <h5 class="hint" *ngIf="resetVisible">
+          <hr />
+          Reset your password
         </h5>
       </section>
       <div class="login-group">
@@ -25,7 +29,7 @@
             placeholder="Staff email"
           />
         </clr-input-container>
-        <clr-password-container *ngIf="!isSignup">
+        <clr-password-container *ngIf="loginVisible">
           <label class="clr-sr-only">Password</label>
           <input
             type="password"
@@ -35,10 +39,11 @@
             autocomplete="current-password"
           />
           <clr-control-helper
-            >Forgot your password? <a>Reset it here.</a></clr-control-helper
+            >Forgot your password?
+            <a (click)="showReset()">Reset it here.</a></clr-control-helper
           >
         </clr-password-container>
-        <clr-password-container *ngIf="isSignup">
+        <clr-password-container *ngIf="signupVisible">
           <label class="clr-sr-only">New password</label>
           <input
             type="password"
@@ -48,7 +53,7 @@
             autocomplete="new-password"
           />
         </clr-password-container>
-        <clr-password-container *ngIf="isSignup">
+        <clr-password-container *ngIf="signupVisible">
           <label class="clr-sr-only">Confirm password</label>
           <input
             type="password"
@@ -70,20 +75,31 @@
             </div>
           </div>
         </div>
-        <button (click)="tryLogin()" *ngIf="!isSignup" class="btn btn-primary">
+        <button
+          (click)="tryLogin()"
+          *ngIf="loginVisible"
+          class="btn btn-primary"
+        >
           LOG IN
         </button>
         <button
           (click)="createAccount()"
-          *ngIf="isSignup"
+          *ngIf="signupVisible"
           class="btn btn-primary"
         >
           Create account
         </button>
-        <a (click)="showSignup()" *ngIf="!isSignup" class="signup"
+        <button
+          (click)="sendResetEmail()"
+          *ngIf="resetVisible"
+          class="btn btn-primary"
+        >
+          Send reset email
+        </button>
+        <a (click)="showSignup()" *ngIf="loginVisible" class="signup"
           >Or create a new account</a
         >
-        <a (click)="hideSignup()" *ngIf="isSignup" class="signup"
+        <a (click)="showLogin()" *ngIf="signupVisible" class="signup"
           >Already have an account? Log in</a
         >
       </div>

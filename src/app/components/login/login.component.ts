@@ -30,7 +30,7 @@ function checkMatch(
 })
 export class LoginComponent implements OnInit {
   formGroup: FormGroup;
-  isSignup: boolean = false;
+  currentScreen: string = 'login';
   alert: string = null;
   alertMessage: string = '';
 
@@ -62,7 +62,9 @@ export class LoginComponent implements OnInit {
       })
       .catch((error) => {
         console.log(error.code + ': ' + error.message);
-        this.showErrorAlert('Invalid username or password.');
+        this.showErrorAlert(
+          'Invalid username or password. Does this account exist?'
+        );
       });
   }
 
@@ -78,7 +80,12 @@ export class LoginComponent implements OnInit {
         .createUserWithEmailAndPassword(email, newPassword)
         .then(() => {
           firebase.auth().currentUser.sendEmailVerification();
-          console.log('Email sent... right?');
+          this.showSuccessAlert(
+            'Account successfully created. Please check your email to finish up. Redirecting...'
+          );
+          setTimeout(() => {
+            this._Router.navigate(['']);
+          }, 5000);
         })
         .catch((error) => {
           if (error.code === 'auth/email-already-in-use') {
@@ -102,9 +109,27 @@ export class LoginComponent implements OnInit {
     }
   }
 
+  sendResetEmail() {
+    firebase
+      .auth()
+      .sendPasswordResetEmail(this.formGroup.get('emailInput').value)
+      .catch((error) => {
+        console.log(error.code);
+      });
+    this.showSuccessAlert(
+      'If that account exists, a reset email has been sent.'
+    );
+    this.showLogin();
+  }
+
   showErrorAlert(error: string) {
     this.alert = 'danger';
     this.alertMessage = error;
+  }
+
+  showSuccessAlert(message: string) {
+    this.alert = 'success';
+    this.alertMessage = message;
   }
 
   hideAlert() {
@@ -113,10 +138,17 @@ export class LoginComponent implements OnInit {
   }
 
   showSignup() {
-    this.isSignup = true;
+    this.currentScreen = 'signup';
+    this.hideAlert();
   }
-  hideSignup() {
-    this.isSignup = false;
+
+  showLogin() {
+    this.currentScreen = 'login';
+    //this.hideAlert();
+  }
+  showReset() {
+    this.currentScreen = 'reset';
+    this.hideAlert();
   }
 
   get alertClass() {
@@ -129,5 +161,15 @@ export class LoginComponent implements OnInit {
     } else if (this.alert === 'success') {
       return 'alert alert-success';
     } else return null;
+  }
+
+  get loginVisible() {
+    return this.currentScreen === 'login';
+  }
+  get signupVisible() {
+    return this.currentScreen === 'signup';
+  }
+  get resetVisible() {
+    return this.currentScreen === 'reset';
   }
 }

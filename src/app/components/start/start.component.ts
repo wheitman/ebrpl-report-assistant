@@ -1,3 +1,4 @@
+import { AngularFireAuth } from '@angular/fire/auth';
 import { TemplateService } from '../../services/template.service';
 import { Component, OnInit } from '@angular/core';
 
@@ -9,11 +10,21 @@ import { Component, OnInit } from '@angular/core';
 export class StartComponent implements OnInit {
   templateNames: string[] = [''];
 
-  constructor(public reportService: TemplateService) {}
+  userVerified: boolean = false;
+
+  constructor(
+    public reportService: TemplateService,
+    public auth: AngularFireAuth
+  ) {}
 
   ngOnInit(): void {
     this.reportService.getTemplateNames().subscribe((names) => {
       this.templateNames = names;
+    });
+    this.auth.user.subscribe((user) => {
+      if (user) {
+        this.userVerified = user.emailVerified;
+      }
     });
   }
 }
