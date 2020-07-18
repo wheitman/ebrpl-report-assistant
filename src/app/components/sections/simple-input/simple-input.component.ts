@@ -74,4 +74,8 @@ export class SimpleInputSection extends AbstractSection implements OnInit {
       this.sectionChanged.emit(this.interface);
     });
   }
+
+  getConstant(constantName: string) {
+    return ['a', 'b', 'c'];
+  }
 }

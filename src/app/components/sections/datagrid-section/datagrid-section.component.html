@@ -56,7 +56,7 @@
         <select clrSelect [formControl]="formArray.controls[i]">
           <option
             [value]="division.label"
-            *ngFor="let division of constants['divisions']"
+            *ngFor="let division of getConstant('division')"
           >
             {{ division.label }}</option
           >
@@ -133,7 +133,7 @@
         <select clrSelect [formControl]="formArray.controls[i]">
           <option
             [value]="division.label"
-            *ngFor="let division of constants['divisions']"
+            *ngFor="let division of getConstant('division')"
           >
             {{ division.label }}</option
           >

@@ -57,10 +57,6 @@ export class ResponseService {
     ResponseService.saveLocally();
   }
 
-  static getConstants(): Object {
-    return TemplateService.getConstants();
-  }
-
   static closeReport() {
     ResponseService._reportOpened = false;
     ResponseService._report = null;

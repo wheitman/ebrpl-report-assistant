@@ -39,12 +39,10 @@
       <datagrid-section
         *ngFor="let section of datagrids"
         [interface]="section.interface"
-        [constants]="getConstants()"
         (sectionChanged)="updateSection(section.order, $event)"
       ></datagrid-section>
       <simple-input
         *ngFor="let section of simpleInputs"
-        [constants]="getConstants()"
         [interface]="section.interface"
         (sectionChanged)="updateSection(section.order, $event)"
       ></simple-input>

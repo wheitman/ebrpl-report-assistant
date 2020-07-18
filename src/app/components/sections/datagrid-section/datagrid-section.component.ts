@@ -25,7 +25,6 @@ export class DatagridSection extends AbstractSection implements OnInit {
 
   @Output() sectionChanged = new EventEmitter<Object>();
   @Input() interface: DatagridInterface;
-  @Input() constants: Object;
 
   addModalOpened: boolean = false;
   editModalOpened: boolean = false;
@@ -202,5 +201,9 @@ export class DatagridSection extends AbstractSection implements OnInit {
     });
     console.log(this.formArray.status);
     console.log(this.formArray.valid);
+  }
+
+  getConstant(divisionName: string) {
+    return ['A', 'B', 'C'];
   }
 }

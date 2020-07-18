@@ -183,10 +183,6 @@ export class ReportComponent implements OnInit, OnDestroy {
     );
   }
 
-  getConstants() {
-    return ResponseService.getConstants();
-  }
-
   ngOnDestroy() {
     ResponseService.closeReport();
   }
