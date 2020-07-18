@@ -1,0 +1,76 @@
+diff a/src/app/components/start/start.component.html b/src/app/components/start/start.component.html	(rejected hunks)
+@@ -1,45 +1,71 @@
+ <div class="clr-row clr-justify-content-center" style="width: 95vw;">
++  <div class="clr-col-md-6 alert alert-warning" *ngIf="!userVerified">
++    <div class="alert-items">
++      <div class="alert-item static" role="alert">
++        <div class="alert-icon-wrapper">
++          <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon>
++        </div>
++        <span class="alert-text">
++          In order to continue, please verify your account using the link
++          emailed to you, then refresh this page.
++        </span>
++      </div>
++    </div>
++  </div>
++  <div class="clr-break-row"></div>
+   <div class="clr-col-md-4">
+     <h1>You can do this.</h1>
+   </div>
+   <div class="clr-break-row"></div>
+   <div class="clr-col-md-4">
+     <clr-dropdown style="width: 100%;">
+-      <button class="btn btn-primary" clrDropdownTrigger>
++      <button
++        class="btn btn-primary"
++        clrDropdownTrigger
++        [disabled]="!userVerified"
++      >
+         Create report from template
+         <clr-icon shape="caret down"></clr-icon>
+       </button>
+       <clr-dropdown-menu clrPosition="bottom-left" *clrIfOpen>
+         <ng-container *ngFor="let name of templateNames">
+           <button clrDropdownItem [routerLink]="['/report', name]">
+             {{ name }}
+           </button>
+         </ng-container>
+       </clr-dropdown-menu>
+     </clr-dropdown>
+   </div>
+   <div class="clr-break-row"></div>
+   <div class="clr-col-md-4">
+     <clr-dropdown style="width: 100%;">
+-      <button class="btn btn-primary" clrDropdownTrigger>
++      <button
++        class="btn btn-primary"
++        clrDropdownTrigger
++        [disabled]="!userVerified"
++      >
+         Copy an old report
+         <clr-icon shape="caret down"></clr-icon>
+       </button>
+       <clr-dropdown-menu clrPosition="bottom-left" *clrIfOpen>
+         <button clrDropdownItem routerLink="/report/branch-usage/1">
+           <clr-icon shape="plus-circle"></clr-icon> From blank template
+         </button>
+         <button clrDropdownItem routerLink="/report/branch-usage/1">
+           <clr-icon shape="unarchive"></clr-icon> Based on a previous one
+         </button>
+       </clr-dropdown-menu>
+     </clr-dropdown>
+   </div>
+   <div class="clr-break-row"></div>
+   <div class="clr-col-md-4">
+-    <button class="btn btn-outline-primary" style="width: 100%;">
++    <button
++      class="btn btn-outline-primary"
++      style="width: 100%;"
++      [disabled]="!userVerified"
++    >
+       View old reports
+     </button>
+   </div>
+   <div class="clr-break-row"></div>
+ </div>

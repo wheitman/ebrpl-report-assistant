@@ -9,4 +9,5 @@ export interface Report {
   pageCount: number;
   metaSection: Object;
   pages: Array<Object>;
+  completionStatus: string;
 }

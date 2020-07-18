@@ -20,6 +20,7 @@ export class ResponseService {
     pageStatuses: undefined,
     metaSection: undefined,
     pages: [],
+    completionStatus: undefined,
   };
 
   constructor() {
@@ -537,6 +538,7 @@ export class ResponseService {
       ],
       coverageDate: { month: 'May', year: 2020 },
       additionalInfo: '',
+      completionStatus: 'incomplete',
     };
 
     ResponseService._reportOpened = true;
@@ -622,6 +624,7 @@ export class ResponseService {
           sections: [{}, {}, {}, {}, {}, {}, {}],
         },
       ],
+      completionStatus: 'incomplete',
     };
     console.log(ResponseService._report);
     ResponseService._reportOpened = true;
