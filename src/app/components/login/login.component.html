@@ -1,25 +1,14 @@
 <div class="clr-row clr-justify-content-center" style="width: 95vw;">
   <div class="clr-col clr-offset-md-4 login-wrapper">
-    <form class="login" [formGroup]="formGroup">
+    <form class="login" [formGroup]="loginGroup" *ngIf="loginVisible">
       <section class="title">
         <h3 class="welcome">Welcome to the</h3>
         EBRPL Report Assistant
         <h5 class="hint" *ngIf="!resetVisible">
           Use your staff email to sign in, or create a new account now
         </h5>
-        <h5 class="hint" *ngIf="resetVisible">
-          <hr />
-          Reset your password
-        </h5>
       </section>
       <div class="login-group">
-        <!-- <clr-select-container>
-        <label class="clr-sr-only">User Role</label>
-        <select clrSelect name="type">
-          <option value="local">Local Users</option>
-          <option value="admin">Administrator</option>
-        </select>
-      </clr-select-container> -->
         <clr-input-container>
           <label class="clr-sr-only">Staff email</label>
           <input
@@ -43,30 +32,7 @@
             <a (click)="showReset()">Reset it here.</a></clr-control-helper
           >
         </clr-password-container>
-        <clr-password-container *ngIf="signupVisible">
-          <label class="clr-sr-only">New password</label>
-          <input
-            type="password"
-            formControlName="newPasswordInput"
-            clrPassword
-            placeholder="New password"
-            autocomplete="new-password"
-          />
-        </clr-password-container>
-        <clr-password-container *ngIf="signupVisible">
-          <label class="clr-sr-only">Confirm password</label>
-          <input
-            type="password"
-            formControlName="confirmPasswordInput"
-            clrPassword
-            placeholder="Confirm password"
-          />
-        </clr-password-container>
-        <!-- <clr-checkbox-wrapper>
-        <label>Remember me</label>
-        <input type="checkbox" name="rememberMe" clrCheckbox />
-      </clr-checkbox-wrapper> -->
-        <div *ngIf="!formGroup.valid" [className]="alertClass" role="alert">
+        <div *ngIf="!loginGroup.valid" [className]="alertClass" role="alert">
           <div class="alert-items">
             <div class="alert-item static">
               <span class="alert-text">
@@ -79,29 +45,129 @@
           (click)="tryLogin()"
           *ngIf="loginVisible"
           class="btn btn-primary"
+          [disabled]="loginGroup.invalid"
         >
           LOG IN
-        </button>
-        <button
-          (click)="createAccount()"
-          *ngIf="signupVisible"
-          class="btn btn-primary"
-        >
-          Create account
-        </button>
-        <button
-          (click)="sendResetEmail()"
-          *ngIf="resetVisible"
-          class="btn btn-primary"
-        >
-          Send reset email
         </button>
         <a (click)="showSignup()" *ngIf="loginVisible" class="signup"
           >Or create a new account</a
         >
+      </div>
+    </form>
+    <form class="login" [formGroup]="createAccountGroup" *ngIf="signupVisible">
+      <section class="title">
+        <h3 class="welcome">Welcome to the</h3>
+        EBRPL Report Assistant
+        <h5 class="hint">
+          Use your staff email to sign in, or create a new account now
+        </h5>
+      </section>
+      <div class="login-group">
+        <clr-input-container>
+          <label class="clr-sr-only">Staff email</label>
+          <input
+            type="email"
+            formControlName="emailInput"
+            clrInput
+            placeholder="Staff email"
+          />
+        </clr-input-container>
+        <clr-select-container>
+          <label class="clr-sr-only">Which branch do you work for?</label>
+          <select clrSelect name="type" formControlName="branchSelect">
+            <option
+              [value]="branch"
+              *ngFor="let branch of getConstant('branches')"
+              >{{ branch }}</option
+            >
+          </select>
+          <clr-control-helper>Which branch do you work for?</clr-control-helper>
+        </clr-select-container>
+        <clr-password-container>
+          <label class="clr-sr-only">New password</label>
+          <input
+            type="password"
+            formControlName="newPasswordInput"
+            clrPassword
+            placeholder="New password"
+            autocomplete="new-password"
+          />
+        </clr-password-container>
+        <clr-password-container>
+          <label class="clr-sr-only">Confirm password</label>
+          <input
+            type="password"
+            formControlName="confirmPasswordInput"
+            clrPassword
+            placeholder="Confirm password"
+          />
+        </clr-password-container>
+        <div
+          *ngIf="!createAccountGroup.valid"
+          [className]="alertClass"
+          role="alert"
+        >
+          <div class="alert-items">
+            <div class="alert-item static">
+              <span class="alert-text">
+                {{ alertMessage }}
+              </span>
+            </div>
+          </div>
+        </div>
+        <button
+          (click)="createAccount()"
+          class="btn btn-primary"
+          [disabled]="createAccountGroup.invalid"
+        >
+          Create account
+        </button>
         <a (click)="showLogin()" *ngIf="signupVisible" class="signup"
           >Already have an account? Log in</a
         >
+      </div>
+    </form>
+    <form class="login" [formGroup]="forgotPasswordGroup" *ngIf="resetVisible">
+      <section class="title">
+        <h3 class="welcome">Welcome to the</h3>
+        EBRPL Report Assistant
+        <h5 class="hint">
+          <hr />
+          Reset your password
+        </h5>
+      </section>
+      <div class="login-group">
+        <clr-input-container>
+          <label class="clr-sr-only">Staff email</label>
+          <input
+            type="email"
+            formControlName="emailInput"
+            clrInput
+            placeholder="Staff email"
+          />
+        </clr-input-container>
+        <div
+          *ngIf="!forgotPasswordGroup.valid"
+          [className]="alertClass"
+          role="alert"
+        >
+          <div class="alert-items">
+            <div class="alert-item static">
+              <span class="alert-text">
+                {{ alertMessage }}
+              </span>
+            </div>
+          </div>
+        </div>
+        <button
+          (click)="sendResetEmail()"
+          *ngIf="resetVisible"
+          class="btn btn-primary"
+          [disabled]="forgotPasswordGroup.invalid"
+        >
+          Send reset email
+        </button>
+        <a (click)="showLogin()" class="signup">Back to login</a>
       </div>
     </form>
   </div>

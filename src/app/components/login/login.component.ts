@@ -10,6 +10,7 @@ import {
 } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import * as firebase from 'firebase';
+import { UserService } from 'src/app/services/user.service';
 
 function checkMatch(
   control: AbstractControl
@@ -29,33 +30,41 @@ function checkMatch(
   styleUrls: ['./login.component.css'],
 })
 export class LoginComponent implements OnInit {
-  formGroup: FormGroup;
+  loginGroup: FormGroup;
+  createAccountGroup: FormGroup;
+  forgotPasswordGroup: FormGroup;
   currentScreen: string = 'login';
   alert: string = null;
   alertMessage: string = '';
 
-  constructor(public _Router: Router) {}
+  constructor(public _Router: Router, public userv: UserService) {}
 
   ngOnInit(): void {
-    this.formGroup = new FormGroup(
+    this.loginGroup = new FormGroup({
+      emailInput: new FormControl('', Validators.required),
+      passwordInput: new FormControl('', Validators.required),
+    });
+    this.createAccountGroup = new FormGroup(
       {
         emailInput: new FormControl('', Validators.required),
-        passwordInput: new FormControl('', Validators.required),
         newPasswordInput: new FormControl('', Validators.required),
         confirmPasswordInput: new FormControl('', Validators.required),
+        branchSelect: new FormControl('Branch', Validators.required),
       },
       [checkMatch]
     );
+    this.forgotPasswordGroup = new FormGroup({
+      emailInput: new FormControl('', Validators.required),
+    });
   }
 
   tryLogin() {
     console.log('Logging in...');
-    let email = this.formGroup.get('emailInput').value;
-    let password = this.formGroup.get('passwordInput').value;
-    console.log(this.formGroup.get('emailInput').value);
-    firebase
-      .auth()
-      .signInWithEmailAndPassword(email, password)
+    let email = this.loginGroup.get('emailInput').value;
+    let password = this.loginGroup.get('passwordInput').value;
+    console.log(this.loginGroup.get('emailInput').value);
+    this.userv
+      .logIn(email, password)
       .then(() => {
         console.log('Login successful.');
         this._Router.navigate(['']);
@@ -69,15 +78,26 @@ export class LoginComponent implements OnInit {
   }
 
   createAccount() {
-    let email = this.formGroup.get('emailInput').value;
-    let newPassword = this.formGroup.get('newPasswordInput').value;
-    let confirmPassword = this.formGroup.get('confirmPasswordInput').value;
-    if (!this.formGroup.errors) {
+    let email = this.createAccountGroup.get('emailInput').value;
+    let newPassword = this.createAccountGroup.get('newPasswordInput').value;
+    let confirmPassword = this.createAccountGroup.get('confirmPasswordInput')
+      .value;
+    let branch = this.createAccountGroup.get('branchSelect').value;
+    if (!this.createAccountGroup.errors) {
       console.log('Creating account');
       this.hideAlert();
-      firebase
-        .auth()
-        .createUserWithEmailAndPassword(email, newPassword)
+      //pass a fresh User to createAccount, along with new password
+      this.userv
+        .createAccount(
+          {
+            email: email,
+            emailVerified: false,
+            branch: branch,
+            role: 'user',
+            reportIDs: [],
+          },
+          newPassword
+        )
         .then(() => {
           firebase.auth().currentUser.sendEmailVerification();
           this.showSuccessAlert(
@@ -88,31 +108,22 @@ export class LoginComponent implements OnInit {
           }, 5000);
         })
         .catch((error) => {
-          if (error.code === 'auth/email-already-in-use') {
-            this.showErrorAlert(
-              'Email already in use. Log in or reset password.'
-            );
-          } else if (error.code === 'auth/weak-password') {
-            this.showErrorAlert(
-              'Passwords should be at least six characters long.'
-            );
-          } else {
-            console.error(error.code);
-            this.showErrorAlert(error.code);
-          }
+          console.error('ERROR' + error);
+          this.showErrorAlert(error);
+          this.createAccountGroup.setErrors({ firebase: true });
         });
-    } else if (this.formGroup.getError('notMatching')) {
+    } else if (this.createAccountGroup.getError('notMatching')) {
       console.error('Passwords do not match');
       this.showErrorAlert('Passwords do not match.');
     } else {
-      console.error(this.formGroup.errors);
+      console.error(this.createAccountGroup.errors);
     }
   }
 
   sendResetEmail() {
     firebase
       .auth()
-      .sendPasswordResetEmail(this.formGroup.get('emailInput').value)
+      .sendPasswordResetEmail(this.forgotPasswordGroup.get('emailInput').value)
       .catch((error) => {
         console.log(error.code);
       });
@@ -171,5 +182,24 @@ export class LoginComponent implements OnInit {
   }
   get resetVisible() {
     return this.currentScreen === 'reset';
+  }
+
+  getConstant(constantName: string) {
+    return [
+      'Main Library',
+      'Baker Branch',
+      'Bluebonnet Regional Branch',
+      'Carver Branch',
+      'Central Branch',
+      'Delmont Gardens Branch',
+      'Eden Park Branch',
+      'Fairwood Branch',
+      'Greenwell Springs Rd. Regional Branch',
+      'Jones Creek Regional Branch',
+      'Pride-Chaneyville Branch',
+      'River Center Branch',
+      'Scotlandville Branch',
+      'Zachary Branch',
+    ];
   }
 }

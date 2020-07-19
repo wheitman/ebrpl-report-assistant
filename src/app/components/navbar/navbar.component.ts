@@ -4,6 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { auth } from 'firebase/app';
 import { ResponseService } from 'src/app/services/response.service';
+import { UserService } from 'src/app/services/user.service';
 
 @Component({
   selector: 'app-navbar',
@@ -17,7 +18,8 @@ export class NavbarComponent implements OnInit {
   constructor(
     _ResponseService: ResponseService,
     public auth: AngularFireAuth,
-    public _Router: Router
+    public _Router: Router,
+    public userv: UserService
   ) {}
 
   ngOnInit(): void {
@@ -31,7 +33,7 @@ export class NavbarComponent implements OnInit {
   }
 
   logout() {
-    this.auth.signOut();
+    this.userv.logOut();
     this._Router.navigate(['login']);
   }
 }
