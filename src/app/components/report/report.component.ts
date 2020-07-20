@@ -4,7 +4,7 @@ import {
   SimpleInputInterface,
 } from './../../interfaces/sections';
 import { FormControl } from '@angular/forms';
-import { ResponseService } from './../../services/response.service';
+import { ReportService } from '../../services/report.service';
 import { DatagridSection } from './../sections/datagrid-section/datagrid-section.component';
 import { AbstractSection } from './../sections/abstract-section/abstract-section.component';
 import { Observable, of } from 'rxjs';
@@ -49,18 +49,18 @@ export class ReportComponent implements OnInit, OnDestroy {
 
       //catch incomplete path, create a fresh report
       if (this.reportID === null) {
-        ResponseService.openReport(this.templateId).subscribe((observer) => {
+        ReportService.openReport(this.templateId).subscribe((observer) => {
           if (observer)
             this._Router.navigate(['report', this.templateId, observer.id, 0]);
         });
       }
 
-      if (!ResponseService.reportOpened) {
+      if (!ReportService.reportOpened) {
         console.warn('Report not loaded. Loading ' + this.reportID + ' now.');
-        ResponseService.openReport(this.templateId, this.reportID);
+        ReportService.openReport(this.templateId, this.reportID);
       }
       this.startPage = new SimpleInputSection();
-      ResponseService.reportObservable.subscribe((observer) => {
+      ReportService.reportObservable.subscribe((observer) => {
         this.report = observer;
         if (observer) {
           let metaSection = this.report.metaSection as SimpleInputInterface;
@@ -102,11 +102,11 @@ export class ReportComponent implements OnInit, OnDestroy {
       this.markCompleteControl.valueChanges.subscribe((value) => {
         if (value === true) {
           this.report.pageStatuses[this.pageNumber - 1] = 'complete';
-          ResponseService.setPageStatus(this.pageNumber - 1, 'complete');
+          ReportService.setPageStatus(this.pageNumber - 1, 'complete');
           this.updatePageCompletions();
         } else {
           this.report.pageStatuses[this.pageNumber - 1] = 'incomplete';
-          ResponseService.setPageStatus(this.pageNumber - 1, 'incomplete');
+          ReportService.setPageStatus(this.pageNumber - 1, 'incomplete');
           this.updatePageCompletions();
         }
       });
@@ -166,7 +166,7 @@ export class ReportComponent implements OnInit, OnDestroy {
     this.metaObj = formInterface.data;
   }
   finishStartPage() {
-    ResponseService.parseMetaObject(this.report.metaSection);
+    ReportService.parseMetaObject(this.report.metaSection);
     this._Router.navigate([
       'report',
       this.templateId,
@@ -176,15 +176,11 @@ export class ReportComponent implements OnInit, OnDestroy {
   }
 
   updateSection(sectionIndex: number, sectionObject: SectionInterface) {
-    ResponseService.setSection(
-      this.pageNumber - 1,
-      sectionIndex,
-      sectionObject
-    );
+    ReportService.setSection(this.pageNumber - 1, sectionIndex, sectionObject);
   }
 
   ngOnDestroy() {
-    ResponseService.closeReport();
+    ReportService.closeReport();
   }
 
   get pageTitle() {

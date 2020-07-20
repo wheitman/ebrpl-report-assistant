@@ -70,7 +70,7 @@ export class LoginComponent implements OnInit {
         this._Router.navigate(['']);
       })
       .catch((error) => {
-        console.log(error.code + ': ' + error.message);
+        console.log(error);
         this.showErrorAlert(
           'Invalid username or password. Does this account exist?'
         );

@@ -1,3 +1,4 @@
+import { PreferencesComponent } from './components/preferences/preferences.component';
 import { ReportComponent } from './components/report/report.component';
 import { StartComponent } from './components/start/start.component';
 import { LoginComponent } from './components/login/login.component';
@@ -23,6 +24,12 @@ const routes: Routes = [
   {
     path: 'report/:template-id/:report-id/:page-number',
     component: ReportComponent,
+    canActivate: [AngularFireAuthGuard],
+    data: { authGuardPipe: rejectUnverified },
+  },
+  {
+    path: 'preferences',
+    component: PreferencesComponent,
     canActivate: [AngularFireAuthGuard],
     data: { authGuardPipe: rejectUnverified },
   },

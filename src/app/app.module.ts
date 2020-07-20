@@ -1,4 +1,5 @@
-import { ResponseService } from 'src/app/services/response.service';
+import { ConstantService } from './services/constant.service';
+import { ReportService } from 'src/app/services/report.service';
 import { environment } from './../environments/environment';
 import { TemplateService } from './services/template.service';
 import { BrowserModule } from '@angular/platform-browser';
@@ -20,6 +21,7 @@ import { SimpleInputSection } from './components/sections/simple-input/simple-in
 import { MonthSelectComponent } from './components/controls/month-select/month-select.component';
 import { AngularFireModule } from '@angular/fire';
 import { UserService } from './services/user.service';
+import { PreferencesComponent } from './components/preferences/preferences.component';
 
 @NgModule({
   declarations: [
@@ -33,6 +35,7 @@ import { UserService } from './services/user.service';
     DivisionSelectComponent,
     SimpleInputSection,
     MonthSelectComponent,
+    PreferencesComponent,
   ],
   imports: [
     BrowserModule,
@@ -42,7 +45,7 @@ import { UserService } from './services/user.service';
     ReactiveFormsModule,
     AngularFireModule.initializeApp(environment.firebase),
   ],
-  providers: [TemplateService, UserService],
+  providers: [TemplateService, UserService, ConstantService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

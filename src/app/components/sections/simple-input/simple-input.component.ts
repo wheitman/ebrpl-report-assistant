@@ -2,7 +2,7 @@ import { SimpleInputInterface } from './../../../interfaces/sections';
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { AbstractSection } from '../abstract-section/abstract-section.component';
 import { FormArray, FormGroup, FormControl, Validators } from '@angular/forms';
-import { ResponseService } from 'src/app/services/response.service';
+import { ReportService } from 'src/app/services/report.service';
 
 @Component({
   selector: 'simple-input',

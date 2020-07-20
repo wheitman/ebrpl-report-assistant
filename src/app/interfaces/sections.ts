@@ -1,10 +1,9 @@
 export interface SectionInterface {
   title: string;
-  data: any;
+  value: any;
   type: string;
   index: number;
   subtitle?: string;
-  extras?: Object;
   tags?: Object[];
 }
 

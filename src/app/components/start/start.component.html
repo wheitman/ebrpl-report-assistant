@@ -1,5 +1,5 @@
 <div class="clr-row clr-justify-content-center" style="width: 100vw;">
-  <div class="clr-col-md-6 alert alert-warning" *ngIf="!userVerified">
+  <div class="clr-col-md-6 alert alert-warning" *ngIf="showUnverifiedAlert">
     <div class="alert-items">
       <div class="alert-item static" role="alert">
         <div class="alert-icon-wrapper">
@@ -7,20 +7,35 @@
         </div>
         <span class="alert-text">
           In order to continue, please verify your account using the link
-          emailed to you, then refresh this page.
+          emailed to you, then refresh this page. If you don't receive a
+          verification email (check your spam),
+          <a href="javascript://" (click)="resendVerification()"
+            >click here to resend one</a
+          >.
         </span>
       </div>
     </div>
   </div>
-  <div class="clr-col clr-col-md-10 clr-col-xl-8">
+  <div class="clr-col-md-6 alert" *ngIf="emailSent">
+    <div class="alert-items">
+      <div class="alert-item static" role="alert">
+        <div class="alert-icon-wrapper">
+          <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon>
+        </div>
+        <span class="alert-text">
+          A new email has been sent to you.
+        </span>
+      </div>
+    </div>
+  </div>
+  <div
+    class="clr-col clr-col-md-10 clr-col-xl-8"
+    *ngIf="(user | async)?.emailVerified"
+  >
     <div class="clr-row clr-justify-content-between clr-align-items-end">
-      <h1>Reports for {{ branchName }}</h1>
+      <h1>Reports for {{ (user | async)?.branch }}</h1>
       <clr-dropdown>
-        <button
-          class="btn btn-primary"
-          clrDropdownTrigger
-          [disabled]="!userVerified"
-        >
+        <button class="btn btn-primary" clrDropdownTrigger>
           <clr-icon shape="plus"></clr-icon> New report
         </button>
         <clr-dropdown-menu clrPosition="bottom-right" *clrIfOpen>
@@ -32,7 +47,7 @@
         </clr-dropdown-menu>
       </clr-dropdown>
     </div>
-    <div class="clr-row" *ngIf="userVerified">
+    <div class="clr-row">
       <clr-datagrid style="width: 100%;">
         <clr-dg-placeholder>No reports found.</clr-dg-placeholder>
 

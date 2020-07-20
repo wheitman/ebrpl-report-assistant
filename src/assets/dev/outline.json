@@ -1,82 +1,51 @@
 {
-  "contants": {
-    "divisions": [
-      { "label": "Adults", "code": "AD" },
-      { "label": "20-Somethings", "code": "20" },
-      { "label": "Teens", "code": "TD" },
-      { "label": "Children", "code": "CR" }
-    ],
-    "branches": [
-      {
-        "name": "Main"
-      },
-      {
-        "name": "Baker"
-      },
-      {
-        "name": "Bluebonnet"
-      },
-      {
-        "name": "Carver"
-      },
-      {
-        "name": "Central"
-      },
-      {
-        "name": "Delmont Gardens"
-      },
-      {
-        "name": "Eden Park"
-      },
-      {
-        "name": "Fairwood"
-      },
-      {
-        "name": "Greenwell Springs Rd."
-      },
-      {
-        "name": "Jones Creek"
-      },
-      {
-        "name": "Pride-Chaneyville"
-      },
-      {
-        "name": "River Center"
-      },
-      {
-        "name": "Scotlandville"
-      },
-      {
-        "name": "Zachary"
-      }
-    ]
-  },
-  "meta-section": {
-    "title": "Basic information",
-    "type": "simple-input",
-    "inputs": [
-      {
-        "label": "This report is for the month of:",
-        "type": "month-select",
-        "value": null,
-        "properties": {
-          "response-key": "report-coverage-date",
-          "set-title": true
-        }
-      },
-      {
-        "label": "Additional info (optional):",
-        "type": "textarea",
-        "value": null,
-        "properties": {
-          "response-key": "report-additional-info"
-        }
-      }
-    ]
-  },
+  "id": null,
+  "templateID": "Branch Usage",
+  "title": null,
+  "coverageDate": null,
+  "submitDate": null,
+  "submittedBy": null,
+  "additionalInfo": null,
+  "pageStatuses": [
+    "incomplete",
+    "incomplete",
+    "incomplete",
+    "incomplete",
+    "incomplete"
+  ],
+  "pageCount": 5,
+  "completionStatus": "incomplete",
   "pages": [
     {
+      "title": "Start",
+      "number": "0",
+      "sections": [
+        {
+          "title": "Basic information",
+          "type": "simple-input",
+          "meta": true,
+          "inputs": [
+            {
+              "label": "This report is for the month of:",
+              "type": "month-select",
+              "value": null,
+              "links": ""
+            },
+            {
+              "label": "Additional info (optional):",
+              "type": "textarea",
+              "value": null,
+              "properties": {
+                "response-key": "report-additional-info"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
       "title": "Programs in the library",
+      "number": "1",
       "sections": [
         {
           "title": "Regular programs",
@@ -106,7 +75,7 @@
             { "label": "Digital lab program", "icon": "terminal" },
             { "label": "Innovation/Maker Space", "icon": "atom" }
           ],
-          "data": [
+          "value": [
             [
               "20-Somethings",
               "07/07/2020",
@@ -224,6 +193,7 @@
     },
     {
       "title": "Other library events",
+      "number": "2",
       "sections": [
         {
           "title": "Room Usage",
@@ -233,7 +203,7 @@
             { "label": "Room", "type": "text" },
             { "label": "Attendance", "type": "number" }
           ],
-          "data": [
+          "value": [
             [null, "Group Study Room/Alternative Meeting Room", null],
             [null, "Quiet Reading Room", null],
             [null, "Teen Study Room", null],
@@ -264,6 +234,7 @@
     },
     {
       "title": "Staff presentations and events outside the library",
+      "number": "3",
       "sections": [
         {
           "title": "Speech or lecture",
@@ -293,7 +264,7 @@
             { "label": "Total # of talks", "type": "number" },
             { "label": "Attendance", "type": "number" }
           ],
-          "data": [
+          "value": [
             ["Book Clubs", null, null],
             ["Elementary", null, null],
             ["Middle school", null, null],
@@ -310,7 +281,7 @@
             { "label": "Total # of talks", "type": "number" },
             { "label": "Attendance", "type": "number" }
           ],
-          "data": [
+          "value": [
             ["Elementary", null, null],
             ["Middle school", null, null],
             ["High school", null, null],
@@ -349,6 +320,7 @@
     },
     {
       "title": "Other categories tracked",
+      "number": "4",
       "sections": [
         {
           "title": "Volunteers",
@@ -358,7 +330,7 @@
             { "label": "# of volunteers", "type": "number" },
             { "label": "Total hours worked", "type": "number" }
           ],
-          "data": [
+          "value": [
             ["Adult", null, null],
             ["Teen", null, null],
             ["Children", null, null]
@@ -403,7 +375,7 @@
             { "label": "Total", "type": "number" },
             { "label": "Title", "type": "text" }
           ],
-          "data": [
+          "value": [
             [null, null, "Coloring pages"],
             [null, null, "Reading Dogs"],
             [null, null, "Read to your bunny"]

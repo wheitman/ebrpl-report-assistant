@@ -1,6 +1,9 @@
+import { Observable } from 'rxjs';
+import { UserService } from 'src/app/services/user.service';
 import { TemplateService } from '../../services/template.service';
 import { Component, OnInit } from '@angular/core';
 import { Report } from 'src/app/interfaces/report';
+import { User } from 'src/app/interfaces/user';
 
 @Component({
   selector: 'app-start',
@@ -16,17 +19,26 @@ export class StartComponent implements OnInit {
   deleteVisible: boolean = false;
   exportVisible: boolean = false;
 
+  //alert booleans
+  emailSent: boolean = false;
+
   //from UserService
-  userVerified: boolean = true;
-  branchName: string = 'Fixme';
+  user: Observable<User> = this._UserService.getUserObservable();
+  showUnverifiedAlert: boolean;
   reports: Report[] = [];
   selectedReport: Report;
 
-  constructor(public reportService: TemplateService) {}
+  constructor(
+    public reportService: TemplateService,
+    private _UserService: UserService
+  ) {}
 
   ngOnInit(): void {
     this.reportService.getTemplateNames().subscribe((names) => {
       this.templateNames = names;
+    });
+    this.user.subscribe((user) => {
+      if (user) this.showUnverifiedAlert = !user.emailVerified;
     });
   }
 
@@ -58,5 +70,12 @@ export class StartComponent implements OnInit {
 
   isUnfinished(report: Report) {
     return report.completionStatus === 'incomplete' ? true : false;
+  }
+
+  resendVerification() {
+    this._UserService.sendVerificationEmail().then(() => {
+      this.emailSent = true;
+      this.showUnverifiedAlert = false;
+    });
   }
 }

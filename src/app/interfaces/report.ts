@@ -3,11 +3,12 @@ export interface Report {
   id: string;
   templateID: string;
   title: string;
-  coverageDate?: Object;
+  coverageDate?: string;
+  submitDate?: string;
+  submittedBy?: string;
   additionalInfo?: string;
   pageStatuses: string[];
   pageCount: number;
-  metaSection: Object;
   pages: Array<Object>;
   completionStatus: string;
 }

@@ -19,7 +19,7 @@
         {{ user.email }}
       </button>
       <clr-dropdown-menu *clrIfOpen clrPosition="bottom-right">
-        <a href="..." clrDropdownItem>Preferences</a>
+        <a [routerLink]="['preferences']" clrDropdownItem>Preferences</a>
         <a (click)="logout()" clrDropdownItem>Log out</a>
       </clr-dropdown-menu>
     </clr-dropdown>

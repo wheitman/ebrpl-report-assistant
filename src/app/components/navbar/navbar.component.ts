@@ -3,7 +3,7 @@ import { Report } from 'src/app/interfaces/report';
 import { Component, OnInit } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { auth } from 'firebase/app';
-import { ResponseService } from 'src/app/services/response.service';
+import { ReportService } from 'src/app/services/report.service';
 import { UserService } from 'src/app/services/user.service';
 
 @Component({
@@ -16,14 +16,14 @@ export class NavbarComponent implements OnInit {
   provider;
 
   constructor(
-    _ResponseService: ResponseService,
+    _ResponseService: ReportService,
     public auth: AngularFireAuth,
     public _Router: Router,
     public userv: UserService
   ) {}
 
   ngOnInit(): void {
-    ResponseService.reportObservable.subscribe((observer) => {
+    ReportService.reportObservable.subscribe((observer) => {
       this.report = observer;
     });
   }

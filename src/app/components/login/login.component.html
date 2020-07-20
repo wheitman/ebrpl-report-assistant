@@ -32,7 +32,7 @@
             <a (click)="showReset()">Reset it here.</a></clr-control-helper
           >
         </clr-password-container>
-        <div *ngIf="!loginGroup.valid" [className]="alertClass" role="alert">
+        <div *ngIf="alert" [className]="alertClass" role="alert">
           <div class="alert-items">
             <div class="alert-item static">
               <span class="alert-text">
@@ -102,11 +102,7 @@
             placeholder="Confirm password"
           />
         </clr-password-container>
-        <div
-          *ngIf="!createAccountGroup.valid"
-          [className]="alertClass"
-          role="alert"
-        >
+        <div *ngIf="alert" [className]="alertClass" role="alert">
           <div class="alert-items">
             <div class="alert-item static">
               <span class="alert-text">

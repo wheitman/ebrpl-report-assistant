@@ -1,0 +1,35 @@
+<div
+  class="clr-row clr-justify-content-center"
+  style="width: 100vw; margin-left: 1rem;"
+>
+  <div class="clr-col clr-col-md-6 clr-col-xl-6">
+    <div class="clr-row clr-justify-content-between clr-align-items-end">
+      <h1>User preferences</h1>
+    </div>
+    <div class="clr-row">
+      <form clrForm [formGroup]="formGroup">
+        <h3>Change your branch affiliation</h3>
+        <clr-select-container>
+          <label class="clr-sr-only">Which branch do you work for?</label>
+          <select clrSelect name="type" formControlName="branchSelect">
+            <option
+              [value]="branch"
+              *ngFor="let branch of (constants | async)?.branches"
+              >{{ branch }}</option
+            >
+          </select>
+          <clr-control-helper>Which branch do you work for?</clr-control-helper>
+        </clr-select-container>
+      </form>
+    </div>
+    <div class="clr-row" style="margin-top: 3rem;">
+      <button
+        class="btn btn-primary"
+        [clrLoading]="saveBtnState"
+        (click)="saveChanges()"
+      >
+        Save changes
+      </button>
+    </div>
+  </div>
+</div>
