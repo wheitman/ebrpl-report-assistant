@@ -31,8 +31,8 @@ export class SimpleInputSection extends AbstractSection implements OnInit {
       this.formLabels.push(input['label']);
 
       //if saved data exists, fill the form with that to start
-      if (this.interface.data) {
-        let savedData = this.interface.data;
+      if (this.interface.value) {
+        let savedData = this.interface.value;
         if (input['type'] === 'tag-select') {
           let checkboxArray = new FormArray([]);
           this.interface.tags.forEach((tag) => {
@@ -70,7 +70,7 @@ export class SimpleInputSection extends AbstractSection implements OnInit {
     });
     this.formArray.valueChanges.subscribe((newData) => {
       // ResponseService.reportMetaObject = dataObj;
-      this.interface.data = newData;
+      this.interface.value = newData;
       this.sectionChanged.emit(this.interface);
     });
   }

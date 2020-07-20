@@ -45,7 +45,7 @@ import { PreferencesComponent } from './components/preferences/preferences.compo
     ReactiveFormsModule,
     AngularFireModule.initializeApp(environment.firebase),
   ],
-  providers: [TemplateService, UserService, ConstantService],
+  providers: [TemplateService, UserService, ConstantService, ReportService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

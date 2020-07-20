@@ -1,9 +1,11 @@
+import { ReportService } from 'src/app/services/report.service';
 import { Observable } from 'rxjs';
 import { UserService } from 'src/app/services/user.service';
 import { TemplateService } from '../../services/template.service';
 import { Component, OnInit } from '@angular/core';
 import { Report } from 'src/app/interfaces/report';
 import { User } from 'src/app/interfaces/user';
+import { report, pages } from 'src/assets/dev/outline';
 
 @Component({
   selector: 'app-start',
@@ -29,17 +31,19 @@ export class StartComponent implements OnInit {
   selectedReport: Report;
 
   constructor(
-    public reportService: TemplateService,
+    public _TemplateService: TemplateService,
+    public _ReportService: ReportService,
     private _UserService: UserService
   ) {}
 
   ngOnInit(): void {
-    this.reportService.getTemplateNames().subscribe((names) => {
+    this._TemplateService.getTemplateNames().subscribe((names) => {
       this.templateNames = names;
     });
     this.user.subscribe((user) => {
       if (user) this.showUnverifiedAlert = !user.emailVerified;
     });
+    this._TemplateService.pushTemplateObjectToDB(report, pages);
   }
 
   showExport(report: Report) {

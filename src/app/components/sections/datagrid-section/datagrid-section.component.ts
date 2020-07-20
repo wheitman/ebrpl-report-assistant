@@ -84,12 +84,12 @@ export class DatagridSection extends AbstractSection implements OnInit {
       }
     });
     console.log(this.interface);
-    this.interface.data.push(row);
+    this.interface.value.push(row);
     this.sectionChanged.emit(this.interface);
   }
 
   deleteRow(index: number) {
-    (this.interface.data as Array<any>).splice(index, 1);
+    (this.interface.value as Array<any>).splice(index, 1);
     this.sectionChanged.emit(this.interface);
   }
 
@@ -101,7 +101,7 @@ export class DatagridSection extends AbstractSection implements OnInit {
 
   openEditModal(rowIndex: number) {
     this.selectedRow = rowIndex;
-    let editData = this.interface.data[rowIndex];
+    let editData = this.interface.value[rowIndex];
 
     this.formArray.setValue(this.convertToFormValues(editData));
     this.editModalOpened = true;
@@ -157,7 +157,7 @@ export class DatagridSection extends AbstractSection implements OnInit {
         row.push(this.formArray.at(index).value);
       }
     });
-    this.interface.data[rowIndex] = row;
+    this.interface.value[rowIndex] = row;
     this.sectionChanged.emit(this.interface);
   }
 
@@ -169,7 +169,7 @@ export class DatagridSection extends AbstractSection implements OnInit {
   addAnother() {
     this.addRowFromFormArray();
     this.formArray.reset();
-    console.log(this.interface.data);
+    console.log(this.interface.value);
 
     //show a confirmation banner, then hide after 3 seconds
     this.showItemAddConfirmation = true;

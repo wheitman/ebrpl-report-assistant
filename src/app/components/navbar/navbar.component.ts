@@ -16,14 +16,14 @@ export class NavbarComponent implements OnInit {
   provider;
 
   constructor(
-    _ResponseService: ReportService,
+    private _ReportService: ReportService,
     public auth: AngularFireAuth,
     public _Router: Router,
     public userv: UserService
   ) {}
 
   ngOnInit(): void {
-    ReportService.reportObservable.subscribe((observer) => {
+    this._ReportService.getReportObservable().subscribe((observer) => {
       this.report = observer;
     });
   }

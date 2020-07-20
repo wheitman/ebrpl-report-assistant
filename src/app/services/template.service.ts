@@ -1,3 +1,4 @@
+import { Report } from 'src/app/interfaces/report';
 import { SimpleInputInterface } from './../interfaces/sections';
 import { SimpleInputSection } from './../components/sections/simple-input/simple-input.component';
 import { DatagridSection } from './../components/sections/datagrid-section/datagrid-section.component';
@@ -6,6 +7,7 @@ import { SectionInterface } from '../interfaces/sections';
 import { Injectable, ChangeDetectorRef } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AbstractSection } from '../components/sections/abstract-section/abstract-section.component';
+import { AngularFirestore } from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root',
@@ -463,7 +465,7 @@ export class TemplateService {
     }
   );
 
-  constructor() {}
+  constructor(public _AngularFirestore: AngularFirestore) {}
 
   getStart(): Observable<SimpleInputSection> {
     let startObj = TemplateService.foolishObj['meta-section'];
@@ -474,7 +476,7 @@ export class TemplateService {
       (simpleInput.interface as SimpleInputInterface) = {
         title: startObj['title'] || null,
         type: startObj['type'] || null,
-        data: [],
+        value: [],
         index: 0,
         tags: startObj['tags'] || null,
         inputs: startObj['inputs'],
@@ -582,5 +584,17 @@ export class TemplateService {
 
   static getTemplatePageCount(templateID: string) {
     return 4;
+  }
+
+  pushTemplateObjectToDB(template: Report, pages: Page[]) {
+    let templateDoc = this._AngularFirestore.doc(
+      '/templates/' + template.templateID
+    );
+    templateDoc.set(template).then(() => {
+      let pageCollection = templateDoc.collection('pages');
+      pages.forEach((page, index) => {
+        pageCollection.doc(index.toString()).set(page);
+      });
+    });
   }
 }

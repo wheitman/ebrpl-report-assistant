@@ -6,21 +6,13 @@
     <div class="clr-col-md-4">
       <h1>Let's begin.</h1>
       <hr />
-      <simple-input
-        *ngIf="startPage"
-        [interface]="startPage.interface"
-        (sectionChanged)="setMetaObj($event)"
-      >
+      <simple-input *ngIf="startPage" [interface]="startPage.interface">
       </simple-input>
       <div class="clr-row"></div>
     </div>
     <div class="clr-break-row"></div>
     <div class="clr-col-md-4">
-      <button
-        class="btn btn-success"
-        [disabled]="!metaObj"
-        (click)="finishStartPage()"
-      >
+      <button class="btn btn-success" [disabled]="!metaObj">
         Save and continue
       </button>
     </div>
@@ -31,20 +23,21 @@
       class="clr-col clr-col-lg-10 clr-col-xl-8 sectionCol"
       *ngIf="pageNumber > 0"
     >
-      <h1>
-        ({{ pageNumber }}/{{ pageCount }})
-        {{ pageTitle }}
-      </h1>
+      <h1>({{ pageNumber }}/{{ pageCount }}) pageTitle</h1>
       <hr />
       <datagrid-section
         *ngFor="let section of datagrids"
         [interface]="section.interface"
-        (sectionChanged)="updateSection(section.order, $event)"
+        (sectionChanged)="
+          _ReportService.setSectionValue(pageNumber, section.order, $event)
+        "
       ></datagrid-section>
       <simple-input
         *ngFor="let section of simpleInputs"
         [interface]="section.interface"
-        (sectionChanged)="updateSection(section.order, $event)"
+        (sectionChanged)="
+          _ReportService.setSectionValue(pageNumber, section.order, $event)
+        "
       ></simple-input>
       <div class="clr-col-md-6 clr-offset-md-3 clr-align-self-end">
         <clr-icon shape="help-info"></clr-icon
@@ -74,7 +67,7 @@
           </clr-button>
           <clr-button
             [class]="getPageButtonClass(i + 1)"
-            *ngFor="let page of report.pages; index as i"
+            *ngFor="let page of report.pageReferences; index as i"
             [routerLink]="['/report', templateId, reportID, i + 1]"
             >{{ i + 1 }}
             <clr-icon

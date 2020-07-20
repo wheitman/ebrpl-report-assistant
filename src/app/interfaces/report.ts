@@ -9,6 +9,8 @@ export interface Report {
   additionalInfo?: string;
   pageStatuses: string[];
   pageCount: number;
-  pages: Array<Object>;
   completionStatus: string;
+
+  //NOTE: pages are stored separately, since they're in a collection
+  //on the database, not part of the document per se.
 }

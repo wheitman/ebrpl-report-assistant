@@ -2,7 +2,7 @@ import { SectionInterface } from './sections';
 
 export interface Page {
   title: string;
-  subtitle: string;
+  subtitle?: string;
   number?: number;
-  sections: SectionInterface[];
+  sections: Object[]; //SectionInterface or sibling
 }
