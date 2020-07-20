@@ -43,7 +43,6 @@ export class StartComponent implements OnInit {
     this.user.subscribe((user) => {
       if (user) this.showUnverifiedAlert = !user.emailVerified;
     });
-    this._TemplateService.pushTemplateObjectToDB(report, pages);
   }
 
   showExport(report: Report) {
