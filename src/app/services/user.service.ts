@@ -8,7 +8,7 @@ import {
   AngularFirestore,
   AngularFirestoreDocument,
 } from '@angular/fire/firestore';
-import * as firebase from 'firebase';
+import * as firebase from 'firebase/app';
 import { first } from 'rxjs/operators';
 import { promise } from 'protractor';
 

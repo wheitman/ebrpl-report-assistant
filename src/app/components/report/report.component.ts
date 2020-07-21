@@ -44,11 +44,15 @@ export class ReportComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.report$ = this._ReportService.getReportObservable();
     this.page$ = this._ReportService.getPageObservable();
-    if (!this._ReportService.report) {
-      this._Router.navigate(['']);
-    }
+    // if (!this._ReportService.report) {
+    //   this._Router.navigate(['']);
+    // }
     this.report$.subscribe((report) => {
-      console.log(report);
+      if (!report) {
+        let reportID = this.activeRoute.snapshot.paramMap.get('report-id');
+        console.warn('Report ' + reportID + ' not open. Opening now...');
+        this._ReportService.openReport(reportID);
+      } else console.log(report);
     });
     this.page$.subscribe((page) => {
       console.log(page);
