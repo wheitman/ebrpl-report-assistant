@@ -4,7 +4,7 @@ export const report = {
   title: null,
   coverageDate: null,
   submitDate: null,
-  submittedBy: null,
+  author: null,
   additionalInfo: null,
   pageStatuses: [
     'incomplete',

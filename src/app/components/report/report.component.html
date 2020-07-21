@@ -1,42 +1,20 @@
 <div class="topDiv clr-col">
-  <div
-    *ngIf="isStartPage"
-    class="clr-row clr-justify-content-center startSection"
-  >
-    <div class="clr-col-md-4">
-      <h1>Let's begin.</h1>
-      <hr />
-      <simple-input *ngIf="startPage" [interface]="startPage.interface">
-      </simple-input>
-      <div class="clr-row"></div>
-    </div>
-    <div class="clr-break-row"></div>
-    <div class="clr-col-md-4">
-      <button class="btn btn-success" [disabled]="!metaObj">
-        Save and continue
-      </button>
-    </div>
-    <div class="clr-break-row"></div>
-  </div>
   <div class="clr-row clr-justify-content-center">
-    <div
-      class="clr-col clr-col-lg-10 clr-col-xl-8 sectionCol"
-      *ngIf="pageNumber > 0"
-    >
-      <h1>({{ pageNumber }}/{{ pageCount }}) pageTitle</h1>
+    <div class="clr-col clr-col-lg-10 clr-col-xl-8 sectionCol">
+      <h1>({{ currentPage }}/{{ (report$ | async)?.pageCount }}) pageTitle</h1>
       <hr />
       <datagrid-section
         *ngFor="let section of datagrids"
         [interface]="section.interface"
         (sectionChanged)="
-          _ReportService.setSectionValue(pageNumber, section.order, $event)
+          _ReportService.setSectionValue(currentPage, section.order, $event)
         "
       ></datagrid-section>
       <simple-input
         *ngFor="let section of simpleInputs"
         [interface]="section.interface"
         (sectionChanged)="
-          _ReportService.setSectionValue(pageNumber, section.order, $event)
+          _ReportService.setSectionValue(currentPage, section.order, $event)
         "
       ></simple-input>
       <div class="clr-col-md-6 clr-offset-md-3 clr-align-self-end">
@@ -46,33 +24,33 @@
       <div style="height: 48px;"></div>
     </div>
   </div>
-  <div class="stickybar clr-row" *ngIf="!isStartPage">
+  <div class="stickybar clr-row" *ngIf="currentPage > 0">
     <div class="clr-col-8 clr-col-md-10">
       <div class="clr-row clr-justify-content-center clr-align-items-center">
         <button
           type="button"
           class="btn btn-icon btn-link"
           aria-label="previous page"
-          [disabled]="pageNumber < 1"
-          [routerLink]="['/report', templateId, reportID, pageNumber - 1]"
+          [disabled]="currentPage < 1"
+          [routerLink]="['/report', (report$ | async)?.id, currentPage - 1]"
         >
           <clr-icon shape="angle" dir="left"></clr-icon>
         </button>
-        <clr-button-group *ngIf="report">
+        <clr-button-group *ngIf="report$ | async">
           <clr-button
-            [routerLink]="['/report', templateId, reportID, 0]"
+            [routerLink]="['/report', (report$ | async)?.id, 0]"
             [class]="getPageButtonClass(0)"
           >
             <clr-icon shape="home"></clr-icon>
           </clr-button>
           <clr-button
             [class]="getPageButtonClass(i + 1)"
-            *ngFor="let page of report.pageReferences; index as i"
-            [routerLink]="['/report', templateId, reportID, i + 1]"
+            *ngFor="let status of (report$ | async)?.pageStatuses; index as i"
+            [routerLink]="['/report', (report$ | async)?.id, i + 1]"
             >{{ i + 1 }}
             <clr-icon
               shape="check"
-              *ngIf="pageCompletions[i]"
+              *ngIf="pageComplete(i)"
               title="Marked complete"
             ></clr-icon
           ></clr-button>
@@ -81,8 +59,8 @@
           type="button"
           class="btn btn-icon btn-link"
           aria-label="next page"
-          *ngIf="pageNumber < pageCount"
-          [routerLink]="['/report', templateId, reportID, pageNumber + 1]"
+          *ngIf="currentPage < (report$ | async)?.pageCount"
+          [routerLink]="['/report', (report$ | async)?.id, currentPage + 1]"
         >
           <clr-icon shape="angle" dir="right"></clr-icon>
         </button>
@@ -109,7 +87,7 @@
             name="options"
             [formControl]="markCompleteControl"
           />
-          <label *ngIf="currentPageComplete; else incompleteLabel"
+          <label *ngIf="pageComplete(currentPage); else incompleteLabel"
             >Complete</label
           >
           <ng-template #incompleteLabel>

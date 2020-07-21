@@ -12,7 +12,6 @@ import {
   emailVerified,
   loggedIn,
 } from '@angular/fire/auth-guard';
-import * as firebase from 'firebase';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { map } from 'rxjs/operators';
 const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['login']);
@@ -22,7 +21,7 @@ map((user) => {
 });
 const routes: Routes = [
   {
-    path: 'report/:template-id/:report-id/:page-number',
+    path: 'report/:report-id/:page-number',
     component: ReportComponent,
     canActivate: [AngularFireAuthGuard],
     data: { authGuardPipe: rejectUnverified },
@@ -33,12 +32,15 @@ const routes: Routes = [
     canActivate: [AngularFireAuthGuard],
     data: { authGuardPipe: rejectUnverified },
   },
-  {
-    path: 'report/:template-id',
-    component: ReportComponent,
-    canActivate: [AngularFireAuthGuard],
-    data: { authGuardPipe: rejectUnverified },
-  },
+
+  // Remove this to make things more explicit-- reports should be loaded
+  // BEFORE they're opened in the ReportComponent
+  // {
+  //   path: 'report/:template-id',
+  //   component: ReportComponent,
+  //   canActivate: [AngularFireAuthGuard],
+  //   data: { authGuardPipe: rejectUnverified },
+  // },
   {
     path: '',
     component: StartComponent,

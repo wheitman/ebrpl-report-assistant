@@ -1,5 +1,14 @@
+import { UserService } from 'src/app/services/user.service';
+import { AngularFireAuth } from '@angular/fire/auth';
+import { Router } from '@angular/router';
 import { Report } from 'src/app/interfaces/report';
-import { BehaviorSubject, range } from 'rxjs';
+import {
+  BehaviorSubject,
+  range,
+  Observable,
+  Subscription,
+  combineLatest,
+} from 'rxjs';
 import { Injectable } from '@angular/core';
 import { Page } from 'src/app/interfaces/page';
 import { AngularFirestore } from '@angular/fire/firestore';
@@ -13,12 +22,13 @@ export class ReportService {
   private _report: Report;
   private page$: BehaviorSubject<Page>;
   private _page: Page;
-  constructor(private _AngularFirestore: AngularFirestore) {
+  constructor(
+    private _AngularFirestore: AngularFirestore,
+    private _Router: Router,
+    private _UserService: UserService
+  ) {
     this.report$ = new BehaviorSubject<Report>(this._report); //undefined
     this.page$ = new BehaviorSubject<Page>(this._page); //undefined
-    this.generateReportID(true, 4, '1234').then((result) =>
-      console.log(result)
-    );
   }
 
   openReport(reportID: string, startPage: number = 0): Promise<void> {
@@ -39,14 +49,18 @@ export class ReportService {
             );
             reject();
           } else {
-            let pageDoc = reportDoc
+            reportDoc
               .collection('pages')
-              .doc('0')
+              .doc<Page>(startPage.toString())
               .valueChanges()
               .pipe(first())
               .subscribe((page: Page) => {
                 this._page = page;
                 this.page$.next(page);
+                console.log(this._page);
+                console.log(
+                  '[Report Serv] Report and page successfully opened.'
+                );
                 resolve();
               });
           }
@@ -54,11 +68,125 @@ export class ReportService {
     });
   }
 
+  createNewReport(templateID: string): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      let templateReport: Report;
+      let templateDoc = this._AngularFirestore.doc<Report>(
+        '/templates/' + templateID
+      );
+      templateDoc
+        .get()
+        .pipe(first())
+        .subscribe(
+          (report) => {
+            templateReport = report.data() as Report;
+            this.generateReportID().then((newReportID) => {
+              let reportDoc = this._AngularFirestore.doc<Report>(
+                '/reports/' + newReportID
+              );
+              reportDoc.set(templateReport).then(
+                //create the pages in a collection
+                () => {
+                  let pageCopyPromises: Promise<void>[] = [];
+                  templateReport.pageStatuses.forEach((status, index) => {
+                    let copyPromise = new Promise<void>((resolve, reject) => {
+                      let fromDoc = templateDoc
+                        .collection('pages')
+                        .doc<Page>(index.toString());
+                      fromDoc
+                        .valueChanges()
+                        .pipe(first())
+                        .subscribe((page) => {
+                          let toDoc = reportDoc
+                            .collection('pages')
+                            .doc(index.toString());
+                          console.log(page);
+                          toDoc.set(page).then(resolve).catch(reject);
+                        }, reject);
+                    });
+                    pageCopyPromises.push(copyPromise);
+                  });
+                  //once all pages are copied, resolve with the new ID.
+                  Promise.all(pageCopyPromises).then(() =>
+                    resolve(newReportID)
+                  );
+                }
+              );
+            });
+          },
+          (error) => {
+            console.error(error);
+            reject();
+          }
+        );
+    });
+  }
+
+  closeReport(redirectToHome: boolean = true) {
+    this._report = null;
+    this.report$.next(null);
+    if (redirectToHome) {
+      //go to the home page when closed
+      this._Router.navigate(['']);
+    }
+    console.log('[Report Serv] The report has been successfully closed.');
+  }
+
+  //this marks the report as 'complete' and grants visibility to admins
+  submitReport(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      if (!this._report) {
+        console.error('[Report Serv] Cannot submit report. None is open.');
+        reject(); //reject if no report is open.
+      }
+      this._report.completionStatus = 'complete';
+      this._report.submitDate = new Date().toISOString();
+      this._report.author = this._UserService.getUserSnapshot().email;
+      this.report$.next(this._report);
+      this.saveReportOnline().then(() => {
+        this.closeReport();
+        resolve();
+      }, reject);
+    });
+  }
+
+  attachToCurrentUser(updateOnline: boolean = false) {
+    this._report.author = this._UserService.getUserSnapshot().email;
+    this.report$.next(this._report);
+    this._UserService.addReportID(this._report.id);
+    if (updateOnline) {
+      this.saveReportOnline();
+    }
+  }
+
   getReportObservable() {
     return this.report$.asObservable();
   }
+  get report(): Report {
+    return this._report;
+  }
   getPageObservable() {
     return this.page$.asObservable();
+  }
+  get page(): Page {
+    return this._page;
+  }
+
+  saveReportOnline(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      if (this._report) {
+        let reportDoc = this._AngularFirestore.doc<Report>(
+          'reports/' + this._report.id
+        );
+        reportDoc.set(this._report).then(() => {
+          console.log('[Report Serv] Successfully saved to server.');
+          resolve();
+        }, reject);
+      } else {
+        console.error('[Report Serv] Cannot save report online. None is open.');
+        reject();
+      }
+    });
   }
 
   setSectionValue(pageIndex: number, sectionIndex: number, value: any) {}
@@ -89,7 +217,6 @@ export class ReportService {
           .valueChanges()
           .pipe(first())
           .subscribe((observer) => {
-            console.log(observer.length);
             if (observer.length > 0) {
               console.warn(
                 '[Report Serv] Generated ID is not unique. Retrying...'

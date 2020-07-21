@@ -34,13 +34,19 @@
   >
     <div class="clr-row clr-justify-content-between clr-align-items-end">
       <h1>Reports for {{ (user | async)?.branch }}</h1>
-      <clr-dropdown>
+      <clr-dropdown [clrCloseMenuOnItemClick]="false">
         <button class="btn btn-primary" clrDropdownTrigger>
           <clr-icon shape="plus"></clr-icon> New report
         </button>
         <clr-dropdown-menu clrPosition="bottom-right" *clrIfOpen>
-          <ng-container *ngFor="let name of templateNames">
-            <button clrDropdownItem [routerLink]="['/report', name]">
+          <ng-container
+            *ngFor="let name of _TemplateService.templateNames; index as i"
+          >
+            <button
+              clrDropdownItem
+              [clrLoading]="templateLoadStatuses[i]"
+              (click)="createReport(name, i)"
+            >
               {{ name }}
             </button>
           </ng-container>

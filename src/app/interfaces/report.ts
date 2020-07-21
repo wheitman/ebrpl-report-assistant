@@ -5,7 +5,7 @@ export interface Report {
   title: string;
   coverageDate?: string;
   submitDate?: string;
-  submittedBy?: string;
+  author?: string;
   additionalInfo?: string;
   pageStatuses: string[];
   pageCount: number;

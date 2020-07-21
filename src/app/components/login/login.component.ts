@@ -1,3 +1,4 @@
+import { auth } from 'firebase/app';
 import { Router } from '@angular/router';
 import { AngularFireAuth } from '@angular/fire/auth';
 
@@ -9,7 +10,6 @@ import {
   Validators,
 } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
-import * as firebase from 'firebase';
 import { UserService } from 'src/app/services/user.service';
 
 function checkMatch(
@@ -99,7 +99,7 @@ export class LoginComponent implements OnInit {
           newPassword
         )
         .then(() => {
-          firebase.auth().currentUser.sendEmailVerification();
+          auth().currentUser.sendEmailVerification();
           this.showSuccessAlert(
             'Account successfully created. Please check your email to finish up. Redirecting...'
           );
@@ -121,8 +121,7 @@ export class LoginComponent implements OnInit {
   }
 
   sendResetEmail() {
-    firebase
-      .auth()
+    auth()
       .sendPasswordResetEmail(this.forgotPasswordGroup.get('emailInput').value)
       .catch((error) => {
         console.log(error.code);

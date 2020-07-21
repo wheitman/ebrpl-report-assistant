@@ -31,7 +31,6 @@ export class UserService {
         this.user$.next(this._user);
       } else {
         //else fetch the user data from the server
-        console.log(authUser.emailVerified);
         let userDoc = _AngularFirestore.doc<User>('users/' + authUser.email);
         userDoc
           .valueChanges()
@@ -44,12 +43,10 @@ export class UserService {
                   user.emailVerified = authUser.emailVerified;
                   this._user = user;
                   this.user$.next(this._user);
-                  console.log(this._user);
                 });
             } else {
               this._user = user;
               this.user$.next(this._user);
-              console.log(this._user);
             }
           });
       }

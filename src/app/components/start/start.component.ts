@@ -1,3 +1,5 @@
+import { Router } from '@angular/router';
+import { ClrLoadingState } from '@clr/angular';
 import { ReportService } from 'src/app/services/report.service';
 import { Observable } from 'rxjs';
 import { UserService } from 'src/app/services/user.service';
@@ -13,7 +15,7 @@ import { report, pages } from 'src/assets/dev/outline';
   styleUrls: ['./start.component.css'],
 })
 export class StartComponent implements OnInit {
-  templateNames: string[] = [''];
+  templateNames: string[];
 
   //modal booleans
   editVisible: boolean = false;
@@ -29,19 +31,24 @@ export class StartComponent implements OnInit {
   showUnverifiedAlert: boolean;
   reports: Report[] = [];
   selectedReport: Report;
+  templateLoadStatuses: ClrLoadingState[];
 
   constructor(
     public _TemplateService: TemplateService,
     public _ReportService: ReportService,
-    private _UserService: UserService
+    private _UserService: UserService,
+    private _Router: Router
   ) {}
 
   ngOnInit(): void {
-    this._TemplateService.getTemplateNames().subscribe((names) => {
-      this.templateNames = names;
-    });
     this.user.subscribe((user) => {
       if (user) this.showUnverifiedAlert = !user.emailVerified;
+    });
+
+    //attach loading statuses to the templates in the 'new report' dropdown
+    this.templateLoadStatuses = [];
+    this._TemplateService.templateNames.forEach(() => {
+      this.templateLoadStatuses.push(ClrLoadingState.DEFAULT);
     });
   }
 
@@ -80,5 +87,29 @@ export class StartComponent implements OnInit {
       this.emailSent = true;
       this.showUnverifiedAlert = false;
     });
+  }
+
+  createReport(templateName: string, dropdownIndex: number) {
+    this.templateLoadStatuses[dropdownIndex] = ClrLoadingState.LOADING;
+    this._ReportService.createNewReport(templateName).then(
+      (newID) => {
+        this._ReportService
+          .openReport(newID)
+          .then(() => {
+            this._ReportService.attachToCurrentUser(true);
+            this._Router.navigate(['report', newID, 0]);
+          })
+          .catch((reason) => {
+            console.error(
+              'Error opening new report with ID ' + newID + ': ' + reason
+            );
+          });
+      },
+      () => {
+        console.error(
+          'Error creating new report with template ' + templateName
+        );
+      }
+    );
   }
 }

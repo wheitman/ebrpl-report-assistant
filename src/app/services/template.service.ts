@@ -13,6 +13,8 @@ import { AngularFirestore } from '@angular/fire/firestore';
   providedIn: 'root',
 })
 export class TemplateService {
+  private _templateNames: string[];
+
   private static foolishObj = {
     contants: {
       divisions: [
@@ -465,7 +467,21 @@ export class TemplateService {
     }
   );
 
-  constructor(public _AngularFirestore: AngularFirestore) {}
+  constructor(public _AngularFirestore: AngularFirestore) {
+    this._templateNames = [];
+    _AngularFirestore
+      .collection('templates')
+      .get()
+      .subscribe((snapshot) => {
+        snapshot.forEach((doc) => {
+          this._templateNames.push(doc.id);
+        });
+      });
+  }
+
+  get templateNames() {
+    return this._templateNames;
+  }
 
   getStart(): Observable<SimpleInputSection> {
     let startObj = TemplateService.foolishObj['meta-section'];

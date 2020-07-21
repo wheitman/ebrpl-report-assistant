@@ -25,20 +25,14 @@ import { columnStateFactory } from '@clr/angular/data/datagrid/providers/column-
   styleUrls: ['./report.component.css'],
 })
 export class ReportComponent implements OnInit, OnDestroy {
-  templateId: string;
-  pageNumber: number;
-  reportID: string;
-  metaObj: Object;
-  pageCount: 5;
-  pages: [];
+  report$: Observable<Report>;
+  page$: Observable<Page>;
 
-  report: Report;
   datagrids: DatagridSection[] = [];
   simpleInputs: SimpleInputSection[] = [];
   startPage: SimpleInputSection;
 
   markCompleteControl = new FormControl();
-  pageCompletions: boolean[] = [];
   submitButtonState: ClrLoadingState = ClrLoadingState.DEFAULT;
 
   constructor(
@@ -48,108 +42,34 @@ export class ReportComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.activeRoute.paramMap.subscribe((params) => {
-      // this.templateId = params.get('template-id');
-      // this.pageNumber = +params.get('page-number');
-      // this.reportID = params.get('report-id');
-      // //catch incomplete path, create a fresh report
-      // if (this.reportID === null) {
-      //   this._ReportService.openReport(this.templateId).then(()=>{
-      //     this._ReportService.getReportObservable().subscribe((report)=> {
-      //       if(report){
-      //         this._Router.navigate(['report', this.templateId, report.id, 0]);
-      //       }
-      //     })
-      //   }
-      // }
-      // if (!ReportService.reportOpened) {
-      //   console.warn('Report not loaded. Loading ' + this.reportID + ' now.');
-      //   this._ReportService.openReport(this.templateId, this.reportID);
-      // }
-      // this.startPage = new SimpleInputSection();
-      // ReportService.reportObservable.subscribe((observer) => {
-      //   this.report = observer;
-      //   if (observer) {
-      //     let metaSection = this.report.metaSection as SimpleInputInterface;
-      //     this.startPage.title = metaSection.title;
-      //     this.startPage.subtitle = metaSection.subtitle || null;
-      //     this.startPage.interface = metaSection;
-      //     this.report.pageStatuses = observer.pageStatuses || null;
-      //     //set initial value of completion toggle (bottom corner)
-      //     if (this.report.pageStatuses[this.pageNumber - 1] === 'complete') {
-      //       this.markCompleteControl.setValue(true);
-      //     } else this.markCompleteControl.setValue(false);
-      //     this.datagrids.length = 0;
-      //     this.simpleInputs.length = 0;
-      //     //the start page exists outside 'pages[]' so we have to check
-      //     if (observer.pages[this.pageNumber - 1]) {
-      //       observer.pages[this.pageNumber - 1]['sections'].forEach(
-      //         (sectionInterface, index) => {
-      //           if (sectionInterface.type === 'datagrid') {
-      //             let dg = new DatagridSection();
-      //             dg.interface = sectionInterface as DatagridInterface;
-      //             dg.order = index;
-      //             this.datagrids.push(dg);
-      //           } else if (sectionInterface.type === 'simple-input') {
-      //             let si = new SimpleInputSection();
-      //             si.interface = sectionInterface as SimpleInputInterface;
-      //             si.order = index;
-      //             this.simpleInputs.push(si);
-      //           }
-      //         }
-      //       );
-      //     }
-      //   //   }
-      //   });
-      //   //update the page status as the toggle changes
-      //   this.markCompleteControl.valueChanges.subscribe((value) => {
-      //     if (value === true) {
-      //       this.report.pageStatuses[this.pageNumber - 1] = 'complete';
-      //       ReportService.setPageStatus(this.pageNumber - 1, 'complete');
-      //       this.updatePageCompletions();
-      //     } else {
-      //       this.report.pageStatuses[this.pageNumber - 1] = 'incomplete';
-      //       ReportService.setPageStatus(this.pageNumber - 1, 'incomplete');
-      //       this.updatePageCompletions();
-      //     }
-      //   });
-      //   this.updatePageCompletions();
-      // });
+    this.report$ = this._ReportService.getReportObservable();
+    this.page$ = this._ReportService.getPageObservable();
+    if (!this._ReportService.report) {
+      this._Router.navigate(['']);
+    }
+    this.report$.subscribe((report) => {
+      console.log(report);
     });
-  }
-
-  get currentPageComplete(): boolean {
-    if (
-      this.report &&
-      this.report.pageStatuses[this.pageNumber] === 'complete'
-    ) {
-      return true;
-    } else return false;
+    this.page$.subscribe((page) => {
+      console.log(page);
+    });
   }
 
   getPageButtonClass(pageNumber: number) {
-    if (pageNumber == this.pageNumber) return 'btn btn-primary';
+    if (pageNumber == this.currentPage) return 'btn btn-primary';
     else return 'btn';
   }
-  pageCompleted(pageNumber: number) {
-    if (this.report.pageStatuses[this.pageNumber] === 'complete') return true;
-    else return false;
-  }
-  updatePageCompletions() {
-    this.pageCompletions = [];
-    this.report.pageStatuses.forEach((status, index) => {
-      if (status === 'complete') {
-        this.pageCompletions.push(true);
-      } else {
-        this.pageCompletions.push(false);
-      }
-    });
+  pageComplete(pageIndex: number): boolean {
+    if (!this._ReportService.report) return false;
+    return this._ReportService.report.pageStatuses[pageIndex] === 'complete'
+      ? true
+      : false;
   }
 
   get reportFullyComplete() {
     let fullyComplete = true;
-    if (this.report) {
-      this.report.pageStatuses.forEach((elem) => {
+    if (this._ReportService.report) {
+      this._ReportService.report.pageStatuses.forEach((elem) => {
         //if one page is incomplete, the whole report is too!
         if (elem !== 'complete') {
           fullyComplete = false;
@@ -157,10 +77,6 @@ export class ReportComponent implements OnInit, OnDestroy {
       });
     }
     return fullyComplete;
-  }
-
-  get isStartPage() {
-    return this.pageNumber === 0;
   }
 
   // setMetaObj(formInterface: SimpleInputInterface) {
@@ -184,8 +100,7 @@ export class ReportComponent implements OnInit, OnDestroy {
   // }
 
   ngOnDestroy() {
-    console.warn('fixme');
-    //ReportService.closeReport();
+    this._ReportService.closeReport();
   }
 
   // get pageTitle() {
@@ -201,9 +116,13 @@ export class ReportComponent implements OnInit, OnDestroy {
   submitReport() {
     console.log('[R Comp] Submitting report...');
     this.submitButtonState = ClrLoadingState.LOADING;
-    setTimeout(() => {
-      console.log('Submitted foolishly!');
+    this._ReportService.submitReport().then(() => {
       this.submitButtonState = ClrLoadingState.SUCCESS;
-    }, 3000);
+    });
+  }
+
+  get currentPage() {
+    if (this._ReportService.page) return this._ReportService.page.number;
+    else return 0;
   }
 }
