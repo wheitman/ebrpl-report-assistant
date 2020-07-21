@@ -13,12 +13,12 @@
       <button class="action-item" (click)="openEditModal(i)">Edit</button>
       <button class="action-item" (click)="deleteRow(i)">Delete</button>
     </clr-dg-action-overflow>
-    <clr-dg-cell *ngFor="let cell of row">
+    <clr-dg-cell *ngFor="let cell of row.row">
       <span *ngIf="!isTagObj(cell); else tagRenderer">
         {{ cell }}
       </span>
       <ng-template #tagRenderer>
-        <span *ngFor="let tag of cell">
+        <span *ngFor="let tag of cell.tags">
           <clr-icon [attr.shape]="tag.icon" title="{{ tag.label }}"></clr-icon>
         </span>
       </ng-template>
@@ -53,10 +53,14 @@
       </clr-date-container>
       <clr-select-container *ngIf="isType(column, 'division-select')">
         <label for="">{{ column["label"] }}</label>
-        <select clrSelect [formControl]="formArray.controls[i]">
+        <select
+          clrSelect
+          *ngIf="constants"
+          [formControl]="formArray.controls[i]"
+        >
           <option
             [value]="division.label"
-            *ngFor="let division of getConstant('division')"
+            *ngFor="let division of constants['divisions']"
           >
             {{ division.label }}</option
           >
@@ -130,10 +134,14 @@
       </clr-date-container>
       <clr-select-container *ngIf="isType(column, 'division-select')">
         <label for="">{{ column["label"] }}</label>
-        <select clrSelect [formControl]="formArray.controls[i]">
+        <select
+          clrSelect
+          *ngIf="constants"
+          [formControl]="formArray.controls[i]"
+        >
           <option
             [value]="division.label"
-            *ngFor="let division of getConstant('division')"
+            *ngFor="let division of constants['divisions']"
           >
             {{ division.label }}</option
           >

@@ -28,12 +28,19 @@ export class ReportComponent implements OnInit, OnDestroy {
   report$: Observable<Report>;
   page$: Observable<Page>;
 
-  datagrids: DatagridSection[] = [];
-  simpleInputs: SimpleInputSection[] = [];
+  urlPageNumber: number;
+
+  datagrids: DatagridInterface[] = [];
+  simpleInputs: SimpleInputInterface[] = [];
   startPage: SimpleInputSection;
 
   markCompleteControl = new FormControl();
   submitButtonState: ClrLoadingState = ClrLoadingState.DEFAULT;
+  saveButtonState: ClrLoadingState = ClrLoadingState.DEFAULT;
+  saveSuccessful: boolean = false;
+  saveTime: number;
+
+  submitConfirmationVisible: boolean = false;
 
   constructor(
     private activeRoute: ActivatedRoute,
@@ -44,23 +51,60 @@ export class ReportComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.report$ = this._ReportService.getReportObservable();
     this.page$ = this._ReportService.getPageObservable();
-    // if (!this._ReportService.report) {
-    //   this._Router.navigate(['']);
-    // }
+
+    this.activeRoute.paramMap.subscribe((params) => {
+      this.urlPageNumber = +params.get('page-number');
+      if (
+        this.urlPageNumber !== null &&
+        this.urlPageNumber !== undefined &&
+        this.urlPageNumber !== this.currentPageIndex &&
+        this._ReportService.report
+      ) {
+        this._ReportService.openPage(this.urlPageNumber);
+      }
+    });
+
+    this.markCompleteControl.valueChanges.subscribe((newState: boolean) => {
+      if (newState === true) {
+        this._ReportService.setStatus(this.currentPageIndex, 'complete');
+      } else {
+        this._ReportService.setStatus(this.currentPageIndex, 'incomplete');
+      }
+    });
+
     this.report$.subscribe((report) => {
       if (!report) {
         let reportID = this.activeRoute.snapshot.paramMap.get('report-id');
+        let pageNumber = this.activeRoute.snapshot.paramMap.get('page-number');
         console.warn('Report ' + reportID + ' not open. Opening now...');
-        this._ReportService.openReport(reportID);
-      } else console.log(report);
+        this._ReportService.openReport(reportID, +pageNumber);
+      }
     });
+    //if requested page isn't open, open it
+
     this.page$.subscribe((page) => {
-      console.log(page);
+      if (page) {
+        this.datagrids = [];
+        this.simpleInputs = [];
+        //process new sections
+        page.sections.forEach((section) => {
+          if (section['type'] == 'datagrid') {
+            this.datagrids.push(section as DatagridInterface);
+          } else if (section['type'] == 'simple-input') {
+            this.simpleInputs.push(section as SimpleInputInterface);
+          }
+        });
+        this.markCompleteControl.setValue(
+          this._ReportService.report.pageStatuses[page.number] === 'complete'
+            ? true
+            : false
+        );
+      }
     });
   }
 
-  getPageButtonClass(pageNumber: number) {
-    if (pageNumber == this.currentPage) return 'btn btn-primary';
+  getPageButtonClass(pageIndex: number) {
+    if (pageIndex == this.currentPageIndex) return 'btn btn-primary';
     else return 'btn';
   }
   pageComplete(pageIndex: number): boolean {
@@ -107,15 +151,37 @@ export class ReportComponent implements OnInit, OnDestroy {
     this._ReportService.closeReport();
   }
 
-  // get pageTitle() {
-  //   if (this.report) return this.report.pages[this.pageNumber - 1]['title'];
-  //   else return '';
-  // }
-  // get pageCount() {
-  //   if (this.report) {
-  //     return this.report.pages.length;
-  //   } else return 0;
-  // }
+  savePage() {
+    this.saveButtonState = ClrLoadingState.LOADING;
+    this._ReportService
+      .savePageOnline()
+      .then(() => {
+        this.saveButtonState = ClrLoadingState.DEFAULT;
+        this.saveSuccessful = true;
+        this.saveTime = Date.now();
+        setTimeout(() => (this.saveSuccessful = false), 2500);
+      })
+      .catch(() => {
+        this.saveButtonState = ClrLoadingState.ERROR;
+      });
+  }
+
+  goToPage(pageNumber: number) {
+    this.savePage();
+    this._Router.navigate([
+      'report',
+      this._ReportService.report.id,
+      pageNumber,
+    ]);
+  }
+
+  confirmSubmitReport() {
+    this.submitConfirmationVisible = true;
+  }
+
+  cancelSubmitReport() {
+    this.submitConfirmationVisible = false;
+  }
 
   submitReport() {
     console.log('[R Comp] Submitting report...');
@@ -125,8 +191,27 @@ export class ReportComponent implements OnInit, OnDestroy {
     });
   }
 
-  get currentPage() {
+  get currentPageIndex() {
     if (this._ReportService.page) return this._ReportService.page.number;
-    else return 0;
+    else return null;
+  }
+
+  //return minutes since last save
+  get saveTimeElapsed(): string {
+    if (!this.saveTime) {
+      return null;
+    } else {
+      return (
+        ((Date.now() - this.saveTime) / (1000 * 60)).toFixed() +
+        ' minutes since save'
+      );
+    }
+  }
+
+  get saveStale(): boolean {
+    //if unsaved or ten minutes have passed
+    if (!this.saveTime || (Date.now() - this.saveTime) / (1000 * 60) > 10) {
+      return true;
+    } else return false;
   }
 }

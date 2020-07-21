@@ -539,25 +539,6 @@ export class TemplateService {
     return TemplateService.foolishObj.contants;
   }
 
-  getDatagrids(pageNumber: number): Observable<DatagridSection[]> {
-    pageNumber--;
-    return new Observable<DatagridSection[]>((observer) => {
-      let sections = TemplateService.foolishObj.pages[pageNumber].sections;
-      let datagrids: DatagridSection[] = [];
-      sections.forEach((section, index) => {
-        if (section.type == 'datagrid') {
-          let datagrid: DatagridSection = new DatagridSection();
-          datagrid.title = section.title || null;
-          datagrid.subtitle = section.subtitle || null;
-          datagrid.order = index;
-          datagrid.interface = section;
-          datagrids.push(datagrid);
-        }
-      });
-      observer.next(datagrids);
-    });
-  }
-
   getSimpleInputs(pageNumber: number): Observable<SimpleInputSection[]> {
     pageNumber--;
     return new Observable<SimpleInputSection[]>((observer) => {

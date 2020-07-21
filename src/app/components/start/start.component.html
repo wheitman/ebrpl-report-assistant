@@ -58,57 +58,51 @@
         <clr-dg-placeholder>No reports found.</clr-dg-placeholder>
 
         <clr-dg-column>Template</clr-dg-column>
-        <clr-dg-column>Title</clr-dg-column>
+        <clr-dg-column>ID</clr-dg-column>
         <clr-dg-column>Coverage date</clr-dg-column>
         <clr-dg-column>Additional info</clr-dg-column>
         <clr-dg-column>Actions</clr-dg-column>
 
         <clr-dg-row *ngFor="let report of reports; index as i">
-          <clr-dg-cell
+          <clr-dg-action-overflow>
+            <button class="action-item" (click)="navigate(report)">
+              Open report
+            </button>
+            <button class="action-item" (click)="showCopy(report)">
+              Duplicate to new report
+            </button>
+            <button
+              *ngIf="!isUnfinished(report)"
+              class="action-item"
+              (click)="showExport(report)"
+            >
+              View JSON
+            </button>
+            <button
+              *ngIf="isUnfinished(report)"
+              class="action-item"
+              (click)="showDelete(report)"
+            >
+              Delete draft
+            </button>
+          </clr-dg-action-overflow>
+          <clr-dg-cell (click)="navigate(report)" class="clickable"
             >{{ report.templateID }}
             <span *ngIf="isUnfinished(report)" class="label label-warning"
               >Draft</span
             >
           </clr-dg-cell>
-          <clr-dg-cell>{{ report.title }}</clr-dg-cell>
-          <clr-dg-cell>{{
+          <clr-dg-cell (click)="navigate(report)" class="clickable">{{
+            report.id
+          }}</clr-dg-cell>
+          <clr-dg-cell (click)="navigate(report)" class="clickable">{{
             report.coverageDate | date: "longDate"
           }}</clr-dg-cell>
-          <clr-dg-cell>{{ report.additionalInfo }}</clr-dg-cell>
+          <clr-dg-cell (click)="navigate(report)" class="clickable">{{
+            report.additionalInfo
+          }}</clr-dg-cell>
           <clr-dg-cell style="padding: 0;">
-            <div class="btn-group btn-link btn-icon">
-              <button class="btn">
-                <clr-icon shape="pencil" title="Edit report"></clr-icon>
-                <span class="clr-icon-title">Edit report</span>
-              </button>
-              <button class="btn" (click)="showCopy(report)">
-                <clr-icon
-                  shape="copy"
-                  title="Duplicate to new report"
-                ></clr-icon>
-                <span class="clr-icon-title">Duplicate to new report</span>
-              </button>
-              <button
-                *ngIf="!isUnfinished(report)"
-                class="btn"
-                (click)="showExport(report)"
-              >
-                <clr-icon shape="download" title="View JSON"></clr-icon>
-                <span class="clr-icon-title">View JSON</span>
-              </button>
-              <button
-                *ngIf="isUnfinished(report)"
-                class="btn btn-danger"
-                (click)="showDelete(report)"
-              >
-                <clr-icon
-                  shape="trash"
-                  class="is-warning"
-                  title="Delete draft"
-                ></clr-icon>
-                <span class="clr-icon-title">Delete draft</span>
-              </button>
-            </div>
+            <div class="btn-group btn-link btn-icon"></div>
           </clr-dg-cell>
         </clr-dg-row>
 

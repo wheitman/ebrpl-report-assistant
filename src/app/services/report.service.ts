@@ -84,6 +84,8 @@ export class ReportService {
               let reportDoc = this._AngularFirestore.doc<Report>(
                 '/reports/' + newReportID
               );
+              templateReport.id = newReportID;
+              templateReport.author = this._UserService.getUserSnapshot().email;
               reportDoc.set(templateReport).then(
                 //create the pages in a collection
                 () => {
@@ -130,6 +132,27 @@ export class ReportService {
       this._Router.navigate(['']);
     }
     console.log('[Report Serv] The report has been successfully closed.');
+  }
+
+  openPage(pageNumber: number): Promise<void> {
+    console.log('[Report Serv] Opening page ' + pageNumber + '...');
+    return new Promise<void>((resolve, reject) => {
+      if (!this._report) {
+        console.error('[Report Serv] Cannot open page. No report is open.');
+        reject();
+      }
+      let pageDoc = this._AngularFirestore.doc<Page>(
+        '/reports/' + this._report.id + '/pages/' + pageNumber.toString()
+      );
+      pageDoc
+        .valueChanges()
+        .pipe(first())
+        .subscribe((page) => {
+          this._page = page;
+          this.page$.next(page);
+          resolve();
+        }, reject);
+    });
   }
 
   //this marks the report as 'complete' and grants visibility to admins
@@ -189,7 +212,55 @@ export class ReportService {
     });
   }
 
-  setSectionValue(pageIndex: number, sectionIndex: number, value: any) {}
+  savePageOnline(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      if (this._page) {
+        let pageDoc = this._AngularFirestore.doc<Page>(
+          'reports/' + this._report.id + '/pages/' + this._page.number
+        );
+        pageDoc.set(this._page).then(() => {
+          console.log(
+            '[Report Serv] Successfully saved page ' +
+              this._page.number +
+              ' to server.'
+          );
+          resolve();
+        }, reject);
+      } else {
+        console.error('[Report Serv] Cannot save page online. None is open.');
+        reject();
+      }
+    });
+  }
+
+  setSectionValue(pageIndex: number, sectionIndex: number, value: any) {
+    console.log(value);
+  }
+
+  setStatus(pageIndex: number, status: string) {
+    if (!(status === 'complete' || status === 'incomplete')) {
+      console.warn('Is ' + status + ' a valid status?');
+    }
+    this._report.pageStatuses[pageIndex] = status;
+    this.report$.next(this._report);
+  }
+
+  fetchReports(reportIDs: string[]): Promise<Report[]> {
+    let fetchPromises: Promise<Report>[] = [];
+    reportIDs.forEach((reportID) => {
+      let reportDoc = this._AngularFirestore.doc<Report>('reports/' + reportID);
+      let fetchPromise = new Promise<Report>((resolve, reject) => {
+        reportDoc
+          .valueChanges()
+          .pipe(first())
+          .subscribe((report) => {
+            resolve(report);
+          }, reject);
+      });
+      fetchPromises.push(fetchPromise);
+    });
+    return Promise.all(fetchPromises);
+  }
 
   private generateReportID(
     checkUniqueness = true,

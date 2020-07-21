@@ -1,3 +1,4 @@
+import { ConstantService } from './../../../services/constant.service';
 import { TemplateService } from './../../../services/template.service';
 import { DatagridInterface } from './../../../interfaces/sections';
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
@@ -31,14 +32,23 @@ export class DatagridSection extends AbstractSection implements OnInit {
   showItemAddConfirmation: boolean = false;
   selectedRow: number;
 
-  constructor() {
+  constants: Object;
+
+  constructor(public constantService: ConstantService) {
     super();
   }
 
   ngOnInit(): void {
+    if (!this.interface.value) {
+      this.interface.value = [];
+    }
     this.buildFormFromInterface();
     this.formGroup = new FormGroup({
       array: this.formArray,
+    });
+    this.constantService.constants.subscribe((obj) => {
+      this.constants = obj;
+      console.log(obj);
     });
   }
 
@@ -78,13 +88,13 @@ export class DatagridSection extends AbstractSection implements OnInit {
           if ((this.formArray.at(index) as FormArray).at(j).value === true)
             tags.push(tag);
         });
-        row.push(tags);
+        row.push({ tags: tags });
       } else {
         row.push(this.formArray.at(index).value);
       }
     });
     console.log(this.interface);
-    this.interface.value.push(row);
+    this.interface.value.push({ row: row });
     this.sectionChanged.emit(this.interface);
   }
 
@@ -110,13 +120,13 @@ export class DatagridSection extends AbstractSection implements OnInit {
   convertToFormValues(dataRow): any[] {
     let formVals: any[] = [];
     //check if any column contains tags
-    dataRow.forEach((col, index) => {
+    dataRow.row.forEach((col, index) => {
       if (
         (this.interface as DatagridInterface).columns[index]['type'] ===
         'tag-select'
       ) {
         let templateTags: Object[] = (this.interface as DatagridInterface).tags;
-        let rowTags: Object[] = col;
+        let rowTags: Object[] = col.tags;
         let tagVals: boolean[] = [];
         let templateLabels: string[] = [];
         templateTags.forEach((tag: Object) => {
@@ -152,12 +162,13 @@ export class DatagridSection extends AbstractSection implements OnInit {
           if ((this.formArray.at(index) as FormArray).at(j).value === true)
             tags.push(tag);
         });
-        row.push(tags);
+        row.push({ tags: tags });
       } else {
         row.push(this.formArray.at(index).value);
       }
     });
-    this.interface.value[rowIndex] = row;
+    console.log(row);
+    this.interface.value[rowIndex] = { row: row };
     this.sectionChanged.emit(this.interface);
   }
 
@@ -184,14 +195,7 @@ export class DatagridSection extends AbstractSection implements OnInit {
   }
 
   isTagObj(obj) {
-    if (
-      obj !== null &&
-      obj !== undefined &&
-      obj[0] &&
-      obj[0]['label'] &&
-      obj[0]['icon']
-    )
-      return true;
+    if (obj !== null && obj !== undefined && obj['tags']) return true;
     else return false;
   }
 
@@ -201,9 +205,5 @@ export class DatagridSection extends AbstractSection implements OnInit {
     });
     console.log(this.formArray.status);
     console.log(this.formArray.valid);
-  }
-
-  getConstant(divisionName: string) {
-    return ['A', 'B', 'C'];
   }
 }

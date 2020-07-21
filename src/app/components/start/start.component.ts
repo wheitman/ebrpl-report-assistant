@@ -42,7 +42,17 @@ export class StartComponent implements OnInit {
 
   ngOnInit(): void {
     this.user.subscribe((user) => {
-      if (user) this.showUnverifiedAlert = !user.emailVerified;
+      if (user) {
+        this.showUnverifiedAlert = !user.emailVerified;
+        this._ReportService
+          .fetchReports(user.reportIDs)
+          .then((reports) => {
+            this.reports = reports;
+          })
+          .catch(() => {
+            console.error('Could not fetch reports for ' + user.email);
+          });
+      }
     });
 
     //attach loading statuses to the templates in the 'new report' dropdown
@@ -111,5 +121,10 @@ export class StartComponent implements OnInit {
         );
       }
     );
+  }
+
+  navigate(report: Report) {
+    console.log('Opening: ' + report.id);
+    this._Router.navigate(['report', report.id, 0]);
   }
 }

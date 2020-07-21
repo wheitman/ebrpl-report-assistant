@@ -2,22 +2,29 @@
   <div class="clr-row clr-justify-content-center">
     <div class="clr-col clr-col-lg-10 clr-col-xl-8 sectionCol">
       <h1>
-        ({{ currentPage }}/{{ (report$ | async)?.pageCount }})
         {{ (page$ | async)?.title }}
       </h1>
       <hr />
       <datagrid-section
         *ngFor="let section of datagrids"
-        [interface]="section.interface"
+        [interface]="section"
         (sectionChanged)="
-          _ReportService.setSectionValue(currentPage, section.order, $event)
+          _ReportService.setSectionValue(
+            currentPageIndex,
+            section.order,
+            $event
+          )
         "
       ></datagrid-section>
       <simple-input
         *ngFor="let section of simpleInputs"
-        [interface]="section.interface"
+        [interface]="section"
         (sectionChanged)="
-          _ReportService.setSectionValue(currentPage, section.order, $event)
+          _ReportService.setSectionValue(
+            currentPageIndex,
+            section.order,
+            $event
+          )
         "
       ></simple-input>
       <div class="clr-col-md-6 clr-offset-md-3 clr-align-self-end">
@@ -27,30 +34,100 @@
       <div style="height: 48px;"></div>
     </div>
   </div>
-  <div class="stickybar clr-row" *ngIf="currentPage > 0">
+  <clr-modal [(clrModalOpen)]="submitConfirmationVisible">
+    <h3 class="modal-title">Ready to submit?</h3>
+    <div class="modal-body">
+      <clr-alert
+        *ngIf="!reportFullyComplete"
+        [clrAlertType]="'warning'"
+        [clrAlertClosable]="false"
+      >
+        <clr-alert-item>
+          <span class="alert-text">
+            Heads up: not all pages have been marked as complete.
+          </span>
+        </clr-alert-item>
+      </clr-alert>
+      <hr />
+      Once a report is submitted, <b>it cannot be edited again</b>. Double-check
+      to make sure that all sections are filled out.
+    </div>
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-outline"
+        (click)="cancelSubmitReport()"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="cancelSubmitReport()"
+      >
+        Submit
+      </button>
+    </div>
+  </clr-modal>
+  <div
+    class="alert alert-success"
+    *ngIf="saveSuccessful"
+    role="alert"
+    style="
+      position: fixed;
+      bottom: 54px;
+      left: 6px;
+      width: 10rem;
+      z-index: 1000;
+    "
+  >
+    <div class="alert-items">
+      <div class="alert-item static">
+        <div class="alert-icon-wrapper">
+          <clr-icon class="alert-icon" shape="check-circle"></clr-icon>
+        </div>
+        <span class="alert-text">Page saved</span>
+      </div>
+    </div>
+  </div>
+  <div class="stickybar clr-row">
     <div class="clr-col-8 clr-col-md-10">
       <div class="clr-row clr-justify-content-center clr-align-items-center">
         <button
           type="button"
+          class="btn"
+          [class.btn-primary]="saveStale"
+          [class.btn-link]="!saveStale"
+          aria-label="save page"
+          [clrLoading]="saveButtonState"
+          (click)="savePage()"
+          title="Save current page"
+        >
+          <clr-icon shape="floppy" [class.has-alert]="saveStale"></clr-icon>
+          {{ saveTimeElapsed }}
+        </button>
+        <button
+          type="button"
           class="btn btn-icon btn-link"
           aria-label="previous page"
-          [disabled]="currentPage < 1"
-          [routerLink]="['/report', (report$ | async)?.id, currentPage - 1]"
+          [disabled]="currentPageIndex < 1"
+          (click)="goToPage(currentPageIndex - 1)"
         >
           <clr-icon shape="angle" dir="left"></clr-icon>
         </button>
-        <clr-button-group *ngIf="report$ | async">
+        <clr-button-group *ngIf="(report$ | async)?.id">
           <clr-button
-            [routerLink]="['/report', (report$ | async)?.id, 0]"
-            [class]="getPageButtonClass(0)"
-          >
-            <clr-icon shape="home"></clr-icon>
-          </clr-button>
-          <clr-button
-            [class]="getPageButtonClass(i + 1)"
+            [class]="getPageButtonClass(i)"
             *ngFor="let status of (report$ | async)?.pageStatuses; index as i"
-            [routerLink]="['/report', (report$ | async)?.id, i + 1]"
-            >{{ i + 1 }}
+            (click)="goToPage(i)"
+          >
+            <clr-icon
+              shape="home"
+              *ngIf="i < 1; else showPageNumber"
+            ></clr-icon>
+            <ng-template #showPageNumber>
+              {{ i }}
+            </ng-template>
             <clr-icon
               shape="check"
               *ngIf="pageComplete(i)"
@@ -62,17 +139,17 @@
           type="button"
           class="btn btn-icon btn-link"
           aria-label="next page"
-          *ngIf="currentPage < (report$ | async)?.pageCount"
-          [routerLink]="['/report', (report$ | async)?.id, currentPage + 1]"
+          [disabled]="currentPageIndex > (report$ | async)?.pageCount - 2"
+          (click)="goToPage(currentPageIndex + 1)"
         >
           <clr-icon shape="angle" dir="right"></clr-icon>
         </button>
         <button
           type="button"
-          class="btn btn-success"
+          class="btn"
           aria-label="next page"
-          [disabled]="!reportFullyComplete"
-          (click)="submitReport()"
+          (click)="confirmSubmitReport()"
+          [class.btn-success]="reportFullyComplete"
           [clrLoading]="submitButtonState"
         >
           Finish report<clr-icon shape="step-forward-2"></clr-icon>
@@ -90,7 +167,7 @@
             name="options"
             [formControl]="markCompleteControl"
           />
-          <label *ngIf="pageComplete(currentPage); else incompleteLabel"
+          <label *ngIf="pageComplete(currentPageIndex); else incompleteLabel"
             >Complete</label
           >
           <ng-template #incompleteLabel>

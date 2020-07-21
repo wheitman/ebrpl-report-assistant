@@ -30,3 +30,9 @@ clr-toggle-container {
   margin: 0;
   user-select: none;
 }
+
+.save-success {
+  position: fixed;
+  bottom: 54;
+  left: 6;
+}

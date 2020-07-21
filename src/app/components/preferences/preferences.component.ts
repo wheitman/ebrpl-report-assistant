@@ -25,7 +25,7 @@ export class PreferencesComponent implements OnInit {
     this.formGroup = new FormGroup({
       branchSelect: new FormControl(''),
     });
-    this.constants = this._ConstantService.constantObservable;
+    this.constants = this._ConstantService.constants;
     this._UserService.getUserObservable().subscribe((user) => {
       if (user) this.formGroup.get('branchSelect').setValue(user.branch);
     });
