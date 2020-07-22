@@ -1,3 +1,4 @@
+import { BuilderComponent } from './components/builder/builder.component';
 import { PreferencesComponent } from './components/preferences/preferences.component';
 import { ReportComponent } from './components/report/report.component';
 import { StartComponent } from './components/start/start.component';
@@ -32,15 +33,12 @@ const routes: Routes = [
     canActivate: [AngularFireAuthGuard],
     data: { authGuardPipe: rejectUnverified },
   },
-
-  // Remove this to make things more explicit-- reports should be loaded
-  // BEFORE they're opened in the ReportComponent
-  // {
-  //   path: 'report/:template-id',
-  //   component: ReportComponent,
-  //   canActivate: [AngularFireAuthGuard],
-  //   data: { authGuardPipe: rejectUnverified },
-  // },
+  {
+    path: 'builder',
+    component: BuilderComponent,
+    canActivate: [AngularFireAuthGuard],
+    data: { authGuardPipe: rejectUnverified },
+  },
   {
     path: '',
     component: StartComponent,

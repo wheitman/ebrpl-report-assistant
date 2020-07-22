@@ -3,5 +3,4 @@ export interface User {
   emailVerified: boolean;
   branch: string;
   role: string;
-  reportIDs: string[];
 }

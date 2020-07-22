@@ -28,17 +28,25 @@ import {
 })
 export class MonthSelectComponent implements OnInit, ControlValueAccessor {
   @Input() label: string = 'Month: ';
-  @Output() currentYear: number = new Date().getFullYear();
-  @Output() month: Object;
+  year: number = new Date().getFullYear();
+  month: number;
+  dateString: string; //ISO date string
 
   formGroup: FormGroup;
 
   onChange = (month: Object) => {};
   onTouched = () => {};
 
-  writeValue(month: Object): void {
-    this.month = month;
-    this.onChange(this.month);
+  writeValue(date: string): void {
+    this.dateString = date;
+    this.onChange(this.dateString);
+    if (this.formGroup) {
+      let dateObj = new Date(this.dateString);
+      let monthIndex = dateObj.getMonth();
+      let year = dateObj.getFullYear();
+      this.formGroup.get('monthInput').setValue(this._months[monthIndex]);
+      this.formGroup.get('yearInput').setValue(year);
+    }
   }
 
   registerOnChange(fn: (month: Object) => void): void {
@@ -74,17 +82,19 @@ export class MonthSelectComponent implements OnInit, ControlValueAccessor {
   ngOnInit(): void {
     this.formGroup = new FormGroup({
       monthInput: new FormControl(this._months[0]),
-      yearInput: new FormControl(this.currentYear, [
+      yearInput: new FormControl(this.year, [
         Validators.min(1900),
         Validators.max(2100),
       ]),
     });
     this.formGroup.valueChanges.subscribe((newObj) => {
-      this.month = {
-        month: this.formGroup.get('monthInput').value,
-        year: this.formGroup.get('yearInput').value,
-      };
-      this.onChange(this.month);
+      let date = new Date();
+      let month = this.formGroup.get('monthInput').value;
+      let monthIndex = this._months.indexOf(month);
+      date.setMonth(monthIndex);
+      date.setFullYear(this.formGroup.get('yearInput').value);
+      this.dateString = date.toISOString();
+      this.onChange(this.dateString);
     });
   }
 }

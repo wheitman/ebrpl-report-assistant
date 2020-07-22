@@ -5,6 +5,7 @@ export interface SectionInterface {
   index: number;
   subtitle?: string;
   tags?: Object[];
+  meta?: boolean;
 }
 
 export interface DatagridInterface extends SectionInterface {

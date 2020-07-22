@@ -3,12 +3,26 @@ img {
   padding-right: 0.5rem;
 }
 .reportTitle {
-  width: 30vw;
+  max-width: 30vw;
   height: 60px;
-  position: absolute;
+  position: relative;
   left: 35vw;
   display: flex;
   align-items: center;
+}
+
+.app-title {
+  min-width: 40vw !important;
+  position: relative;
+  top: 0;
+  left: 0;
+}
+
+.navbar-links {
+  max-width: 30vw !important;
+  position: fixed;
+  top: 0;
+  right: 0;
 }
 
 .titleText {

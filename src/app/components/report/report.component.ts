@@ -1,3 +1,4 @@
+import { UserService } from 'src/app/services/user.service';
 import {
   SectionInterface,
   DatagridInterface,
@@ -45,7 +46,8 @@ export class ReportComponent implements OnInit, OnDestroy {
   constructor(
     private activeRoute: ActivatedRoute,
     private _Router: Router,
-    public _ReportService: ReportService
+    public _ReportService: ReportService,
+    private _UserService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -66,17 +68,17 @@ export class ReportComponent implements OnInit, OnDestroy {
 
     this.markCompleteControl.valueChanges.subscribe((newState: boolean) => {
       if (newState === true) {
-        this._ReportService.setStatus(this.currentPageIndex, 'complete');
+        this._ReportService.setPageStatus(this.currentPageIndex, 'complete');
       } else {
-        this._ReportService.setStatus(this.currentPageIndex, 'incomplete');
+        this._ReportService.setPageStatus(this.currentPageIndex, 'incomplete');
       }
+      this._ReportService.saveReportOnline();
     });
 
     this.report$.subscribe((report) => {
       if (!report) {
         let reportID = this.activeRoute.snapshot.paramMap.get('report-id');
         let pageNumber = this.activeRoute.snapshot.paramMap.get('page-number');
-        console.warn('Report ' + reportID + ' not open. Opening now...');
         this._ReportService.openReport(reportID, +pageNumber);
       }
     });
@@ -127,26 +129,6 @@ export class ReportComponent implements OnInit, OnDestroy {
     return fullyComplete;
   }
 
-  // setMetaObj(formInterface: SimpleInputInterface) {
-  //   this.report.metaSection['inputs'].forEach((inputObj, index) => {
-  //     inputObj['value'] = formInterface.data[index];
-  //   });
-  //   this.metaObj = formInterface.data;
-  // }
-  // finishStartPage() {
-  //   ReportService.parseMetaObject(this.report.metaSection);
-  //   this._Router.navigate([
-  //     'report',
-  //     this.templateId,
-  //     this.reportID,
-  //     this.pageNumber + 1,
-  //   ]);
-  // }
-
-  // updateSection(sectionIndex: number, sectionObject: SectionInterface) {
-  //   ReportService.setSection(this.pageNumber - 1, sectionIndex, sectionObject);
-  // }
-
   ngOnDestroy() {
     this._ReportService.closeReport();
   }
@@ -167,7 +149,8 @@ export class ReportComponent implements OnInit, OnDestroy {
   }
 
   goToPage(pageNumber: number) {
-    this.savePage();
+    //no point saving a page if it hasn't been edited
+    if (this.editable) this.savePage();
     this._Router.navigate([
       'report',
       this._ReportService.report.id,
@@ -188,6 +171,7 @@ export class ReportComponent implements OnInit, OnDestroy {
     this.submitButtonState = ClrLoadingState.LOADING;
     this._ReportService.submitReport().then(() => {
       this.submitButtonState = ClrLoadingState.SUCCESS;
+      this._Router.navigate(['']);
     });
   }
 
@@ -203,7 +187,7 @@ export class ReportComponent implements OnInit, OnDestroy {
     } else {
       return (
         ((Date.now() - this.saveTime) / (1000 * 60)).toFixed() +
-        ' minutes since save'
+        ' min since save'
       );
     }
   }
@@ -213,5 +197,45 @@ export class ReportComponent implements OnInit, OnDestroy {
     if (!this.saveTime || (Date.now() - this.saveTime) / (1000 * 60) > 10) {
       return true;
     } else return false;
+  }
+
+  setSection(section, eventData) {
+    this._ReportService.setSectionValue(
+      this.currentPageIndex,
+      section.order,
+      eventData
+    );
+    //sections interact with Report properties directly,
+    //but it's up to the ReportComponent to save the changes
+    //to the database afterwards.
+    if (section['meta']) {
+      this._ReportService.saveReportOnline();
+    }
+  }
+
+  get editable(): boolean {
+    //if the report's been submitted and the user isn't an admin,
+    //make the report uneditable
+    if (
+      this._ReportService.report &&
+      this._UserService.getUserSnapshot().role !== 'admin' &&
+      this._ReportService.report.completionStatus === 'complete'
+    ) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+  get adminSubmitted(): boolean {
+    if (
+      this._UserService.getUserSnapshot() &&
+      this._UserService.getUserSnapshot().role === 'admin' &&
+      this._ReportService.report &&
+      this._ReportService.report.completionStatus === 'complete'
+    ) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

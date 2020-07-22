@@ -16,6 +16,7 @@ import { report, pages } from 'src/assets/dev/outline';
 })
 export class StartComponent implements OnInit {
   templateNames: string[];
+  detailState = false;
 
   //modal booleans
   editVisible: boolean = false;
@@ -32,6 +33,7 @@ export class StartComponent implements OnInit {
   reports: Report[] = [];
   selectedReport: Report;
   templateLoadStatuses: ClrLoadingState[];
+  deleteLoading: ClrLoadingState;
 
   constructor(
     public _TemplateService: TemplateService,
@@ -45,9 +47,10 @@ export class StartComponent implements OnInit {
       if (user) {
         this.showUnverifiedAlert = !user.emailVerified;
         this._ReportService
-          .fetchReports(user.reportIDs)
+          .fetchReportsByBranch(user.branch)
           .then((reports) => {
             this.reports = reports;
+            console.log(reports);
           })
           .catch(() => {
             console.error('Could not fetch reports for ' + user.email);
@@ -70,7 +73,26 @@ export class StartComponent implements OnInit {
     this.exportVisible = false;
   }
 
-  copyReport(report: Report) {}
+  duplicateReport(report: Report) {
+    console.log(report.id);
+    this._ReportService.duplicateReport(report).then(
+      (newID) => {
+        this._ReportService
+          .openReport(newID)
+          .then(() => {
+            this._Router.navigate(['report', newID, 0]);
+          })
+          .catch((reason) => {
+            console.error(
+              'Error opening new report with ID ' + newID + ': ' + reason
+            );
+          });
+      },
+      () => {
+        console.error('Error duplicating report ' + report.id);
+      }
+    );
+  }
   showCopy(report: Report) {
     this.selectedReport = report;
     this.copyVisible = true;
@@ -79,7 +101,22 @@ export class StartComponent implements OnInit {
     this.copyVisible = false;
   }
 
-  deleteReport(report: Report) {}
+  deleteReport(report: Report) {
+    this.deleteLoading = ClrLoadingState.LOADING;
+    this._ReportService.deleteReport(report).then(() => {
+      let user = this._UserService.getUserSnapshot();
+      this._ReportService
+        .fetchReportsByBranch(user.branch)
+        .then((reports) => {
+          this.reports = reports;
+          this.deleteLoading = ClrLoadingState.SUCCESS;
+          this.hideDelete();
+        })
+        .catch(() => {
+          console.error('Could not fetch reports for ' + user.email);
+        });
+    });
+  }
   showDelete(report: Report) {
     this.selectedReport = report;
     this.deleteVisible = true;
@@ -89,7 +126,8 @@ export class StartComponent implements OnInit {
   }
 
   isUnfinished(report: Report) {
-    return report.completionStatus === 'incomplete' ? true : false;
+    if (report) return report.completionStatus === 'incomplete' ? true : false;
+    else return false;
   }
 
   resendVerification() {
@@ -106,7 +144,6 @@ export class StartComponent implements OnInit {
         this._ReportService
           .openReport(newID)
           .then(() => {
-            this._ReportService.attachToCurrentUser(true);
             this._Router.navigate(['report', newID, 0]);
           })
           .catch((reason) => {
@@ -126,5 +163,20 @@ export class StartComponent implements OnInit {
   navigate(report: Report) {
     console.log('Opening: ' + report.id);
     this._Router.navigate(['report', report.id, 0]);
+  }
+
+  json(obj) {
+    return JSON.stringify(obj);
+  }
+
+  get isAdmin() {
+    let user = this._UserService.getUserSnapshot();
+    if (user && user.role === 'admin') {
+      return true;
+    } else return false;
+  }
+
+  openBuilder() {
+    this._Router.navigate(['builder']);
   }
 }

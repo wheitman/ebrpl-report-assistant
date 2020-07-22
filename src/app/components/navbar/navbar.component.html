@@ -1,22 +1,42 @@
+<clr-alert
+  *ngIf="offline"
+  [clrAlertType]="'warning'"
+  [clrAlertAppLevel]="true"
+  [clrAlertClosable]="false"
+>
+  <clr-alert-item>
+    <span class="alert-text">
+      It looks like you aren't connected to the internet.
+    </span>
+    <!-- <div class="alert-actions">
+          <button class="btn alert-action">Fix</button>
+      </div> -->
+  </clr-alert-item>
+</clr-alert>
 <header class="header header-7">
-  <div class="branding">
+  <div class="branding app-title" style="z-index: 1000;">
     <a routerLink="" class="nav-link">
-      <img src="assets/logo.svg" />
-      <span class="title">Report Assistant</span>
+      <img src="assets/logo.svg" *ngIf="vw > 600" />
+      <span class="title"
+        >Report Assistant
+        <span class="badge badge-light-blue" *ngIf="isAdmin">Admin</span></span
+      >
     </a>
   </div>
   <div class="reportTitle" *ngIf="report">
-    <p class="titleText">{{ report.templateID }}: {{ report.title }}</p>
+    <p class="titleText" *ngIf="report.coverageDate">
+      {{ report.templateID }}: {{ report.coverageDate | date: "MMMM 	’yy" }}
+    </p>
   </div>
-  <div class="header-actions">
+  <div class="header-actions navbar-links" *ngIf="!offline">
     <clr-dropdown *ngIf="auth.user | async as user; else logIn">
       <button
         class="nav-text"
         clrDropdownTrigger
         aria-label="open user profile"
       >
-        <clr-icon shape="user"></clr-icon>
-        {{ user.email }}
+        <clr-icon [attr.shape]="userShape"></clr-icon>
+        <span *ngIf="vw > 769">{{ user.email }}</span>
       </button>
       <clr-dropdown-menu *clrIfOpen clrPosition="bottom-right">
         <a [routerLink]="['preferences']" clrDropdownItem>Preferences</a>

@@ -94,7 +94,6 @@ export class LoginComponent implements OnInit {
             emailVerified: false,
             branch: branch,
             role: 'user',
-            reportIDs: [],
           },
           newPassword
         )

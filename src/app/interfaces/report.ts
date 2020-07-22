@@ -2,10 +2,11 @@ import { Page } from './page';
 export interface Report {
   id: string;
   templateID: string;
-  title: string;
+  title?: string;
   coverageDate?: string;
   submitDate?: string;
   author?: string;
+  branch?: string;
   additionalInfo?: string;
   pageStatuses: string[];
   pageCount: number;

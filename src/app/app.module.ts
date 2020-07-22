@@ -22,6 +22,7 @@ import { MonthSelectComponent } from './components/controls/month-select/month-s
 import { AngularFireModule } from '@angular/fire';
 import { UserService } from './services/user.service';
 import { PreferencesComponent } from './components/preferences/preferences.component';
+import { BuilderComponent } from './components/builder/builder.component';
 
 @NgModule({
   declarations: [
@@ -36,6 +37,7 @@ import { PreferencesComponent } from './components/preferences/preferences.compo
     SimpleInputSection,
     MonthSelectComponent,
     PreferencesComponent,
+    BuilderComponent,
   ],
   imports: [
     BrowserModule,

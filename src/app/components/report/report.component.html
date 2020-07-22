@@ -1,6 +1,28 @@
 <div class="topDiv clr-col">
-  <div class="clr-row clr-justify-content-center">
+  <div
+    class="clr-row clr-justify-content-center"
+    [class.block-clicks]="!editable"
+  >
     <div class="clr-col clr-col-lg-10 clr-col-xl-8 sectionCol">
+      <clr-alert [clrAlertClosable]="false" *ngIf="!editable">
+        <clr-alert-item>
+          <span class="alert-text">
+            You're viewing a submitted report. It cannot be edited.
+          </span>
+        </clr-alert-item>
+      </clr-alert>
+      <clr-alert
+        [clrAlertClosable]="false"
+        [clrAlertType]="'warning'"
+        *ngIf="adminSubmitted"
+        [clrAlertIcon]="'administrator'"
+      >
+        <clr-alert-item>
+          <span class="alert-text">
+            You're viewing a submitted report. Only admins can edit it.
+          </span>
+        </clr-alert-item>
+      </clr-alert>
       <h1>
         {{ (page$ | async)?.title }}
       </h1>
@@ -8,24 +30,12 @@
       <datagrid-section
         *ngFor="let section of datagrids"
         [interface]="section"
-        (sectionChanged)="
-          _ReportService.setSectionValue(
-            currentPageIndex,
-            section.order,
-            $event
-          )
-        "
+        (sectionChanged)="setSection(section, $event)"
       ></datagrid-section>
       <simple-input
         *ngFor="let section of simpleInputs"
         [interface]="section"
-        (sectionChanged)="
-          _ReportService.setSectionValue(
-            currentPageIndex,
-            section.order,
-            $event
-          )
-        "
+        (sectionChanged)="setSection(section, $event)"
       ></simple-input>
       <div class="clr-col-md-6 clr-offset-md-3 clr-align-self-end">
         <clr-icon shape="help-info"></clr-icon
@@ -63,7 +73,8 @@
       <button
         type="button"
         class="btn btn-primary"
-        (click)="cancelSubmitReport()"
+        (click)="submitReport()"
+        [clrLoading]="submitButtonState"
       >
         Submit
       </button>
@@ -102,6 +113,7 @@
           [clrLoading]="saveButtonState"
           (click)="savePage()"
           title="Save current page"
+          *ngIf="editable"
         >
           <clr-icon shape="floppy" [class.has-alert]="saveStale"></clr-icon>
           {{ saveTimeElapsed }}
@@ -151,12 +163,13 @@
           (click)="confirmSubmitReport()"
           [class.btn-success]="reportFullyComplete"
           [clrLoading]="submitButtonState"
+          *ngIf="editable"
         >
           Finish report<clr-icon shape="step-forward-2"></clr-icon>
         </button>
       </div>
     </div>
-    <div class="clr-col-4 clr-col-md-2">
+    <div class="clr-col-4 clr-col-md-2" *ngIf="editable">
       <clr-toggle-container #markCompleteToggle>
         <label class="p6" style="margin-top: 0.3rem;">Mark this page:</label>
         <clr-toggle-wrapper>

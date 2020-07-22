@@ -70,7 +70,7 @@ export class DatagridSection extends AbstractSection implements OnInit {
         });
         this.formArray.push(checkboxArray);
       } else {
-        this.formArray.push(new FormControl('', [Validators.required]));
+        this.formArray.push(new FormControl(''));
       }
     });
   }

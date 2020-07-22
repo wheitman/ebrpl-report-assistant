@@ -1,0 +1,72 @@
+<div class="clr-row" style="width: 100vw;">
+  <div
+    class="clr-col-sm-4 clr-col-md-3 clr-col-xl-2"
+    style="box-shadow: 0px 10px 18px #c7c6c6;"
+  >
+    <form clrForm [formGroup]="tempPropsGroup" clrLayout="vertical">
+      <clr-input-container>
+        <label>Template name</label>
+        <input
+          clrInput
+          placeholder="Fill me in, scotty!"
+          name="name"
+          formControlName="templateTitle"
+          style="font-size: 1.5rem;"
+        />
+      </clr-input-container>
+    </form>
+    <clr-tree>
+      <clr-tree-node [clrExpanded]="true">
+        David Wallace (CFO)
+        <clr-tree-node [clrExpanded]="true">
+          Michael Scott (Regional Manager)
+
+          <clr-tree-node
+            >Dwight K. Schrute (Assistant to the Regional
+            Manager)</clr-tree-node
+          >
+
+          <clr-tree-node>
+            Jim Halpert (Head of Sales)
+            <clr-tree-node>Andy Bernard</clr-tree-node>
+            <clr-tree-node>Stanley Hudson</clr-tree-node>
+            <clr-tree-node>Phyllis Vance</clr-tree-node>
+            <clr-tree-node>Todd Packer</clr-tree-node>
+          </clr-tree-node>
+
+          <clr-tree-node>
+            Angela Martin (Head of Accounting)
+            <clr-tree-node>Kevin Malone</clr-tree-node>
+            <clr-tree-node>Oscar Martinez</clr-tree-node>
+          </clr-tree-node>
+
+          <clr-tree-node>
+            Kelly Kapoor (Head of Customer Service)
+            <clr-tree-node>Ryan Howard (Temp)</clr-tree-node>
+          </clr-tree-node>
+
+          <clr-tree-node>
+            Creed Bratton (Quality Assurance)
+          </clr-tree-node>
+
+          <clr-tree-node>
+            Meredith Palmer (Supplier Relations)
+          </clr-tree-node>
+
+          <clr-tree-node>
+            Toby Flenderson (Human Resources)
+          </clr-tree-node>
+
+          <clr-tree-node>
+            Pam Beesly (Reception)
+          </clr-tree-node>
+
+          <clr-tree-node>
+            Darryl Philbin (Warehouse)
+          </clr-tree-node>
+        </clr-tree-node>
+      </clr-tree-node>
+    </clr-tree>
+  </div>
+  <div class="clr-col-sm-8 clr-col-md-9 clr-col-xl-10"></div>
+</div>

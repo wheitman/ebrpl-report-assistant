@@ -36,3 +36,7 @@ clr-toggle-container {
   bottom: 54;
   left: 6;
 }
+
+.block-clicks {
+  pointer-events: none;
+}

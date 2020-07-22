@@ -18,7 +18,7 @@ export class SimpleInputSection extends AbstractSection implements OnInit {
   @Input() constants: Object;
   @Output() sectionChanged = new EventEmitter<Object>();
 
-  constructor() {
+  constructor(private _ReportService: ReportService) {
     super();
   }
 
@@ -53,10 +53,11 @@ export class SimpleInputSection extends AbstractSection implements OnInit {
           this.formArray.push(checkboxArray);
         } else if (input['type'] === 'month-select') {
           this.formArray.push(
-            new FormControl({ month: 'January', year: '2020' })
+            //push the current date
+            new FormControl(new Date().toISOString())
           );
         } else {
-          this.formArray.push(new FormControl('', [Validators.required]));
+          this.formArray.push(new FormControl(''));
         }
       }
     });
@@ -69,6 +70,22 @@ export class SimpleInputSection extends AbstractSection implements OnInit {
       array: this.formArray,
     });
     this.formArray.valueChanges.subscribe((newData) => {
+      if (this.interface.meta && this.interface.meta === true) {
+        this.interface.inputs.forEach((inputObj, index) => {
+          if (inputObj['links']) {
+            let links = inputObj['links'] as string[];
+            links.forEach((link) => {
+              console.log(link);
+              if (link === 'coverageDate') {
+                this._ReportService.setCoverageDate(
+                  this.formArray.value[index]
+                );
+              }
+            });
+          }
+        });
+      }
+
       // ResponseService.reportMetaObject = dataObj;
       this.interface.value = newData;
       this.sectionChanged.emit(this.interface);

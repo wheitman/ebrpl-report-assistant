@@ -483,24 +483,6 @@ export class TemplateService {
     return this._templateNames;
   }
 
-  getStart(): Observable<SimpleInputSection> {
-    let startObj = TemplateService.foolishObj['meta-section'];
-    return new Observable<SimpleInputSection>((observer) => {
-      let simpleInput: SimpleInputSection = new SimpleInputSection();
-      simpleInput.title = startObj.title || null;
-      simpleInput.subtitle = startObj['subtitle'] || null;
-      (simpleInput.interface as SimpleInputInterface) = {
-        title: startObj['title'] || null,
-        type: startObj['type'] || null,
-        value: [],
-        index: 0,
-        tags: startObj['tags'] || null,
-        inputs: startObj['inputs'],
-      };
-      observer.next(simpleInput);
-    });
-  }
-
   getTemplatePage(pageNumber: number): Observable<Page> {
     return new Observable<Page>((observer) => {
       let pageObj = TemplateService.foolishObj.pages[pageNumber - 1];
@@ -537,26 +519,6 @@ export class TemplateService {
 
   static getConstants() {
     return TemplateService.foolishObj.contants;
-  }
-
-  getSimpleInputs(pageNumber: number): Observable<SimpleInputSection[]> {
-    pageNumber--;
-    return new Observable<SimpleInputSection[]>((observer) => {
-      let sections = TemplateService.foolishObj.pages[pageNumber].sections;
-      let simpleInputs: SimpleInputSection[] = [];
-      sections.forEach((section, index) => {
-        if (section.type == 'simple-input') {
-          let simpleInput: SimpleInputSection = new SimpleInputSection();
-          simpleInput.title = section.title || null;
-          simpleInput.subtitle = section.subtitle || null;
-          simpleInput.order = index;
-          simpleInput.interface = section;
-          simpleInput.inputs = section['inputs'];
-          simpleInputs.push(simpleInput);
-        }
-      });
-      observer.next(simpleInputs);
-    });
   }
 
   getSectionCount(pageNumber: number) {

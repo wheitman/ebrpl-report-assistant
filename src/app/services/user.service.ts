@@ -117,28 +117,6 @@ export class UserService {
     });
   }
 
-  addReportID(reportID: string): Promise<void> {
-    let userDoc = this._AngularFirestore.doc<User>('users/' + this._user.email);
-    let newReportIDs = this._user.reportIDs;
-    newReportIDs.push(reportID);
-    return userDoc.update({ reportIDs: newReportIDs }).then(() => {
-      this._user.reportIDs = newReportIDs;
-    });
-  }
-  removeReportID(reportID: string): Promise<void> {
-    let userDoc = this._AngularFirestore.doc<User>('users/' + this._user.email);
-    let newReportIDs = this._user.reportIDs;
-    var index = newReportIDs.indexOf(reportID);
-    if (index > -1) {
-      newReportIDs.splice(index, 1);
-    } else {
-      console.error("[User Serv] Couldn't locate report ID for removal.");
-    }
-    return userDoc.update({ reportIDs: newReportIDs }).then(() => {
-      this._user.reportIDs = newReportIDs;
-    });
-  }
-
   sendVerificationEmail(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       firebase.auth().currentUser.sendEmailVerification().then(resolve, reject);

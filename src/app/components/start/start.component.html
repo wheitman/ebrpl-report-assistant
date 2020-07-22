@@ -34,6 +34,9 @@
   >
     <div class="clr-row clr-justify-content-between clr-align-items-end">
       <h1>Reports for {{ (user | async)?.branch }}</h1>
+      <button class="btn btn-primary" (click)="openBuilder()" *ngIf="isAdmin">
+        <clr-icon shape="paint-roller"></clr-icon> Template builder
+      </button>
       <clr-dropdown [clrCloseMenuOnItemClick]="false">
         <button class="btn btn-primary" clrDropdownTrigger>
           <clr-icon shape="plus"></clr-icon> New report
@@ -57,26 +60,23 @@
       <clr-datagrid style="width: 100%;">
         <clr-dg-placeholder>No reports found.</clr-dg-placeholder>
 
-        <clr-dg-column>Template</clr-dg-column>
-        <clr-dg-column>ID</clr-dg-column>
-        <clr-dg-column>Coverage date</clr-dg-column>
-        <clr-dg-column>Additional info</clr-dg-column>
-        <clr-dg-column>Actions</clr-dg-column>
+        <clr-dg-column [clrDgField]="'templateID'">ID</clr-dg-column>
+        <clr-dg-column [clrDgField]="'id'">Template</clr-dg-column>
+        <clr-dg-column [clrDgField]="'author'">Author</clr-dg-column>
+        <clr-dg-column [clrDgField]="'coverageDate'"
+          >Coverage date</clr-dg-column
+        >
 
-        <clr-dg-row *ngFor="let report of reports; index as i">
+        <clr-dg-row
+          *clrDgItems="let report of reports; index as i"
+          [clrDgItem]="report"
+        >
           <clr-dg-action-overflow>
             <button class="action-item" (click)="navigate(report)">
               Open report
             </button>
             <button class="action-item" (click)="showCopy(report)">
               Duplicate to new report
-            </button>
-            <button
-              *ngIf="!isUnfinished(report)"
-              class="action-item"
-              (click)="showExport(report)"
-            >
-              View JSON
             </button>
             <button
               *ngIf="isUnfinished(report)"
@@ -86,26 +86,37 @@
               Delete draft
             </button>
           </clr-dg-action-overflow>
+          <clr-dg-cell (click)="navigate(report)" class="clickable">{{
+            report.id
+          }}</clr-dg-cell>
           <clr-dg-cell (click)="navigate(report)" class="clickable"
             >{{ report.templateID }}
             <span *ngIf="isUnfinished(report)" class="label label-warning"
               >Draft</span
             >
           </clr-dg-cell>
-          <clr-dg-cell (click)="navigate(report)" class="clickable">{{
-            report.id
-          }}</clr-dg-cell>
-          <clr-dg-cell (click)="navigate(report)" class="clickable">{{
-            report.coverageDate | date: "longDate"
-          }}</clr-dg-cell>
-          <clr-dg-cell (click)="navigate(report)" class="clickable">{{
-            report.additionalInfo
-          }}</clr-dg-cell>
-          <clr-dg-cell style="padding: 0;">
-            <div class="btn-group btn-link btn-icon"></div>
-          </clr-dg-cell>
-        </clr-dg-row>
 
+          <clr-dg-cell (click)="navigate(report)" class="clickable">{{
+            report.author
+          }}</clr-dg-cell>
+          <clr-dg-cell (click)="navigate(report)" class="clickable">{{
+            report.coverageDate | date: "MMMM 	’yy"
+          }}</clr-dg-cell>
+        </clr-dg-row>
+        <clr-dg-detail *clrIfDetail="let report">
+          <clr-dg-detail-header>Report details</clr-dg-detail-header>
+          <clr-dg-detail-body>
+            <b>ID: </b> {{ report.id }} <br />
+            <b>Coverage date: </b> {{ report.coverageDate | date: "MMMM 	’yy" }}
+            <br />
+            <b>Submitted: </b> {{ report.submitDate | date: "longDate" }} <br />
+            <b>Author: </b> {{ report.author }} <br />
+            <b>Branch: </b> {{ report.branch }} <br />
+            <b>Page count: </b> {{ report.pageCount }} <br />
+            <b>Completion: </b> {{ report.completionStatus }} <br />
+            <b>Additional info: </b>{{ report.additionalInfo }} <br />
+          </clr-dg-detail-body>
+        </clr-dg-detail>
         <clr-dg-footer>{{ reports.length }} reports</clr-dg-footer>
       </clr-datagrid>
 
@@ -113,7 +124,10 @@
         <h3 class="modal-title">Are you sure you want to delete this draft?</h3>
         <div class="modal-body" *ngIf="selectedReport">
           <p><strong>Template: </strong>{{ selectedReport.templateID }}</p>
-          <p><strong>Title: </strong>{{ selectedReport.title }}</p>
+          <p>
+            <strong>Coverage date: </strong>{{ selectedReport.coverageDate }}
+          </p>
+          <p><strong>Author: </strong>{{ selectedReport.author }}</p>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-outline" (click)="hideDelete()">
@@ -121,7 +135,8 @@
           </button>
           <button
             type="button"
-            class="btn btn-primary"
+            class="btn btn-danger"
+            [clrLoading]="deleteLoading"
             (click)="deleteReport(selectedReport)"
           >
             Delete
@@ -132,8 +147,11 @@
         <h3 class="modal-title">Create a deplicate report?</h3>
         <div class="modal-body" *ngIf="selectedReport">
           <p>This will open the new report in the editor.</p>
-          <p><strong>Template: </strong>{{ selectedReport.templateID }}</p>
-          <p><strong>Title: </strong>{{ selectedReport.title }}</p>
+          <p>
+            <strong>Template: </strong>{{ selectedReport.templateID }}<br />
+            <strong>ID: </strong>{{ selectedReport.id }}<br />
+            <b>Submitted: </b>{{ selectedReport.submitDate | date }}
+          </p>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-outline" (click)="hideCopy()">
@@ -142,27 +160,9 @@
           <button
             type="button"
             class="btn btn-primary"
-            (click)="copyReport(selectedReport)"
+            (click)="duplicateReport(selectedReport)"
           >
-            Copy
-          </button>
-        </div>
-      </clr-modal>
-      <clr-modal [(clrModalOpen)]="exportVisible">
-        <h3 class="modal-title" *ngIf="selectedReport">
-          Download <em>{{ selectedReport.title }}</em> ({{
-            selectedReport.templateID
-          }})?
-        </h3>
-        <div class="modal-body" *ngIf="selectedReport">
-          <p>This will open the new report in the editor.</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline" (click)="hideExport()">
-            Cancel
-          </button>
-          <button type="button" class="btn btn-primary">
-            Download
+            Duplicate
           </button>
         </div>
       </clr-modal>
