@@ -33,7 +33,6 @@ export class NavbarComponent implements OnInit {
         document.documentElement.clientWidth || 0,
         window.innerWidth || 0
       );
-      console.log(this.vw);
     };
     onoffline = () => {
       this.offline = !navigator.onLine;

@@ -1,72 +1,219 @@
-<div class="clr-row" style="width: 100vw;">
+<div
+  class="clr-row clr-justify-content-between"
+  style="width: 100vw; overflow: hidden;"
+>
   <div
-    class="clr-col-sm-4 clr-col-md-3 clr-col-xl-2"
-    style="box-shadow: 0px 10px 18px #c7c6c6;"
+    class="clr-col-3 builder-sidebar"
+    style="
+      box-shadow: 0px 10px 18px #c7c6c6;
+      margin-left: 10px;
+      overflow-y: auto;
+    "
   >
     <form clrForm [formGroup]="tempPropsGroup" clrLayout="vertical">
       <clr-input-container>
-        <label>Template name</label>
         <input
+          class="templateTitle"
           clrInput
-          placeholder="Fill me in, scotty!"
+          placeholder="Untitled template"
           name="name"
           formControlName="templateTitle"
-          style="font-size: 1.5rem;"
         />
       </clr-input-container>
     </form>
-    <clr-tree>
-      <clr-tree-node [clrExpanded]="true">
-        David Wallace (CFO)
-        <clr-tree-node [clrExpanded]="true">
-          Michael Scott (Regional Manager)
-
-          <clr-tree-node
-            >Dwight K. Schrute (Assistant to the Regional
-            Manager)</clr-tree-node
+    <span *ngIf="pagesEmpty"
+      ><clr-icon shape="help-info"></clr-icon><em>No pages yet.</em>
+    </span>
+    <clr-tree *ngIf="_template">
+      <clr-tree-node *ngIf="_template.pages">
+        <p class="p4" style="margin: 0;">Pages</p>
+        <button
+          class="btn btn-sm btn-link btn-icon"
+          title="Add page"
+          (click)="addPage()"
+        >
+          <clr-icon shape="plus"></clr-icon>
+        </button>
+      </clr-tree-node>
+      <clr-tree-node
+        *ngFor="let page of _template.pages; index as i"
+        [(clrExpanded)]="pageExpansions[i]"
+      >
+        <div class="tree-text clr-row">
+          <div>
+            <a (click)="setCurrentPage(i)"
+              ><clr-icon shape="file"></clr-icon> {{ page.title }}</a
+            >
+          </div>
+        </div>
+        <clr-tree-node>
+          <p class="p4" style="margin: 0;">Datagrids</p>
+          <button
+            class="btn btn-sm btn-link btn-icon"
+            title="Add Datagrid"
+            (click)="addDatagrid(i)"
           >
+            <clr-icon shape="plus"></clr-icon>
+          </button>
+        </clr-tree-node>
 
-          <clr-tree-node>
-            Jim Halpert (Head of Sales)
-            <clr-tree-node>Andy Bernard</clr-tree-node>
-            <clr-tree-node>Stanley Hudson</clr-tree-node>
-            <clr-tree-node>Phyllis Vance</clr-tree-node>
-            <clr-tree-node>Todd Packer</clr-tree-node>
-          </clr-tree-node>
-
-          <clr-tree-node>
-            Angela Martin (Head of Accounting)
-            <clr-tree-node>Kevin Malone</clr-tree-node>
-            <clr-tree-node>Oscar Martinez</clr-tree-node>
-          </clr-tree-node>
-
-          <clr-tree-node>
-            Kelly Kapoor (Head of Customer Service)
-            <clr-tree-node>Ryan Howard (Temp)</clr-tree-node>
-          </clr-tree-node>
-
-          <clr-tree-node>
-            Creed Bratton (Quality Assurance)
-          </clr-tree-node>
-
-          <clr-tree-node>
-            Meredith Palmer (Supplier Relations)
-          </clr-tree-node>
-
-          <clr-tree-node>
-            Toby Flenderson (Human Resources)
-          </clr-tree-node>
-
-          <clr-tree-node>
-            Pam Beesly (Reception)
-          </clr-tree-node>
-
-          <clr-tree-node>
-            Darryl Philbin (Warehouse)
-          </clr-tree-node>
+        <clr-tree-node
+          *ngFor="let section of getDatagrids(i)"
+          style="width: 100%;"
+        >
+          <clr-icon shape="table"></clr-icon>
+          <div class="tree-text">{{ section.title }}</div>
+        </clr-tree-node>
+        <clr-tree-node>
+          <p class="p4" style="margin: 0;">SimpleInputs</p>
+          <button
+            class="btn btn-sm btn-link btn-icon"
+            title="Add Datagrid"
+            (click)="addSimpleInput(i)"
+          >
+            <clr-icon shape="plus"></clr-icon>
+          </button>
+        </clr-tree-node>
+        <clr-tree-node
+          *ngFor="let section of getSimpleInputs(i)"
+          style="width: 100%;"
+        >
+          <clr-icon shape="form"></clr-icon>
+          <div class="tree-text">
+            {{ section.title }}
+            <clr-icon
+              *ngIf="section.meta"
+              shape="flag"
+              class="is-solid is-error"
+              title="Meta section"
+            ></clr-icon>
+          </div>
         </clr-tree-node>
       </clr-tree-node>
     </clr-tree>
   </div>
-  <div class="clr-col-sm-8 clr-col-md-9 clr-col-xl-10"></div>
+  <div class="clr-col preview-area" *ngIf="currentPage">
+    <h1>{{ currentPage.title }}</h1>
+    <hr />
+
+    <div
+      class="clr-row"
+      *ngFor="let section of getDatagrids(currentPage.number)"
+    >
+      <div class="clr-col-1 clr-align-self-center" style="padding: 0;">
+        <div class="clr-row clr-justify-content-end">
+          <button
+            class="btn btn-link btn-icon"
+            style="margin-right: 1rem;"
+            (click)="openEditSection(section)"
+          >
+            <clr-icon shape="pencil"></clr-icon>
+          </button>
+        </div>
+      </div>
+      <div class="clr-col-11" style="padding: 0;">
+        <datagrid-section
+          [interface]="section"
+          (sectionChanged)="setSection(section, $event)"
+        >
+        </datagrid-section>
+      </div>
+    </div>
+
+    <div
+      class="clr-row"
+      *ngFor="let section of getSimpleInputs(currentPage.number)"
+    >
+      <div class="clr-col-1 clr-align-self-center" style="padding: 0;">
+        <div class="clr-row clr-justify-content-end">
+          <button
+            class="btn btn-link btn-icon"
+            style="margin-right: 1rem;"
+            (click)="openEditSection(section)"
+          >
+            <clr-icon shape="pencil"></clr-icon>
+          </button>
+        </div>
+      </div>
+      <div class="clr-col-11" style="padding: 0;">
+        <simple-input
+          [interface]="section"
+          (sectionChanged)="setSection(section, $event)"
+        ></simple-input>
+      </div>
+    </div>
+    <clr-modal [(clrModalOpen)]="editSectionOpened">
+      <h3 class="modal-title">Section properties</h3>
+      <div class="modal-body">
+        <form clrForm [formGroup]="sectionPropsForm">
+          <clr-input-container>
+            <label>Title</label>
+            <input clrInput formControlName="title" />
+          </clr-input-container>
+          <clr-input-container>
+            <label>Subtitle (optional)</label>
+            <input clrInput formControlName="subtitle" />
+          </clr-input-container>
+          <clr-select-container>
+            <label>Type</label>
+            <select clrSelect formControlName="type">
+              <option value="datagrid">Datagrid</option>
+              <option value="simple-input">SimpleInput</option>
+            </select>
+          </clr-select-container>
+        </form>
+        <div *ngIf="isSimpleInput(selectedSection)">
+          <div class="clr-row">
+            <h4>Form inputs</h4>
+            <button
+              class="btn btn-sm btn-link btn-icon"
+              title="Add input"
+              (click)="addInput()"
+            >
+              <clr-icon shape="plus"></clr-icon>
+            </button>
+          </div>
+          <em *ngIf="hasInputs(selectedSection)"
+            >Add an input by clicking "+" above.</em
+          >
+          <form
+            clrForm
+            [formGroup]="inputsForm"
+            *ngIf="selectedSection['inputs']"
+          >
+            <ng-template
+              ngFor
+              let-input
+              [ngForOf]="selectedSection['inputs']"
+              let-i="index"
+            >
+              <clr-select-container>
+                <label>Input {{ i + 1 }} type</label>
+                <select clrSelect formControlName="type">
+                  <option value="datagrid">Datagrid</option>
+                  <option value="simple-input">SimpleInput</option>
+                </select>
+              </clr-select-container>
+            </ng-template>
+          </form>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="cancelEditSection()"
+        >
+          Finish
+        </button>
+      </div>
+    </clr-modal>
+  </div>
+  <button
+    class="btn btn-primary builder-save-button"
+    [disabled]="!templateValid"
+    [title]="validMessage"
+  >
+    <clr-icon shape="floppy"></clr-icon> Save template
+  </button>
 </div>

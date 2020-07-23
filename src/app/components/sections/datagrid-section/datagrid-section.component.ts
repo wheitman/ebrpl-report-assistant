@@ -48,7 +48,6 @@ export class DatagridSection extends AbstractSection implements OnInit {
     });
     this.constantService.constants.subscribe((obj) => {
       this.constants = obj;
-      console.log(obj);
     });
   }
 

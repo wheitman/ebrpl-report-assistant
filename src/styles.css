@@ -3,3 +3,7 @@
 .clickable {
   cursor: pointer;
 }
+
+.clr-treenode-content {
+  width: calc(100% - 40px);
+}

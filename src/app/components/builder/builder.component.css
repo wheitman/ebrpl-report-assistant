@@ -1,0 +1,33 @@
+.templateTitle {
+  font-size: 1rem !important;
+  width: 100% !important;
+}
+
+.builder-sidebar {
+  height: calc(100vh - 61px);
+}
+
+.preview-area {
+  overflow-y: auto;
+  height: calc(100vh - 61px);
+}
+
+.builder-save-button {
+  position: absolute;
+  right: 1vw;
+  bottom: 1vh;
+}
+
+.tree-text {
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.edit-hover {
+  height: 100%;
+  width: 100%;
+  z-index: 1000;
+  position: relative;
+}
