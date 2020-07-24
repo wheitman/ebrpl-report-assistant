@@ -1,3 +1,4 @@
+import { ConstantService } from './../../services/constant.service';
 import {
   SimpleInputInterface,
   DatagridInterface,
@@ -23,6 +24,7 @@ import {
 import { Page } from 'src/app/interfaces/page';
 import { first } from 'rxjs/operators';
 import 'emoji-picker-element';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-builder',
@@ -55,16 +57,21 @@ export class BuilderComponent implements OnInit {
   });
 
   currentPage: Page;
-  selectedSection: Object;
+  originalSectionIndex: number;
+  sectionInEdit: Object;
   templateValid: boolean;
   validMessage: string;
+  constants$: Observable<Object>;
+  divisions: Object[];
 
   constructor(
     public _ActivatedRoute: ActivatedRoute,
-    public _AngularFirestore: AngularFirestore
+    public _AngularFirestore: AngularFirestore,
+    public _ConstantService: ConstantService
   ) {}
 
   ngOnInit(): void {
+    this.constants$ = this._ConstantService.constants;
     this._ActivatedRoute.queryParamMap.subscribe((paramMap) => {
       let openTitle = paramMap.get('open');
       //if an existing template has been passed to the URL
@@ -188,7 +195,6 @@ export class BuilderComponent implements OnInit {
 
   setCurrentPage(index: number) {
     this.currentPage = this._template.pages[index];
-    console.log(this.currentPage);
   }
 
   getValidity(): boolean {
@@ -290,51 +296,133 @@ export class BuilderComponent implements OnInit {
   }
 
   openEditSection(section: Object) {
-    this.selectedSection = section;
-    if (section['type'] === 'datagrid') {
-    } else if (section['type'] === 'simple-input') {
-    }
+    //deep copy the section
+    this.sectionInEdit = JSON.parse(JSON.stringify(section));
+
+    this.originalSectionIndex = this.sectionInEdit['index'];
     this.editSectionOpened = true;
   }
   finishEditSection() {
-    console.log(this.selectedSection);
+    console.log(this.sectionInEdit);
+    this.moveSection(this.originalSectionIndex, this.sectionInEdit['index']);
+    this._template['pages'][this.currentPage.number]['sections'][
+      this.sectionInEdit['index']
+    ] = this.sectionInEdit;
+    //now reevaluate the 'index' section properties
+    this.currentPage.sections.forEach((section, index) => {
+      section['index'] = index;
+    });
     this.editSectionOpened = false;
   }
 
-  addColumn() {
-    if (!this.selectedSection['columns']) {
-      this.selectedSection['columns'] = [{ label: 'New column', type: 'text' }];
+  isDatatype(colIndex: number, type: string) {
+    if (this.sectionInEdit['columns'][colIndex]['type'] === type) {
+      return true;
+    } else return false;
+  }
+  isPlainDt(colIndex: number) {
+    let type = this.sectionInEdit['columns'][colIndex]['type'];
+    if (
+      !(
+        type === 'tag-select' ||
+        type === 'date-select' ||
+        type === 'month-select'
+      )
+    ) {
+      return true;
+    } else return false;
+  }
+
+  get tag() {
+    return 'Hello';
+  }
+
+  toggleTag(rowIndex, colIndex, toggled: boolean, tag) {
+    let cellTags: Object[] = this.sectionInEdit['value'][rowIndex]['row'][
+      colIndex
+    ]['tags'];
+    if (toggled === true) {
+      //add the tag to the section value
+      cellTags.push(tag);
     } else {
-      (this.selectedSection['columns'] as Object[]).push({
+      //remove the tag
+      cellTags.forEach((tagJ, index) => {
+        if (tag['label'] === tagJ['label']) {
+          cellTags.splice(index, 1);
+        }
+      });
+    }
+    console.log(this.sectionInEdit);
+  }
+
+  renderDgCell(rowIndex: number, colIndex: number) {
+    let cellVal = this.sectionInEdit['value'][rowIndex]['row'][colIndex];
+    let type = this.sectionInEdit['columns'][colIndex]['type'];
+    if (type === 'tag-select') {
+      let emojis: string = '';
+      (cellVal['tags'] as Object[]).forEach((tagObj) => {
+        emojis = emojis + ' ' + tagObj['icon'];
+      });
+      return emojis;
+    } else {
+      return cellVal;
+    }
+  }
+
+  // Array.prototype.move = function(from, to) {
+  //   this.splice(to, 0, this.splice(from, 1)[0]);
+  // };
+
+  moveSection(fromIndex: number, toIndex: number) {
+    console.log('Moving to ' + toIndex);
+    if (toIndex >= 0 && toIndex < this.currentPage.sections.length) {
+      let arr = this.currentPage.sections;
+      arr.splice(toIndex, 0, arr.splice(fromIndex, 1)[0]);
+    } else console.error("Can't move section. Out of bounds.");
+  }
+
+  addColumn(event: Event) {
+    event.stopPropagation();
+    if (!this.sectionInEdit['columns']) {
+      this.sectionInEdit['columns'] = [{ label: 'New column', type: 'text' }];
+    } else {
+      (this.sectionInEdit['columns'] as Object[]).push({
         label: 'New column',
         type: 'text',
       });
-      (this.selectedSection['value'] as Object[]).forEach((row) => {
+      (this.sectionInEdit['value'] as Object[]).forEach((row) => {
         (row['row'] as Object[]).push('');
       });
     }
   }
 
   clearPrefill() {
-    if (this.selectedSection['value']) {
-      this.selectedSection['value'] = [];
+    if (this.sectionInEdit['value']) {
+      this.sectionInEdit['value'] = [];
     }
   }
 
   deleteColumn(index: number) {
     //if prefill exists, clear it
     this.clearPrefill();
-    console.log();
-    console.log(this.selectedSection['columns']);
-    (this.selectedSection['columns'] as Object[]).splice(index, 1);
-    console.log(this.selectedSection['columns']);
+    console.log(this.sectionInEdit['columns']);
+    (this.sectionInEdit['columns'] as Object[]).splice(index, 1);
+    console.log(this.sectionInEdit['columns']);
+  }
+  deleteInput(index: number) {
+    this.clearPrefill();
+    (this.sectionInEdit['inputs'] as Object[]).splice(index, 1);
   }
 
-  addInput() {
-    (this.selectedSection['inputs'] as Object[]).push({
-      label: '',
+  addInput(event: Event) {
+    event.stopPropagation();
+    let inputs = this.sectionInEdit['inputs'] as Object[];
+    if (!inputs) {
+      inputs = [];
+    }
+    inputs.push({
+      label: 'Untitled',
       type: 'text',
-      value: null,
       links: [],
     });
   }
@@ -364,23 +452,42 @@ export class BuilderComponent implements OnInit {
     return hastg;
   }
 
+  hasTag(rowIndex: number, colIndex: number, tag: Object) {
+    let cellTags: Object[] = this.sectionInEdit['value'][rowIndex]['row'][
+      colIndex
+    ]['tags'];
+    let cellIcons: string[] = [];
+    cellTags.forEach((tag) => {
+      cellIcons.push(tag['icon']);
+    });
+
+    let searchIcon = tag['icon'];
+    return cellIcons.includes(searchIcon);
+  }
+
+  hasPrefill(object: Object): boolean {
+    if (object['value'] && (object['value'] as Object[]).length > 0) {
+      return true;
+    } else return false;
+  }
+
   addTag() {
-    console.log(this.selectedSection);
-    (this.selectedSection['tags'] as Object[]).push({
+    console.log(this.sectionInEdit);
+    (this.sectionInEdit['tags'] as Object[]).push({
       icon: '❓',
       label: 'Untitled',
     });
-    console.log(this.selectedSection);
+    console.log(this.sectionInEdit);
   }
 
   deleteTag(index: number) {
-    console.log((this.selectedSection['tags'] as Object[]).splice(index, 1));
+    console.log((this.sectionInEdit['tags'] as Object[]).splice(index, 1));
   }
 
   editTagEmoji(tagIndex: number, eventData: CustomEvent) {
     console.log(tagIndex, eventData.detail);
-    (this.selectedSection as SectionInterface).tags[tagIndex]['icon'] =
+    (this.sectionInEdit as SectionInterface).tags[tagIndex]['icon'] =
       eventData.detail['unicode'];
-    console.log(this.selectedSection);
+    console.log(this.sectionInEdit);
   }
 }

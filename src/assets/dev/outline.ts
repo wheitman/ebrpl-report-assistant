@@ -127,6 +127,7 @@ export const pages = [
           { label: 'Number of programs', type: 'number' },
           { label: 'Attendance', type: 'number' },
         ],
+        value: [null, null],
       },
       {
         title: 'Computer classes',

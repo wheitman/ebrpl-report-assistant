@@ -96,10 +96,7 @@
     <h1>{{ currentPage.title }}</h1>
     <hr />
 
-    <div
-      class="clr-row"
-      *ngFor="let section of getDatagrids(currentPage.number)"
-    >
+    <div class="clr-row" *ngFor="let section of currentPage.sections">
       <div class="clr-col-1 clr-align-self-center" style="padding: 0;">
         <div class="clr-row clr-justify-content-end">
           <button
@@ -113,231 +110,403 @@
       </div>
       <div class="clr-col-11" style="padding: 0;">
         <datagrid-section
+          *ngIf="isDatagrid(section); else simpleInput"
           [interface]="section"
           (sectionChanged)="setSection(section, $event)"
+          class="grayout"
         >
         </datagrid-section>
+        <ng-template #simpleInput>
+          <simple-input
+            [interface]="section"
+            (sectionChanged)="setSection(section, $event)"
+            class="grayout"
+          ></simple-input>
+        </ng-template>
+        <div></div>
       </div>
     </div>
 
-    <div
-      class="clr-row"
-      *ngFor="let section of getSimpleInputs(currentPage.number)"
-    >
-      <div class="clr-col-1 clr-align-self-center" style="padding: 0;">
-        <div class="clr-row clr-justify-content-end">
-          <button
-            class="btn btn-link btn-icon"
-            style="margin-right: 1rem;"
-            (click)="openEditSection(section)"
-          >
-            <clr-icon shape="pencil"></clr-icon>
-          </button>
-        </div>
-      </div>
-      <div class="clr-col-11" style="padding: 0;">
-        <simple-input
-          [interface]="section"
-          (sectionChanged)="setSection(section, $event)"
-        ></simple-input>
-      </div>
-    </div>
     <clr-modal [(clrModalOpen)]="editSectionOpened" [clrModalSize]="'xl'">
       <h3 class="modal-title">Section properties</h3>
-      <div class="modal-body">
-        <clr-stack-view *ngIf="isDatagrid(selectedSection)">
-          <clr-stack-block>
-            <clr-stack-label>Title</clr-stack-label>
-            <clr-stack-content>
-              <input
-                type="text"
-                [(ngModel)]="selectedSection['title']"
-                class="clr-input"
-              />
-            </clr-stack-content>
-          </clr-stack-block>
-          <clr-stack-block>
-            <clr-stack-label>Subtitle (optional)</clr-stack-label>
-            <clr-stack-content>
-              <input
-                type="text"
-                [(ngModel)]="selectedSection['subtitle']"
-                class="clr-input"
-              />
-            </clr-stack-content>
-          </clr-stack-block>
-          <clr-stack-block>
-            <clr-stack-label>Type</clr-stack-label>
-            <clr-stack-content>
-              <select [(ngModel)]="selectedSection['type']" class="clr-select">
-                <option value="datagrid">Datagrid</option>
-                <option value="simple-input">SimpleInput</option>
-              </select>
-            </clr-stack-content>
-          </clr-stack-block>
-          <clr-stack-block>
-            <clr-stack-label>
-              Columns
-              <clr-tooltip>
-                <clr-icon
-                  clrTooltipTrigger
-                  shape="warning-standard"
-                  class="is-warning"
-                  size="16"
-                ></clr-icon>
-                <clr-tooltip-content
-                  clrPosition="top-right"
-                  clrSize="md"
-                  *clrIfOpen
-                >
-                  <span
-                    >Modifying this section will
-                    <b>clear existing prefill</b>.</span
-                  >
-                </clr-tooltip-content>
-              </clr-tooltip>
-            </clr-stack-label>
-            <clr-stack-content>
-              {{ selectedSection["columns"].length }} columns
-              <button
-                class="btn btn-sm btn-link btn-icon"
-                title="Add column"
-                (click)="addColumn()"
-                style="margin: 0;"
-              >
-                <clr-icon shape="plus"></clr-icon>
-              </button>
-            </clr-stack-content>
-            <clr-stack-block
-              *ngFor="let col of selectedSection['columns']; index as i"
-            >
-              <clr-stack-label
-                >Column {{ i + 1 }}
-                <button
-                  class="btn btn-sm btn-link btn-icon"
-                  (click)="deleteColumn(i)"
-                >
-                  <clr-icon shape="trash"></clr-icon>
-                </button>
-              </clr-stack-label>
-              <clr-stack-content>
-                <input
-                  type="text"
-                  [(ngModel)]="selectedSection['columns'][i]['label']"
-                  class="clr-input"
-                  placeholder="Label"
-                />
-                <select
-                  [(ngModel)]="selectedSection['columns'][i]['type']"
-                  class="clr-select"
-                >
-                  <option value="division-select">Division Select</option>
-                  <option value="text">Text</option>
-                  <option value="number">Number</option>
-                  <option value="date-select">Date</option>
-                  <option value="tag-select">Tag Select</option>
-                </select>
-              </clr-stack-content>
-            </clr-stack-block>
-          </clr-stack-block>
-          <clr-stack-block *ngIf="hasTagSelect(selectedSection)">
-            <clr-stack-label>
-              Tags
-              <clr-tooltip>
-                <clr-icon
-                  clrTooltipTrigger
-                  shape="warning-standard"
-                  class="is-warning"
-                  size="16"
-                ></clr-icon>
-                <clr-tooltip-content
-                  clrPosition="top-right"
-                  clrSize="md"
-                  *clrIfOpen
-                >
-                  <span
-                    >Modifying this section will
-                    <b>clear existing prefill</b>.</span
-                  >
-                </clr-tooltip-content>
-              </clr-tooltip>
-            </clr-stack-label>
-            <clr-stack-content>
-              {{ selectedSection["tags"].length }} tags
-              <button
-                class="btn btn-sm btn-link btn-icon"
-                title="Add tag"
-                (click)="addTag()"
-                style="margin: 0;"
-              >
-                <clr-icon shape="plus"></clr-icon>
-              </button>
-            </clr-stack-content>
-            <clr-stack-block
-              *ngFor="let tag of selectedSection['tags']; index as i"
-            >
-              <clr-stack-label
-                >Tag {{ i + 1 }}
-                <button
-                  class="btn btn-sm btn-link btn-icon"
-                  (click)="deleteTag(i)"
-                >
-                  <clr-icon shape="trash"></clr-icon>
-                </button>
-              </clr-stack-label>
-              <clr-stack-content>
-                <clr-accordion>
-                  <clr-accordion-panel>
-                    <clr-accordion-title
-                      >Emoji: {{ tag["icon"] }}</clr-accordion-title
-                    >
-                    <clr-accordion-content *clrIfExpanded
-                      ><emoji-picker
-                        (emoji-click)="editTagEmoji(i, $event)"
-                      ></emoji-picker
-                    ></clr-accordion-content>
-                  </clr-accordion-panel>
-                </clr-accordion>
-                <div class="clr-row">
-                  <p class="p4" style="margin: 0;">Tag label</p>
-                  <input
-                    type="text"
-                    [(ngModel)]="selectedSection['tags'][i]['label']"
-                    class="clr-input"
-                    placeholder="Tag label, e.g. 'Holiday program'"
-                  />
-                </div>
-              </clr-stack-content>
-            </clr-stack-block>
-          </clr-stack-block>
-          <!-- <clr-stack-block
-              *ngFor="let block of blocks; let blockIndex = index"
-              [clrStackViewLevel]="1"
-              [clrStackViewSetsize]="blocks.length"
-              [clrStackViewPosinset]="blockIndex + 1"
-              >
-              <clr-stack-label>{{block.title}}</clr-stack-label>
-              <clr-stack-content>
-                  <input type="text" [(ngModel)]="block.content" class="clr-input"/>
-              </clr-stack-content>
-
-              <clr-stack-block
-                  *ngFor="let child of block.children; let blockChildIndex = index"
-                  [clrSbNotifyChange]="child.content!=='Sub-content '+ (blockChildIndex)"
-                  [clrStackViewLevel]="2"
-                  [clrStackViewSetsize]="block.children.length"
-                  [clrStackViewPosinset]="blockChildIndex + 1"
-                  >
-                  <clr-stack-label>{{child.title}}</clr-stack-label>
+      <div class="modal-body" style="overflow: auto;">
+        <clr-tabs>
+          <clr-tab>
+            <button clrTabLink id="link1">Properties</button>
+            <clr-tab-content id="content1" *clrIfActive>
+              <clr-stack-view>
+                <clr-stack-block>
+                  <clr-stack-label>Title</clr-stack-label>
                   <clr-stack-content>
-                      <input type="text" [(ngModel)]="child.content" class="clr-input"/>
+                    <input
+                      type="text"
+                      [(ngModel)]="sectionInEdit['title']"
+                      class="clr-input"
+                    />
                   </clr-stack-content>
-              </clr-stack-block>
-            </clr-stack-block> -->
-        </clr-stack-view>
+                </clr-stack-block>
+                <clr-stack-block>
+                  <clr-stack-label>Subtitle (optional)</clr-stack-label>
+                  <clr-stack-content>
+                    <input
+                      type="text"
+                      [(ngModel)]="sectionInEdit['subtitle']"
+                      class="clr-input"
+                    />
+                  </clr-stack-content>
+                </clr-stack-block>
+                <clr-stack-block>
+                  <clr-stack-label>Type</clr-stack-label>
+                  <clr-stack-content>
+                    <select
+                      [(ngModel)]="sectionInEdit['type']"
+                      class="clr-select"
+                    >
+                      <option value="datagrid">Datagrid</option>
+                      <option value="simple-input">SimpleInput</option>
+                    </select>
+                  </clr-stack-content>
+                </clr-stack-block>
+                <clr-stack-block>
+                  <clr-stack-label>Order</clr-stack-label>
+                  <clr-stack-content>
+                    <button
+                      class="btn btn-link btn-sm"
+                      title="Move up"
+                      (click)="
+                        sectionInEdit['index'] = sectionInEdit['index'] - 1
+                      "
+                      [disabled]="sectionInEdit['index'] < 1"
+                      style="margin: 0;"
+                    >
+                      <clr-icon shape="angle" dir="up"></clr-icon>
+                    </button>
+                    {{ sectionInEdit["index"] + 1 }}/{{
+                      currentPage.sections.length
+                    }}
+                    <button
+                      class="btn btn-link btn-sm"
+                      title="Move up"
+                      style="margin: 0;"
+                      (click)="
+                        sectionInEdit['index'] = sectionInEdit['index'] + 1
+                      "
+                      [disabled]="
+                        sectionInEdit['index'] > currentPage.sections.length - 2
+                      "
+                    >
+                      <clr-icon shape="angle" dir="down"></clr-icon>
+                    </button>
+                  </clr-stack-content>
+                </clr-stack-block>
+                <clr-stack-block *ngIf="isDatagrid(sectionInEdit)">
+                  <clr-stack-label>
+                    Columns
+                    <clr-tooltip *ngIf="hasPrefill(sectionInEdit)">
+                      <clr-icon
+                        clrTooltipTrigger
+                        shape="warning-standard"
+                        class="is-warning is-solid"
+                        size="16"
+                      ></clr-icon>
+                      <clr-tooltip-content
+                        clrPosition="top-right"
+                        clrSize="md"
+                        *clrIfOpen
+                      >
+                        <span
+                          >Modifying this section will
+                          <b>clear existing prefill</b>.</span
+                        >
+                      </clr-tooltip-content>
+                    </clr-tooltip>
+                  </clr-stack-label>
+                  <clr-stack-content>
+                    {{ sectionInEdit["columns"].length }} columns
+                    <button
+                      class="btn btn-sm btn-link btn-icon"
+                      title="Add column"
+                      (click)="addColumn($event)"
+                      style="margin: 0;"
+                    >
+                      <clr-icon shape="plus"></clr-icon>
+                    </button>
+                  </clr-stack-content>
+                  <clr-stack-block
+                    *ngFor="let col of sectionInEdit['columns']; index as i"
+                  >
+                    <clr-stack-label
+                      >Column {{ i + 1 }}
+                      <button
+                        class="btn btn-sm btn-link btn-icon"
+                        (click)="deleteColumn(i)"
+                      >
+                        <clr-icon shape="trash"></clr-icon>
+                      </button>
+                    </clr-stack-label>
+                    <clr-stack-content>
+                      <input
+                        type="text"
+                        [(ngModel)]="sectionInEdit['columns'][i]['label']"
+                        class="clr-input"
+                        placeholder="Label"
+                      />
+                      <select
+                        [(ngModel)]="sectionInEdit['columns'][i]['type']"
+                        class="clr-select"
+                      >
+                        <option value="division-select">Division Select</option>
+                        <option value="text">Text</option>
+                        <option value="number">Number</option>
+                        <option value="date-select">Date</option>
+                        <option value="tag-select">Tag Select</option>
+                      </select>
+                    </clr-stack-content>
+                  </clr-stack-block>
+                </clr-stack-block>
+                <clr-stack-block *ngIf="isSimpleInput(sectionInEdit)">
+                  <clr-stack-label>
+                    Inputs
+                    <clr-tooltip *ngIf="hasPrefill(sectionInEdit)">
+                      <clr-icon
+                        clrTooltipTrigger
+                        shape="warning-standard"
+                        class="is-warning is-solid"
+                        size="16"
+                      ></clr-icon>
+                      <clr-tooltip-content
+                        clrPosition="top-right"
+                        clrSize="md"
+                        *clrIfOpen
+                      >
+                        <span
+                          >Modifying this section will
+                          <b>clear existing prefill</b>.</span
+                        >
+                      </clr-tooltip-content>
+                    </clr-tooltip>
+                  </clr-stack-label>
+                  <clr-stack-content>
+                    {{ sectionInEdit["inputs"].length }} inputs
+                    <button
+                      class="btn btn-sm btn-link btn-icon"
+                      title="Add input"
+                      (click)="addInput($event)"
+                      style="margin: 0;"
+                    >
+                      <clr-icon shape="plus"></clr-icon>
+                    </button>
+                  </clr-stack-content>
+                  <clr-stack-block
+                    *ngFor="let input of sectionInEdit['inputs']; index as i"
+                  >
+                    <clr-stack-label>
+                      Input {{ i + 1 }}
+                      <button
+                        class="btn btn-sm btn-link btn-icon"
+                        (click)="deleteInput(i)"
+                      >
+                        <clr-icon shape="trash"></clr-icon>
+                      </button>
+                    </clr-stack-label>
+                    <clr-stack-content>
+                      <clr-input-container>
+                        <label>Label</label>
+                        <input clrInput [(ngModel)]="input['label']" />
+                      </clr-input-container>
+                      <clr-select-container>
+                        <label>Type</label>
+                        <select [(ngModel)]="input['type']" clrSelect>
+                          <option value="division-select"
+                            >Division Select</option
+                          >
+                          <option value="text">Text</option>
+                          <option value="number">Number</option>
+                          <option value="date-select">Date</option>
+                          <option value="tag-select">Tag Select</option>
+                        </select>
+                      </clr-select-container>
+                    </clr-stack-content>
+                  </clr-stack-block>
+                </clr-stack-block>
+                <clr-stack-block *ngIf="hasTagSelect(sectionInEdit)">
+                  <clr-stack-label>
+                    Tags
+                    <clr-tooltip *ngIf="hasPrefill(sectionInEdit)">
+                      <clr-icon
+                        clrTooltipTrigger
+                        shape="warning-standard"
+                        class="is-warning is-solid"
+                        size="16"
+                      ></clr-icon>
+                      <clr-tooltip-content
+                        clrPosition="top-right"
+                        clrSize="md"
+                        *clrIfOpen
+                      >
+                        <span
+                          >Modifying this section will
+                          <b>clear existing prefill</b>.</span
+                        >
+                      </clr-tooltip-content>
+                    </clr-tooltip>
+                  </clr-stack-label>
+                  <clr-stack-content>
+                    {{ sectionInEdit["tags"].length }} tags
+                    <button
+                      class="btn btn-sm btn-link btn-icon"
+                      title="Add tag"
+                      (click)="addTag()"
+                      style="margin: 0;"
+                    >
+                      <clr-icon shape="plus"></clr-icon>
+                    </button>
+                  </clr-stack-content>
+                  <clr-stack-block
+                    *ngFor="let tag of sectionInEdit['tags']; index as i"
+                  >
+                    <clr-stack-label
+                      >Tag {{ i + 1 }}
+                      <button
+                        class="btn btn-sm btn-link btn-icon"
+                        (click)="deleteTag(i)"
+                      >
+                        <clr-icon shape="trash"></clr-icon>
+                      </button>
+                    </clr-stack-label>
+                    <clr-stack-content>
+                      <clr-accordion>
+                        <clr-accordion-panel>
+                          <clr-accordion-title
+                            >Emoji: {{ tag["icon"] }}</clr-accordion-title
+                          >
+                          <clr-accordion-content *clrIfExpanded
+                            ><emoji-picker
+                              (emoji-click)="editTagEmoji(i, $event)"
+                            ></emoji-picker
+                          ></clr-accordion-content>
+                        </clr-accordion-panel>
+                      </clr-accordion>
+                      <div class="clr-row">
+                        <p class="p4" style="margin: 0;">Tag label</p>
+                        <input
+                          type="text"
+                          [(ngModel)]="sectionInEdit['tags'][i]['label']"
+                          class="clr-input"
+                          placeholder="Tag label, e.g. 'Holiday program'"
+                        />
+                      </div>
+                    </clr-stack-content>
+                  </clr-stack-block>
+                </clr-stack-block>
+              </clr-stack-view>
+            </clr-tab-content>
+          </clr-tab>
+          <clr-tab>
+            <button clrTabLink>Prefill</button>
+            <clr-tab-content *clrIfActive="true">
+              <p>
+                <clr-icon shape="help-info"></clr-icon> Prefill is the default
+                information present in each section. You can use it to offer
+                hints on how a form should be filled.
+              </p>
+              <simple-input
+                *ngIf="isSimpleInput(sectionInEdit)"
+                [interface]="sectionInEdit"
+              >
+              </simple-input>
+              <datagrid-section
+                *ngIf="isDatagrid(sectionInEdit)"
+                [interface]="sectionInEdit"
+              >
+              </datagrid-section>
+              <!-- <table *ngIf="isDatagrid(sectionInEdit)" class="table">
+                <thead>
+                  <tr>
+                    <th>
+                      <p class="p8">EDIT</p>
+                    </th>
+                    <th *ngFor="let col of sectionInEdit['columns']">
+                      {{ col.label }}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of sectionInEdit['value']; index as i">
+                    <td>
+                      <button
+                        class="btn btn-sm btn-link btn-icon"
+                      >
+                        <clr-icon shape="trash"></clr-icon>
+                      </button>
+                    </td>
+                    <td *ngFor="let col of row['row']; index as j">
+                      <select
+                        *ngIf="isDatatype(j, 'division-select')"
+                        [(ngModel)]="sectionInEdit['value'][i]['row'][j]"
+                        class="clr-select"
+                      >
+                        <option
+                          *ngFor="
+                            let division of (constants$ | async)['divisions']
+                          "
+                          [value]="division['label']"
+                          >{{ division["label"] }}</option
+                        >
+                      </select>
+                      <input
+                        *ngIf="isDatatype(j, 'date-select')"
+                        type="date"
+                        style="margin: 0;"
+                        clrDate
+                        name="demo"
+                        size="20"
+                        [(ngModel)]="sectionInEdit['value'][i]['row'][j]"
+                      />
+                      <clr-checkbox-container
+                        *ngIf="isDatatype(j, 'tag-select')"
+                        clrInline
+                      >
+                        <clr-checkbox-wrapper
+                          *ngFor="let tag of sectionInEdit['tags']"
+                        >
+                          <input
+                            type="checkbox"
+                            clrCheckbox
+                            [ngModel]="hasTag(i, j, tag)"
+                            (ngModelChange)="toggleTag(i, j, $event, tag)"
+                          />
+                          <label [title]="tag['label']">{{
+                            tag["icon"]
+                          }}</label>
+                        </clr-checkbox-wrapper>
+                      </clr-checkbox-container>
+                      <input
+                        *ngIf="isDatatype(j, 'text')"
+                        type="text"
+                        size="20"
+                        [(ngModel)]="sectionInEdit['value'][i]['row'][j]"
+                        class="clr-input"
+                        placeholder="Label"
+                      />
+                      <input
+                        *ngIf="isDatatype(j, 'number')"
+                        type="number"
+                        size="20"
+                        [(ngModel)]="sectionInEdit['value'][i]['row'][j]"
+                        class="clr-input"
+                        placeholder="Label"
+                      />
+                    </td>
+                  </tr>
+                </tbody>
+              </table> -->
+            </clr-tab-content>
+          </clr-tab>
+        </clr-tabs>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn" (click)="finishEditSection()">
+        <button type="button" class="btn" (click)="cancelEditSection()">
           Cancel
         </button>
         <button
