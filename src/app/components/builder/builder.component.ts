@@ -1,6 +1,7 @@
 import {
   SimpleInputInterface,
   DatagridInterface,
+  SectionInterface,
 } from './../../interfaces/sections';
 import { Report } from 'src/app/interfaces/report';
 import { AngularFirestore } from '@angular/fire/firestore';
@@ -13,9 +14,15 @@ import {
   FormArray,
   AbstractControl,
 } from '@angular/forms';
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  NgModule,
+  CUSTOM_ELEMENTS_SCHEMA,
+} from '@angular/core';
 import { Page } from 'src/app/interfaces/page';
 import { first } from 'rxjs/operators';
+import 'emoji-picker-element';
 
 @Component({
   selector: 'app-builder',
@@ -29,7 +36,9 @@ export class BuilderComponent implements OnInit {
   pageExpansions: boolean[];
   pageHovers: boolean[];
   sectionHovers: boolean[][];
+  iconNames: string[];
   editSectionOpened: boolean = false;
+  emojiPickerOpened: boolean = false;
   sectionPropsForm: FormGroup = new FormGroup({
     title: new FormControl(),
     subtitle: new FormControl(),
@@ -283,8 +292,42 @@ export class BuilderComponent implements OnInit {
   openEditSection(section: Object) {
     this.selectedSection = section;
     if (section['type'] === 'datagrid') {
+    } else if (section['type'] === 'simple-input') {
     }
     this.editSectionOpened = true;
+  }
+  finishEditSection() {
+    console.log(this.selectedSection);
+    this.editSectionOpened = false;
+  }
+
+  addColumn() {
+    if (!this.selectedSection['columns']) {
+      this.selectedSection['columns'] = [{ label: 'New column', type: 'text' }];
+    } else {
+      (this.selectedSection['columns'] as Object[]).push({
+        label: 'New column',
+        type: 'text',
+      });
+      (this.selectedSection['value'] as Object[]).forEach((row) => {
+        (row['row'] as Object[]).push('');
+      });
+    }
+  }
+
+  clearPrefill() {
+    if (this.selectedSection['value']) {
+      this.selectedSection['value'] = [];
+    }
+  }
+
+  deleteColumn(index: number) {
+    //if prefill exists, clear it
+    this.clearPrefill();
+    console.log();
+    console.log(this.selectedSection['columns']);
+    (this.selectedSection['columns'] as Object[]).splice(index, 1);
+    console.log(this.selectedSection['columns']);
   }
 
   addInput() {
@@ -301,5 +344,43 @@ export class BuilderComponent implements OnInit {
   }
   hoverLeavePageSB(pageIndex) {
     this.pageHovers[pageIndex] = false;
+  }
+
+  hasTagSelect(object: Object): boolean {
+    let hastg: boolean = false;
+    if (object['inputs']) {
+      (object['inputs'] as Object[]).forEach((input) => {
+        if (input['type'] === 'tag-select') {
+          hastg = true;
+        }
+      });
+    } else if (object['columns']) {
+      (object['columns'] as Object[]).forEach((col) => {
+        if (col['type'] === 'tag-select') {
+          hastg = true;
+        }
+      });
+    }
+    return hastg;
+  }
+
+  addTag() {
+    console.log(this.selectedSection);
+    (this.selectedSection['tags'] as Object[]).push({
+      icon: '❓',
+      label: 'Untitled',
+    });
+    console.log(this.selectedSection);
+  }
+
+  deleteTag(index: number) {
+    console.log((this.selectedSection['tags'] as Object[]).splice(index, 1));
+  }
+
+  editTagEmoji(tagIndex: number, eventData: CustomEvent) {
+    console.log(tagIndex, eventData.detail);
+    (this.selectedSection as SectionInterface).tags[tagIndex]['icon'] =
+      eventData.detail['unicode'];
+    console.log(this.selectedSection);
   }
 }

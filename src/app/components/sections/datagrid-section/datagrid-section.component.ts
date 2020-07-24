@@ -192,6 +192,10 @@ export class DatagridSection extends AbstractSection implements OnInit {
     this.addModalOpened = false;
     this.formArray.reset();
   }
+  editModalCancel() {
+    this.addModalOpened = false;
+    this.formArray.reset();
+  }
 
   isTagObj(obj) {
     if (obj !== null && obj !== undefined && obj['tags']) return true;

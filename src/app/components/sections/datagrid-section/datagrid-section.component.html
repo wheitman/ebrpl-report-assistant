@@ -2,8 +2,7 @@
 <h5 class="subtitle" *ngIf="subtitle">{{ subtitle }}</h5>
 <clr-datagrid>
   <clr-dg-placeholder
-    >Nothing to see here. To add more content, use the controls
-    below.</clr-dg-placeholder
+    >Nothing to see here. Try adding more content.</clr-dg-placeholder
   >
   <clr-dg-column *clrDgItems="let column of interface.columns">{{
     column.label
@@ -19,7 +18,7 @@
       </span>
       <ng-template #tagRenderer>
         <span *ngFor="let tag of cell.tags">
-          <clr-icon [attr.shape]="tag.icon" title="{{ tag.label }}"></clr-icon>
+          <span title="{{ tag.label }}">{{ tag.icon }}</span>
         </span>
       </ng-template>
     </clr-dg-cell>
@@ -80,11 +79,10 @@
           <input
             type="checkbox"
             clrCheckbox
+            *ngIf="addModalOpened"
             [formControl]="getCheckboxControl(i, j, formArray)"
           />
-          <label
-            ><clr-icon [attr.shape]="tag.icon"></clr-icon>{{ tag.label }}</label
-          >
+          <label> {{ tag.icon }} {{ tag.label }}</label>
         </clr-checkbox-wrapper>
       </clr-checkbox-container>
     </form>
@@ -161,17 +159,16 @@
           <input
             type="checkbox"
             clrCheckbox
+            *ngIf="editModalOpened"
             [formControl]="getCheckboxControl(i, j, formArray)"
           />
-          <label
-            ><clr-icon [attr.shape]="tag.icon"></clr-icon>{{ tag.label }}</label
-          >
+          <label>{{ tag.icon }} {{ tag.label }}</label>
         </clr-checkbox-wrapper>
       </clr-checkbox-container>
     </form>
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-outline" (click)="addModalCancel()">
+    <button type="button" class="btn btn-outline" (click)="editModalCancel()">
       Cancel
     </button>
     <button
