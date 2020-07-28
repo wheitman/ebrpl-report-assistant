@@ -43,9 +43,7 @@
         clrCheckbox
         [formControl]="getCheckboxControl(i, j, formArray)"
       />
-      <label
-        ><clr-icon [attr.shape]="tag.icon"></clr-icon>{{ tag.label }}</label
-      >
+      <label>{{ tag.icon }} {{ tag.label }}</label>
     </clr-checkbox-wrapper>
   </clr-checkbox-container>
   <clr-textarea-container *ngIf="isType(input, 'textarea')">

@@ -458,7 +458,6 @@ export class BuilderComponent implements OnInit {
       input.type = 'tag-select';
       if (!input.tags) {
         input['tags'] = [];
-        console.log(input);
       }
     }
   }

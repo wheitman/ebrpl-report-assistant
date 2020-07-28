@@ -21,3 +21,7 @@ clr-date-container {
   pointer-events: none;
   cursor: not-allowed;
 }
+
+.stack-block-content {
+  background-color: transparent;
+}

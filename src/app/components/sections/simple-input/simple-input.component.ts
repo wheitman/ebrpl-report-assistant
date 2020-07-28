@@ -84,7 +84,7 @@ export class SimpleInputSection extends AbstractSection implements OnInit {
       { updateOn: 'blur' }
     );
     this.formArray.valueChanges.subscribe((newData) => {
-      if (this.interface.type === 'meta') {
+      if (this.interface.type === 'meta' && this._ReportService.report) {
         this.interface.inputs.forEach((inputObj: InputInterface, index) => {
           let link = inputObj.link;
 
