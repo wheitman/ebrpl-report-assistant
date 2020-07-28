@@ -39,6 +39,8 @@ export class StartComponent implements OnInit {
   templateModalVisible: boolean = false;
   tempDuplicateVisible: boolean = false;
 
+  _sizeLimit: string = '10';
+
   //from TemplateService
   templates: Observable<Map<string, Report>>;
 
@@ -53,6 +55,106 @@ export class StartComponent implements OnInit {
     this.user.subscribe((user) => {
       if (user) {
         this.showUnverifiedAlert = !user.emailVerified;
+        if (user.role === 'admin') {
+          //then load all reports, within quantity limit
+          if (this._sizeLimit !== 'all') {
+            this._ReportService
+              .fetchAllReportsWithLimit(+this._sizeLimit)
+              .then((reports) => {
+                this.reports = reports;
+                console.log(reports);
+              })
+              .catch(() => {
+                console.error('Could not fetch reports for ' + user.email);
+              });
+          } else {
+            this._ReportService
+              .fetchAllReports()
+              .then((reports) => {
+                this.reports = reports;
+                console.log(reports);
+              })
+              .catch(() => {
+                console.error('Could not fetch reports for ' + user.email);
+              });
+          }
+        } else {
+          if (this._sizeLimit !== 'all') {
+            this._ReportService
+              .fetchReportsByBranchWithLimit(user.branch, +this._sizeLimit)
+              .then((reports) => {
+                this.reports = reports;
+                console.log(reports);
+              })
+              .catch(() => {
+                console.error('Could not fetch reports for ' + user.email);
+              });
+          } else {
+            this._ReportService
+              .fetchReportsByBranch(user.branch)
+              .then((reports) => {
+                this.reports = reports;
+                console.log(reports);
+              })
+              .catch(() => {
+                console.error('Could not fetch reports for ' + user.email);
+              });
+          }
+        }
+      }
+    });
+    this.templates = this._TemplateService.templateObservable;
+
+    //attach loading statuses to the templates in the 'new report' dropdown
+    this.templateLoadStatuses = [];
+    this._TemplateService.templateNames.forEach(() => {
+      this.templateLoadStatuses.push(ClrLoadingState.DEFAULT);
+    });
+  }
+
+  get sizeLimit() {
+    return this._sizeLimit;
+  }
+
+  set sizeLimit(newLimit: string) {
+    this._sizeLimit = newLimit;
+    let user = this._UserService.getUserSnapshot();
+    this.showUnverifiedAlert = !user.emailVerified;
+    if (user.role === 'admin') {
+      //then load all reports, within quantity limit
+      if (this._sizeLimit !== 'all') {
+        this._ReportService
+          .fetchAllReportsWithLimit(+this._sizeLimit)
+          .then((reports) => {
+            this.reports = reports;
+            console.log(reports);
+          })
+          .catch(() => {
+            console.error('Could not fetch reports for ' + user.email);
+          });
+      } else {
+        this._ReportService
+          .fetchAllReports()
+          .then((reports) => {
+            this.reports = reports;
+            console.log(reports);
+          })
+          .catch(() => {
+            console.error('Could not fetch reports for ' + user.email);
+          });
+      }
+    } else {
+      if (this._sizeLimit !== 'all') {
+        this._ReportService
+          .fetchReportsByBranchWithLimit(user.branch, +this._sizeLimit)
+          .then((reports) => {
+            this.reports = reports;
+            console.log(reports);
+          })
+          .catch(() => {
+            console.error('Could not fetch reports for ' + user.email);
+          });
+      } else {
         this._ReportService
           .fetchReportsByBranch(user.branch)
           .then((reports) => {
@@ -63,14 +165,7 @@ export class StartComponent implements OnInit {
             console.error('Could not fetch reports for ' + user.email);
           });
       }
-    });
-    this.templates = this._TemplateService.templateObservable;
-
-    //attach loading statuses to the templates in the 'new report' dropdown
-    this.templateLoadStatuses = [];
-    this._TemplateService.templateNames.forEach(() => {
-      this.templateLoadStatuses.push(ClrLoadingState.DEFAULT);
-    });
+    }
   }
 
   showExport(report: Report) {

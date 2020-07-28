@@ -428,6 +428,61 @@ export class ReportService {
     return Promise.all(fetchPromises);
   }
 
+  fetchAllReports(): Promise<Report[]> {
+    if (
+      confirm(
+        'This will read all reports from the database, and may take a while. Are you sure?'
+      )
+    ) {
+      return new Promise<Report[]>((resolve, reject) => {
+        let queryCollection = this._AngularFirestore.collection<Report>(
+          '/reports'
+        );
+        queryCollection
+          .valueChanges()
+          .pipe(first())
+          .subscribe((reports) => {
+            resolve(reports);
+          }, reject);
+      });
+    } else {
+      return this.fetchAllReportsWithLimit(10);
+    }
+  }
+
+  fetchAllReportsWithLimit(sizeLimit: number): Promise<Report[]> {
+    return new Promise<Report[]>((resolve, reject) => {
+      let queryCollection = this._AngularFirestore.collection<Report>(
+        '/reports',
+        (ref) => ref.limit(sizeLimit)
+      );
+      queryCollection
+        .valueChanges()
+        .pipe(first())
+        .subscribe((reports) => {
+          resolve(reports);
+        }, reject);
+    });
+  }
+
+  fetchReportsByBranchWithLimit(
+    branch: string,
+    sizeLimit: number
+  ): Promise<Report[]> {
+    return new Promise<Report[]>((resolve, reject) => {
+      let queryCollection = this._AngularFirestore.collection<Report>(
+        '/reports',
+        (ref) => ref.where('branch', '==', branch).limit(sizeLimit)
+      );
+      queryCollection
+        .valueChanges()
+        .pipe(first())
+        .subscribe((reports) => {
+          resolve(reports);
+        }, reject);
+    });
+  }
+
   fetchReportsByBranch(branch: string): Promise<Report[]> {
     return new Promise<Report[]>((resolve, reject) => {
       let queryCollection = this._AngularFirestore.collection<Report>(
