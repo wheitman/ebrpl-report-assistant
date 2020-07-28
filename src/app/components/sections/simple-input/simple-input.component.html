@@ -37,7 +37,7 @@
   </clr-input-container>
   <clr-checkbox-container *ngIf="isType(input, 'tag-select')">
     <label for="">{{ input["label"] }}</label>
-    <clr-checkbox-wrapper *ngFor="let tag of interface.tags; index as j">
+    <clr-checkbox-wrapper *ngFor="let tag of input.tags; index as j">
       <input
         type="checkbox"
         clrCheckbox
@@ -53,7 +53,6 @@
     <textarea
       clrTextarea
       name="description"
-      required
       [formControl]="formArray.controls[i]"
     ></textarea>
   </clr-textarea-container>

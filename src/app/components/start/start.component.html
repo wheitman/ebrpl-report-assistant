@@ -34,8 +34,8 @@
   >
     <div class="clr-row clr-justify-content-between clr-align-items-end">
       <h1>Reports for {{ (user | async)?.branch }}</h1>
-      <button class="btn btn-primary" (click)="openBuilder()" *ngIf="isAdmin">
-        <clr-icon shape="tools"></clr-icon> Template builder
+      <button class="btn" (click)="showTemplateModal()" *ngIf="isAdmin">
+        <clr-icon shape="scroll"></clr-icon> Templates
       </button>
       <clr-dropdown [clrCloseMenuOnItemClick]="false">
         <button class="btn btn-primary" clrDropdownTrigger>
@@ -43,16 +43,23 @@
         </button>
         <clr-dropdown-menu clrPosition="bottom-right" *clrIfOpen>
           <ng-container
-            *ngFor="let name of _TemplateService.templateNames; index as i"
+            *ngFor="
+              let template of _TemplateService.visibleTemplates;
+              index as i
+            "
           >
             <button
               clrDropdownItem
               [clrLoading]="templateLoadStatuses[i]"
-              (click)="createReport(name, i)"
+              (click)="createReport(template.templateID, i)"
             >
-              {{ name }}
+              {{ template.templateID }}
             </button>
           </ng-container>
+          <ng-container *ngIf="_TemplateService.visibleTemplates.length < 1"
+            ><clr-icon shape="exclamation-triangle"></clr-icon> No templates are
+            available right now.</ng-container
+          >
         </clr-dropdown-menu>
       </clr-dropdown>
     </div>
@@ -77,6 +84,14 @@
             </button>
             <button class="action-item" (click)="showCopy(report)">
               Duplicate to new report
+            </button>
+            <button
+              *ngIf="!isUnfinished(report) && isAdmin"
+              class="action-item"
+              (click)="showDelete(report)"
+            >
+              Delete report
+              <span class="badge badge-light-blue" *ngIf="isAdmin">Admin</span>
             </button>
             <button
               *ngIf="isUnfinished(report)"
@@ -121,9 +136,18 @@
       </clr-datagrid>
 
       <clr-modal [clrModalSize]="'sm'" [(clrModalOpen)]="deleteVisible">
-        <h3 class="modal-title">Are you sure you want to delete this draft?</h3>
+        <h3 class="modal-title">
+          Are you sure you want to delete this report?
+        </h3>
         <div class="modal-body" *ngIf="selectedReport">
-          <p><strong>Template: </strong>{{ selectedReport.templateID }}</p>
+          <p>
+            <strong>Template: </strong>{{ selectedReport.templateID
+            }}<span
+              *ngIf="isUnfinished(selectedReport)"
+              class="label label-warning"
+              >Draft</span
+            >
+          </p>
           <p>
             <strong>Coverage date: </strong>{{ selectedReport.coverageDate }}
           </p>
@@ -150,7 +174,12 @@
           <p>
             <strong>Template: </strong>{{ selectedReport.templateID }}<br />
             <strong>ID: </strong>{{ selectedReport.id }}<br />
-            <b>Submitted: </b>{{ selectedReport.submitDate | date }}
+            <b>Submitted: </b>{{ selectedReport.submitDate | date
+            }}<span
+              *ngIf="isUnfinished(selectedReport)"
+              class="label label-warning"
+              >Draft</span
+            >
           </p>
         </div>
         <div class="modal-footer">
@@ -161,6 +190,127 @@
             type="button"
             class="btn btn-primary"
             (click)="duplicateReport(selectedReport)"
+          >
+            Duplicate
+          </button>
+        </div>
+      </clr-modal>
+      <clr-modal [(clrModalOpen)]="templateModalVisible">
+        <h3 class="modal-title">
+          {{ _TemplateService.templateNames.length }} templates
+        </h3>
+        <div class="modal-body">
+          <div
+            class="clr-row clr-align-items-center template-row"
+            *ngFor="
+              let templateID of _TemplateService.templateNames;
+              index as i
+            "
+          >
+            <clr-dropdown>
+              <button
+                class="btn btn-link btn-sm btn-icon"
+                style="padding: 0 12px 0 12px;"
+                clrDropdownTrigger
+              >
+                <clr-icon shape="ellipsis-vertical"></clr-icon>
+              </button>
+              <clr-dropdown-menu clrPosition="top-left" *clrIfOpen>
+                <label class="dropdown-header" aria-hidden="true"
+                  >Template actions</label
+                >
+                <div
+                  clrDropdownItem
+                  (click)="_TemplateService.openTemplate(templateID)"
+                >
+                  <clr-icon
+                    shape="angle-double"
+                    dir="right"
+                    class="is-highlight"
+                  ></clr-icon>
+                  Edit
+                </div>
+                <div
+                  clrDropdownItem
+                  (click)="showDuplicateTemplate(templateID)"
+                >
+                  <clr-icon shape="copy"></clr-icon>
+                  Duplicate as...
+                </div>
+                <div
+                  clrDropdownItem
+                  *ngIf="!isHidden(templateID); else showTempl"
+                  (click)="_TemplateService.markHidden(templateID)"
+                >
+                  <clr-icon shape="eye-hide"></clr-icon>
+                  Hide from users
+                </div>
+                <ng-template #showTempl>
+                  <div
+                    clrDropdownItem
+                    (click)="_TemplateService.markVisible(templateID)"
+                  >
+                    <clr-icon shape="eye"></clr-icon>
+                    Show to users
+                  </div>
+                </ng-template>
+                <div clrDropdownItem (click)="deleteTemplate(templateID)">
+                  <clr-icon shape="trash" class="is-danger"></clr-icon>
+                  Delete
+                </div>
+              </clr-dropdown-menu>
+            </clr-dropdown>
+            {{ templateID }}
+          </div>
+          <div class="clr-row clr-justify-content-end">
+            <button
+              class="btn btn-sm btn-link btn-icon"
+              style="margin: 24px 0 0 0;"
+              (click)="_TemplateService.newTemplate()"
+            >
+              Create new
+              <clr-icon
+                shape="plus"
+                dir="right"
+                title="This will open a blank template in the builder."
+              ></clr-icon>
+            </button>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-outline"
+            (click)="hideTemplateModal()"
+          >
+            Close
+          </button>
+        </div>
+      </clr-modal>
+      <clr-modal [clrModalSize]="'sm'" [(clrModalOpen)]="tempDuplicateVisible">
+        <h3 class="modal-title">Duplicate {{ selectedTemplateName }}</h3>
+        <div class="modal-body">
+          <clr-input-container>
+            <label>New template name</label>
+            <input clrInput [(ngModel)]="newTemplateName" required />
+            <clr-control-helper
+              >What should the new template be named?</clr-control-helper
+            >
+          </clr-input-container>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-outline"
+            (click)="hideTemplateModal()"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            [disabled]="newTemplateName.length < 1"
+            (click)="duplicateTemplate(selectedTemplateName, newTemplateName)"
           >
             Duplicate
           </button>

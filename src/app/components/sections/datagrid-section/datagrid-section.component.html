@@ -29,8 +29,8 @@
     </div>
   </clr-dg-footer>
 </clr-datagrid>
-<clr-modal #addModal [(clrModalOpen)]="addModalOpened">
-  <h3 class="modal-title">Add to "{{ interface.title }}"</h3>
+<clr-modal #addModal [(clrModalOpen)]="addModalOpened" *ngIf="addModalOpened">
+  <h3 class="modal-title">Add row</h3>
   <div class="modal-body">
     <clr-alert
       [clrAlertType]="'success'"
@@ -75,29 +75,28 @@
       </clr-input-container>
       <clr-checkbox-container *ngIf="isType(column, 'tag-select')">
         <label for="">{{ column["label"] }}</label>
-        <clr-checkbox-wrapper *ngFor="let tag of interface.tags; index as j">
+        <clr-checkbox-wrapper *ngFor="let tag of column.tags; index as j">
           <input
             type="checkbox"
             clrCheckbox
-            *ngIf="addModalOpened"
             [formControl]="getCheckboxControl(i, j, formArray)"
           />
-          <label> {{ tag.icon }} {{ tag.label }}</label>
+          <label>{{ tag.icon }} {{ tag.label }}</label>
         </clr-checkbox-wrapper>
       </clr-checkbox-container>
     </form>
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-outline" (click)="addModalCancel()">
+    <button type="button" class="btn btn-outline" (click)="editModalCancel()">
       Cancel
     </button>
     <button
       type="button"
-      class="btn btn-primary"
+      class="btn"
       (click)="addAnother()"
       [disabled]="formArray.invalid"
     >
-      Save and add another
+      Add another
     </button>
     <button
       type="button"
@@ -105,12 +104,16 @@
       (click)="finishAddModal()"
       [disabled]="formArray.invalid"
     >
-      Save and finish
+      Add and finish
     </button>
   </div>
 </clr-modal>
-<clr-modal #editModal [(clrModalOpen)]="editModalOpened">
-  <h3 class="modal-title">Edit item</h3>
+<clr-modal
+  #editModal
+  [(clrModalOpen)]="editModalOpened"
+  *ngIf="editModalOpened"
+>
+  <h3 class="modal-title">Edit row</h3>
   <div class="modal-body">
     <!-- <clr-alert
       [clrAlertType]="'success'"
@@ -155,7 +158,7 @@
       </clr-input-container>
       <clr-checkbox-container *ngIf="isType(column, 'tag-select')">
         <label for="">{{ column["label"] }}</label>
-        <clr-checkbox-wrapper *ngFor="let tag of interface.tags; index as j">
+        <clr-checkbox-wrapper *ngFor="let tag of column.tags; index as j">
           <input
             type="checkbox"
             clrCheckbox

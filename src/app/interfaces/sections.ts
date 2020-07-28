@@ -4,14 +4,50 @@ export interface SectionInterface {
   type: string;
   index: number;
   subtitle?: string;
-  tags?: Object[];
   meta?: boolean;
 }
 
 export interface DatagridInterface extends SectionInterface {
-  columns: Object[];
+  columns: Column[];
 }
 
 export interface SimpleInputInterface extends SectionInterface {
-  inputs: Object[];
+  inputs: Input[];
+}
+
+export interface Tag {
+  label: string;
+  icon: string;
+}
+
+export interface Column {
+  label: string;
+  /**
+   * AVAILABLE TYPES:
+   * date-select
+   * month-select
+   * division-select
+   * text
+   * textarea
+   * number
+   * tag-select
+   */
+  type: string;
+  tags?: Tag[];
+}
+
+export interface Input {
+  label: string;
+  /**
+   * AVAILABLE TYPES:
+   * date-select
+   * month-select
+   * division-select
+   * text
+   * number
+   * tag-select
+   */
+  type: string;
+  tags?: Tag[];
+  link?: string;
 }

@@ -92,12 +92,15 @@ export class ReportComponent implements OnInit, OnDestroy {
         page.sections.forEach((section) => {
           if (section['type'] == 'datagrid') {
             this.datagrids.push(section as DatagridInterface);
-          } else if (section['type'] == 'simple-input') {
+          } else if (
+            section['type'] === 'simple-input' ||
+            section['type'] === 'meta'
+          ) {
             this.simpleInputs.push(section as SimpleInputInterface);
           }
         });
         this.markCompleteControl.setValue(
-          this._ReportService.report.pageStatuses[page.number] === 'complete'
+          this._ReportService.report.pageStatuses[page.index] === 'complete'
             ? true
             : false
         );
@@ -135,6 +138,13 @@ export class ReportComponent implements OnInit, OnDestroy {
 
   savePage() {
     this.saveButtonState = ClrLoadingState.LOADING;
+
+    //save report properties if a meta section is present
+    this._ReportService.page.sections.forEach((section) => {
+      if (section['type'] === 'meta') {
+        this._ReportService.saveReportOnline();
+      }
+    });
     this._ReportService
       .savePageOnline()
       .then(() => {
@@ -176,8 +186,9 @@ export class ReportComponent implements OnInit, OnDestroy {
   }
 
   get currentPageIndex() {
-    if (this._ReportService.page) return this._ReportService.page.number;
-    else return null;
+    if (this._ReportService.page) {
+      return this._ReportService.page.index;
+    } else return null;
   }
 
   //return minutes since last save

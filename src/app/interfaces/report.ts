@@ -3,6 +3,9 @@ export interface Report {
   id: string;
   templateID: string;
   title?: string;
+  category?: string;
+  tags?: string[];
+  hidden?: boolean;
   coverageDate?: string;
   submitDate?: string;
   author?: string;

@@ -169,42 +169,54 @@ export class ReportService {
     });
   }
 
-  duplicateReport(fromReport: Report): Promise<string> {
-    return new Promise<string>((resolve, reject) => {
-      if (navigator.onLine === false) {
-        reject('offline');
-      } else {
-        let promiseList: Promise<void>[] = [];
-        //generate a fresh ID
-        let newReportID;
-        this.generateReportID().then((newID) => {
-          newReportID = newID;
-          //start by copying the base report
-          let newReportDoc = this._AngularFirestore.doc('/reports/' + newID);
-          let newReport = fromReport;
-          newReport.id = newID;
-          newReport.author = this._UserService.getUserSnapshot().email;
+  duplicateReport(reportID: string): Promise<string> {
+    console.log('[Report Serv] Duplicating ' + reportID);
 
-          newReportDoc.set(fromReport);
-          //then copy all pages
-          for (let i = 0; i < fromReport.pageCount; i++) {
-            let fromPageDoc = this._AngularFirestore.doc<Page>(
-              '/reports/' + fromReport.id + '/pages/' + i.toString()
-            );
-            fromPageDoc
-              .valueChanges()
-              .pipe(first())
-              .subscribe((fromPage) => {
-                promiseList.push(
+    return new Promise<string>((resolve, reject) => {
+      //grab old template from database
+      this._AngularFirestore
+        .doc<Report>('/reports/' + reportID)
+        .valueChanges()
+        .pipe(first())
+        .subscribe((originalReport) => {
+          let newReport = originalReport;
+
+          console.log(newReport);
+          //reset templateID, id
+          this.generateReportID().then((newReportID) => {
+            newReport.templateID = originalReport.templateID;
+            newReport.id = newReportID;
+            newReport.completionStatus = 'incomplete';
+            //save new template to database
+            this._AngularFirestore
+              .doc('/reports/' + newReportID)
+              .set(newReport)
+              .then(() => {
+                let pagePromises: Promise<void>[] = [];
+                for (let i = 0; i < newReport.pageCount; i++) {
                   this._AngularFirestore
-                    .doc('/reports/' + newID + '/pages/' + i.toString())
-                    .set(fromPage)
-                );
-              });
-          }
-        });
-        Promise.all(promiseList).then(() => resolve(newReportID));
-      }
+                    .doc<Page>(
+                      '/reports/' + reportID + '/pages/' + i.toString()
+                    )
+                    .valueChanges()
+                    .pipe(first())
+                    .subscribe((oldPage) => {
+                      pagePromises.push(
+                        this._AngularFirestore
+                          .doc(
+                            '/reports/' + newReportID + '/pages/' + i.toString()
+                          )
+                          .set(oldPage)
+                      );
+                    });
+                }
+                Promise.all(pagePromises).then(() => {
+                  console.log('Report duplicated successfully.');
+                  resolve(newReportID);
+                }, reject);
+              }, reject);
+          });
+        }, reject);
     });
   }
 
@@ -307,7 +319,7 @@ export class ReportService {
           'reports/' + this._report.id
         );
         reportDoc.set(this._report).then(() => {
-          console.log('[Report Serv] Successfully saved to server.');
+          console.log('[Report Serv] Successfully saved report to server.');
           resolve();
         }, reject);
       } else {
@@ -325,12 +337,12 @@ export class ReportService {
       }
       if (this._page) {
         let pageDoc = this._AngularFirestore.doc<Page>(
-          'reports/' + this._report.id + '/pages/' + this._page.number
+          'reports/' + this._report.id + '/pages/' + this._page.index
         );
         pageDoc.set(this._page).then(() => {
           console.log(
             '[Report Serv] Successfully saved page ' +
-              this._page.number +
+              this._page.index +
               ' to server.'
           );
           resolve();
@@ -347,10 +359,11 @@ export class ReportService {
   }
 
   setCoverageDate(isoDate: string) {
-    if (isNaN(new Date(isoDate).getTime())) {
-      console.error('[Report Serv] Cannot set coverage date. Invalid date.');
+    if (!isoDate || isNaN(new Date(isoDate).getTime())) {
+      console.warn('[Report Serv] Cannot set coverage date. Invalid date.');
       return;
     }
+    console.log('[Report Serv] Setting coverage date to ' + isoDate);
     this._report.coverageDate = isoDate;
     this.report$.next(this._report);
   }
@@ -359,6 +372,7 @@ export class ReportService {
       console.error('[Report Serv] Cannot set coverage date. Invalid date.');
       return;
     }
+    console.log('[Report Serv] Setting submit date to ' + isoDate);
     this._report.submitDate = isoDate;
     this.report$.next(this._report);
   }
@@ -367,8 +381,21 @@ export class ReportService {
     this.report$.next(this._report);
   }
   setAdditionalInfo(info: string) {
+    console.log('[Report Serv] Setting additional info to ' + info);
     this._report.additionalInfo = info;
     this.report$.next(this._report);
+  }
+  setTitle(title: string) {
+    console.log('[Report Serv] Setting title to ' + title);
+    this._report.title = title;
+  }
+  setSubject(subject: string) {
+    console.log('[Report Serv] Setting subject to ' + subject);
+    this._report.title = subject;
+  }
+  setTags(tags: string[]) {
+    console.log('[Report Serv] Setting tags to ' + tags);
+    this._report.tags = tags;
   }
   setPageStatus(pageIndex: number, status: string) {
     if (!(status === 'complete' || status === 'incomplete')) {
@@ -413,6 +440,18 @@ export class ReportService {
         .subscribe((reports) => {
           resolve(reports);
         }, reject);
+    });
+  }
+
+  pushTemplateObjectToDB(template: Report, pages: Page[]) {
+    let templateDoc = this._AngularFirestore.doc(
+      '/templates/' + template.templateID
+    );
+    templateDoc.set(template).then(() => {
+      let pageCollection = templateDoc.collection('pages');
+      pages.forEach((page, index) => {
+        pageCollection.doc(index.toString()).set(page);
+      });
     });
   }
 }

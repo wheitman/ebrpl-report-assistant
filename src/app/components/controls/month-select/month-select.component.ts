@@ -34,22 +34,22 @@ export class MonthSelectComponent implements OnInit, ControlValueAccessor {
 
   formGroup: FormGroup;
 
-  onChange = (month: Object) => {};
-  onTouched = () => {};
+  onChange = (newDateString: string) => {
+    console.log(newDateString);
+  };
+  onTouched: any = () => {};
+
+  set value(newDateString: string) {
+    this.dateString = newDateString;
+    this.onChange(newDateString);
+    this.onTouched(newDateString);
+  }
 
   writeValue(date: string): void {
     this.dateString = date;
-    this.onChange(this.dateString);
-    if (this.formGroup) {
-      let dateObj = new Date(this.dateString);
-      let monthIndex = dateObj.getMonth();
-      let year = dateObj.getFullYear();
-      this.formGroup.get('monthInput').setValue(this._months[monthIndex]);
-      this.formGroup.get('yearInput').setValue(year);
-    }
   }
 
-  registerOnChange(fn: (month: Object) => void): void {
+  registerOnChange(fn: (newDateString: string) => void): void {
     this.onChange = fn;
   }
 
@@ -87,14 +87,14 @@ export class MonthSelectComponent implements OnInit, ControlValueAccessor {
         Validators.max(2100),
       ]),
     });
-    this.formGroup.valueChanges.subscribe((newObj) => {
+    this.formGroup.valueChanges.subscribe((newValue) => {
+      this.month = this._months.indexOf(newValue['monthInput']);
+      this.year = newValue['yearInput'];
       let date = new Date();
-      let month = this.formGroup.get('monthInput').value;
-      let monthIndex = this._months.indexOf(month);
-      date.setMonth(monthIndex);
-      date.setFullYear(this.formGroup.get('yearInput').value);
+      date.setMonth(this.month);
+      date.setFullYear(this.year);
       this.dateString = date.toISOString();
-      this.onChange(this.dateString);
+      this.value = this.dateString;
     });
   }
 }

@@ -26,7 +26,25 @@
     </span>
     <clr-tree *ngIf="_template">
       <clr-tree-node *ngIf="_template.pages">
-        <p class="p4" style="margin: 0;">Pages</p>
+        <h4 style="margin: 0;">Overview</h4>
+        <clr-tooltip>
+          <clr-icon
+            clrTooltipTrigger
+            shape="help-info"
+            size="16"
+            aria-label="Uniq tooltip 3"
+          ></clr-icon>
+          <clr-tooltip-content
+            clrPosition="bottom-right"
+            clrSize="md"
+            *clrIfOpen
+          >
+            <span
+              >Double click on a page or section below to open the properties
+              pane. Use the "+" buttons to add content.</span
+            >
+          </clr-tooltip-content>
+        </clr-tooltip>
         <button
           class="btn btn-sm btn-link btn-icon"
           title="Add page"
@@ -38,14 +56,35 @@
       <clr-tree-node
         *ngFor="let page of _template.pages; index as i"
         [(clrExpanded)]="pageExpansions[i]"
+        (click)="setCurrentPage(i)"
       >
-        <div class="tree-text clr-row">
-          <div>
-            <a (click)="setCurrentPage(i)"
-              ><clr-icon shape="file"></clr-icon> {{ page.title }}</a
-            >
-          </div>
+        <div class="tree-text clr-row" (dblclick)="openEditPage(i)">
+          <div><clr-icon shape="file"></clr-icon> {{ page.title }}</div>
         </div>
+        <clr-tree-node>
+          <p class="p4" style="margin: 0;"></p>
+          <button
+            class="btn btn-sm btn-link"
+            title="Add Meta Section"
+            (click)="addMetaSection(i)"
+            *ngIf="!hasMetaSection"
+          >
+            Add Meta Section
+            <clr-icon shape="plus"></clr-icon>
+          </button>
+        </clr-tree-node>
+        <clr-tree-node
+          *ngFor="let section of getSectionsByType(i, 'meta')"
+          style="width: 100%;"
+          (dblclick)="openEditSection(section)"
+        >
+          <div class="tree-text">{{ section.title }}</div>
+          <clr-icon
+            shape="flag"
+            class="is-solid is-error"
+            title="Meta!"
+          ></clr-icon>
+        </clr-tree-node>
         <clr-tree-node>
           <p class="p4" style="margin: 0;">Datagrids</p>
           <button
@@ -60,6 +99,7 @@
         <clr-tree-node
           *ngFor="let section of getDatagrids(i)"
           style="width: 100%;"
+          (dblclick)="openEditSection(section)"
         >
           <clr-icon shape="table"></clr-icon>
           <div class="tree-text">{{ section.title }}</div>
@@ -77,23 +117,33 @@
         <clr-tree-node
           *ngFor="let section of getSimpleInputs(i)"
           style="width: 100%;"
+          (dblclick)="openEditSection(section)"
         >
           <clr-icon shape="form"></clr-icon>
           <div class="tree-text">
             {{ section.title }}
-            <clr-icon
-              *ngIf="section.meta"
-              shape="flag"
-              class="is-solid is-error"
-              title="Meta section"
-            ></clr-icon>
           </div>
         </clr-tree-node>
       </clr-tree-node>
     </clr-tree>
   </div>
   <div class="clr-col preview-area" *ngIf="currentPage">
-    <h1>{{ currentPage.title }}</h1>
+    <div class="clr-row">
+      <div class="clr-col-1 clr-align-self-center" style="padding: 0;">
+        <div class="clr-row clr-justify-content-end clr-align-items-end">
+          <button
+            class="btn btn-link btn-icon"
+            style="margin-right: 1rem;"
+            (click)="openEditPage(currentPage)"
+          >
+            <clr-icon shape="pencil" style="color: black;"></clr-icon>
+          </button>
+        </div>
+      </div>
+      <div class="clr-col-11" style="padding: 0;">
+        <h1>{{ currentPage.title }}</h1>
+      </div>
+    </div>
     <hr />
 
     <div class="clr-row" *ngFor="let section of currentPage.sections">
@@ -104,7 +154,7 @@
             style="margin-right: 1rem;"
             (click)="openEditSection(section)"
           >
-            <clr-icon shape="pencil"></clr-icon>
+            <clr-icon shape="pencil" style="color: black;"></clr-icon>
           </button>
         </div>
       </div>
@@ -186,7 +236,7 @@
                     }}
                     <button
                       class="btn btn-link btn-sm"
-                      title="Move up"
+                      title="Move down"
                       style="margin: 0;"
                       (click)="
                         sectionInEdit['index'] = sectionInEdit['index'] + 1
@@ -215,7 +265,7 @@
                         *clrIfOpen
                       >
                         <span
-                          >Modifying this section will
+                          >Modifying this section might
                           <b>clear existing prefill</b>.</span
                         >
                       </clr-tooltip-content>
@@ -264,7 +314,12 @@
                     </clr-stack-content>
                   </clr-stack-block>
                 </clr-stack-block>
-                <clr-stack-block *ngIf="isSimpleInput(sectionInEdit)">
+                <clr-stack-block
+                  *ngIf="
+                    isSimpleInput(sectionInEdit) ||
+                    isSectionType(sectionInEdit, 'meta')
+                  "
+                >
                   <clr-stack-label>
                     Inputs
                     <clr-tooltip *ngIf="hasPrefill(sectionInEdit)">
@@ -286,7 +341,7 @@
                       </clr-tooltip-content>
                     </clr-tooltip>
                   </clr-stack-label>
-                  <clr-stack-content>
+                  <clr-stack-content *ngIf="sectionInEdit">
                     {{ sectionInEdit["inputs"].length }} inputs
                     <button
                       class="btn btn-sm btn-link btn-icon"
@@ -326,77 +381,99 @@
                           <option value="tag-select">Tag Select</option>
                         </select>
                       </clr-select-container>
-                    </clr-stack-content>
-                  </clr-stack-block>
-                </clr-stack-block>
-                <clr-stack-block *ngIf="hasTagSelect(sectionInEdit)">
-                  <clr-stack-label>
-                    Tags
-                    <clr-tooltip *ngIf="hasPrefill(sectionInEdit)">
-                      <clr-icon
-                        clrTooltipTrigger
-                        shape="warning-standard"
-                        class="is-warning is-solid"
-                        size="16"
-                      ></clr-icon>
-                      <clr-tooltip-content
-                        clrPosition="top-right"
-                        clrSize="md"
-                        *clrIfOpen
-                      >
-                        <span
-                          >Modifying this section will
-                          <b>clear existing prefill</b>.</span
-                        >
-                      </clr-tooltip-content>
-                    </clr-tooltip>
-                  </clr-stack-label>
-                  <clr-stack-content>
-                    {{ sectionInEdit["tags"].length }} tags
-                    <button
-                      class="btn btn-sm btn-link btn-icon"
-                      title="Add tag"
-                      (click)="addTag()"
-                      style="margin: 0;"
-                    >
-                      <clr-icon shape="plus"></clr-icon>
-                    </button>
-                  </clr-stack-content>
-                  <clr-stack-block
-                    *ngFor="let tag of sectionInEdit['tags']; index as i"
-                  >
-                    <clr-stack-label
-                      >Tag {{ i + 1 }}
-                      <button
-                        class="btn btn-sm btn-link btn-icon"
-                        (click)="deleteTag(i)"
-                      >
-                        <clr-icon shape="trash"></clr-icon>
-                      </button>
-                    </clr-stack-label>
-                    <clr-stack-content>
-                      <clr-accordion>
-                        <clr-accordion-panel>
-                          <clr-accordion-title
-                            >Emoji: {{ tag["icon"] }}</clr-accordion-title
+
+                      <clr-select-container>
+                        <label>Link</label>
+                        <select [(ngModel)]="input['link']" clrSelect>
+                          <option value="coverageDate"
+                            >Report coverage date</option
                           >
-                          <clr-accordion-content *clrIfExpanded
-                            ><emoji-picker
-                              (emoji-click)="editTagEmoji(i, $event)"
-                            ></emoji-picker
-                          ></clr-accordion-content>
-                        </clr-accordion-panel>
-                      </clr-accordion>
-                      <div class="clr-row">
-                        <p class="p4" style="margin: 0;">Tag label</p>
-                        <input
-                          type="text"
-                          [(ngModel)]="sectionInEdit['tags'][i]['label']"
-                          class="clr-input"
-                          placeholder="Tag label, e.g. 'Holiday program'"
-                        />
-                      </div>
+                          <option value="additionalInfo"
+                            >Additional info</option
+                          >
+                          <option value="title">Report title</option>
+                          <option value="subject">Report subject</option>
+                          <option
+                            value="tags"
+                            *ngIf="isEqual(input['type'], 'tag-select')"
+                            >Report tags</option
+                          >
+                        </select>
+                      </clr-select-container>
                     </clr-stack-content>
+                    <!-- Show tag options if input is tag-select -->
+                    <clr-stack-block
+                      *ngIf="isEqual(input['type'], 'tag-select')"
+                    >
+                      <clr-stack-label>
+                        Tags
+                        <clr-tooltip *ngIf="hasPrefill(sectionInEdit)">
+                          <clr-icon
+                            clrTooltipTrigger
+                            shape="warning-standard"
+                            class="is-warning is-solid"
+                            size="16"
+                          ></clr-icon>
+                          <clr-tooltip-content
+                            clrPosition="top-right"
+                            clrSize="md"
+                            *clrIfOpen
+                          >
+                            <span
+                              >Modifying this section might
+                              <b>clear existing prefill</b>.</span
+                            >
+                          </clr-tooltip-content>
+                        </clr-tooltip>
+                      </clr-stack-label>
+                      <clr-stack-content>
+                        {{ input["tags"].length }} tags
+                        <button
+                          class="btn btn-sm btn-link btn-icon"
+                          title="Add tag"
+                          (click)="addTag(input, $event)"
+                          style="margin: 0;"
+                        >
+                          <clr-icon shape="plus"></clr-icon>
+                        </button>
+                      </clr-stack-content>
+                      <clr-stack-block
+                        *ngFor="let tag of input['tags']; index as i"
+                      >
+                        <clr-stack-label
+                          >Tag {{ i + 1 }}
+                          <button
+                            class="btn btn-sm btn-link btn-icon"
+                            (click)="deleteTag(input, i)"
+                          >
+                            <clr-icon shape="trash"></clr-icon>
+                          </button>
+                        </clr-stack-label>
+                        <clr-stack-content>
+                          <clr-accordion>
+                            <clr-accordion-panel>
+                              <clr-accordion-title
+                                >Emoji: {{ tag["icon"] }}</clr-accordion-title
+                              >
+                              <clr-accordion-content *clrIfExpanded
+                                ><emoji-picker
+                                  (emoji-click)="editTagEmoji(input, i, $event)"
+                                ></emoji-picker
+                              ></clr-accordion-content>
+                            </clr-accordion-panel>
+                          </clr-accordion>
+                          <div class="clr-row">
+                            <p class="p4" style="margin: 0;">Tag label</p>
+                            <input
+                              type="text"
+                              [(ngModel)]="sectionInEdit['tags'][i]['label']"
+                              class="clr-input"
+                              placeholder="Tag label, e.g. 'Holiday program'"
+                            />
+                          </div>
+                        </clr-stack-content>
+                      </clr-stack-block>
+                    </clr-stack-block>
                   </clr-stack-block>
                 </clr-stack-block>
               </clr-stack-view>
@@ -411,10 +488,14 @@
                 hints on how a form should be filled.
               </p>
               <simple-input
-                *ngIf="isSimpleInput(sectionInEdit)"
+                *ngIf="
+                  isSimpleInput(sectionInEdit) ||
+                  isSectionType(sectionInEdit, 'meta')
+                "
                 [interface]="sectionInEdit"
               >
               </simple-input>
+
               <datagrid-section
                 *ngIf="isDatagrid(sectionInEdit)"
                 [interface]="sectionInEdit"
@@ -504,6 +585,42 @@
             </clr-tab-content>
           </clr-tab>
         </clr-tabs>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" (click)="cancelEditSection()">
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="finishEditSection()"
+        >
+          Apply changes
+        </button>
+      </div>
+    </clr-modal>
+    <clr-modal [(clrModalOpen)]="editPageOpened" [clrModalSize]="'xl'">
+      <h3 class="modal-title">Page properties</h3>
+      <div class="modal-body" style="overflow: auto;">
+        <button
+          class="btn btn-link btn-sm"
+          title="Move up"
+          (click)="movePageUp()"
+          [disabled]="currentPage.index < 1"
+          style="margin: 0;"
+        >
+          <clr-icon shape="angle" dir="up"></clr-icon>
+        </button>
+        {{ currentPage.index + 1 }}/{{ _template.pages.length }}
+        <button
+          class="btn btn-link btn-sm"
+          title="Move down"
+          style="margin: 0;"
+          (click)="movePageDown()"
+          [disabled]="currentPage.index > _template.pages.length - 2"
+        >
+          <clr-icon shape="angle" dir="down"></clr-icon>
+        </button>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn" (click)="cancelEditSection()">

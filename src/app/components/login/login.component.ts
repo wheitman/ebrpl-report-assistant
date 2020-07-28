@@ -24,6 +24,18 @@ function checkMatch(
   } else return null;
 }
 
+function checkEmail(
+  control: AbstractControl
+): { [key: string]: boolean } | null {
+  let email: string = control.get('emailInput').value;
+  let domain = email.split('@')[1];
+  if (!(domain === 'ebrpl.com' || domain === 'brla.gov')) {
+    return {
+      outsideEmail: true,
+    };
+  } else return null;
+}
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -51,7 +63,7 @@ export class LoginComponent implements OnInit {
         confirmPasswordInput: new FormControl('', Validators.required),
         branchSelect: new FormControl('Branch', Validators.required),
       },
-      [checkMatch]
+      [checkMatch, checkEmail]
     );
     this.forgotPasswordGroup = new FormGroup({
       emailInput: new FormControl('', Validators.required),
@@ -114,6 +126,9 @@ export class LoginComponent implements OnInit {
     } else if (this.createAccountGroup.getError('notMatching')) {
       console.error('Passwords do not match');
       this.showErrorAlert('Passwords do not match.');
+    } else if (this.createAccountGroup.getError('outsideEmail')) {
+      console.error('Employee email required.');
+      this.showErrorAlert('Please use your employee email.');
     } else {
       console.error(this.createAccountGroup.errors);
     }

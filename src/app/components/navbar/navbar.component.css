@@ -5,7 +5,6 @@ img {
 .reportTitle {
   max-width: 30vw;
   height: 60px;
-  position: relative;
   left: 35vw;
   display: flex;
   align-items: center;

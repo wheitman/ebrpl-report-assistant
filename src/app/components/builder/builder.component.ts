@@ -1,8 +1,10 @@
+import { TemplateService } from './../../services/template.service';
 import { ConstantService } from './../../services/constant.service';
 import {
   SimpleInputInterface,
   DatagridInterface,
   SectionInterface,
+  Input,
 } from './../../interfaces/sections';
 import { Report } from 'src/app/interfaces/report';
 import { AngularFirestore } from '@angular/fire/firestore';
@@ -26,6 +28,11 @@ import { first } from 'rxjs/operators';
 import 'emoji-picker-element';
 import { Observable } from 'rxjs';
 
+import {
+  report as outlineReport,
+  pages as outlinePages,
+} from 'src/assets/dev/outline';
+
 @Component({
   selector: 'app-builder',
   templateUrl: './builder.component.html',
@@ -40,6 +47,7 @@ export class BuilderComponent implements OnInit {
   sectionHovers: boolean[][];
   iconNames: string[];
   editSectionOpened: boolean = false;
+  editPageOpened: boolean = false;
   emojiPickerOpened: boolean = false;
   sectionPropsForm: FormGroup = new FormGroup({
     title: new FormControl(),
@@ -63,11 +71,14 @@ export class BuilderComponent implements OnInit {
   validMessage: string;
   constants$: Observable<Object>;
   divisions: Object[];
+  hasMetaSection: boolean;
+  metaSection: SimpleInputInterface;
 
   constructor(
     public _ActivatedRoute: ActivatedRoute,
     public _AngularFirestore: AngularFirestore,
-    public _ConstantService: ConstantService
+    public _ConstantService: ConstantService,
+    public _TS: TemplateService
   ) {}
 
   ngOnInit(): void {
@@ -76,9 +87,23 @@ export class BuilderComponent implements OnInit {
       let openTitle = paramMap.get('open');
       //if an existing template has been passed to the URL
       if (openTitle) {
-        this.openTemplate(openTitle).then(() => {
-          console.log(this._template);
-        });
+        this.openTemplate(openTitle)
+          .then(() => {
+            console.log(this._template);
+            this.hasMetaSection = this.findMetaSection();
+            console.log(this.hasMetaSection);
+          })
+          .catch(() => {});
+      } else {
+        this._template = {
+          id: null,
+          templateID: '',
+          pageStatuses: [],
+          pageCount: 0,
+          completionStatus: 'incomplete',
+          pages: [],
+        };
+        this.templateChanged();
       }
     });
     this.templateValid = this.getValidity();
@@ -89,6 +114,7 @@ export class BuilderComponent implements OnInit {
     this.tempPropsGroup.valueChanges.subscribe(() => {
       this.setTemplateTitle(this.tempPropsGroup.get('templateTitle').value);
     });
+    // this.pushTemplateObjectToDB(outlineReport, outlinePages);
   }
 
   openTemplate(templateID: string): Promise<void> {
@@ -146,11 +172,32 @@ export class BuilderComponent implements OnInit {
                 templateID +
                 ' does not exist. Setting to empty template instead.'
             );
-            this.createTemplate(templateID);
+            this._TS.newTemplate();
             reject();
           }
         }, reject);
     });
+  }
+
+  pushTemplateObjectToDB(template: Report, pages: Page[]) {
+    let templateDoc = this._AngularFirestore.doc(
+      '/templates/' + template.templateID
+    );
+    templateDoc
+      .set(template)
+      .then(() => {
+        let pageCollection = templateDoc.collection('pages');
+        pages.forEach((page, index) => {
+          console.log(page);
+          pageCollection.doc(index.toString()).set(page);
+        });
+      })
+      .catch((reason) => {
+        console.log(reason);
+      })
+      .finally(() =>
+        console.log('Template ' + template.templateID + ' pushed')
+      );
   }
 
   setTemplateTitle(newTitle) {
@@ -160,7 +207,19 @@ export class BuilderComponent implements OnInit {
     }
   }
 
-  createTemplate(templateID: string) {}
+  findMetaSection(): boolean {
+    let hasMeta = false;
+    this._template.pages.forEach((page) => {
+      page.sections.forEach((section) => {
+        console.log(section['type']);
+        if (section['type'] === 'meta') {
+          this.metaSection = section as SimpleInputInterface;
+          hasMeta = true;
+        }
+      });
+    });
+    return hasMeta;
+  }
 
   templateChanged() {
     this.updateSidebar();
@@ -187,7 +246,7 @@ export class BuilderComponent implements OnInit {
   addPage() {
     this._template.pages.push({
       title: 'Untitled page',
-      number: this._template.pages.length,
+      index: this._template.pages.length,
       sections: [],
     });
     console.log(this._template.pages.length);
@@ -261,6 +320,35 @@ export class BuilderComponent implements OnInit {
     }
   }
 
+  getSectionsByType(pageIndex: number, type: string) {
+    let sections: Object[] = [];
+    let page = this._template.pages[pageIndex] as Page;
+    page.sections.forEach((section) => {
+      if (section['type'] === type) {
+        sections.push(section);
+      }
+    });
+    return sections;
+  }
+
+  addMetaSection(pageIndex) {
+    if (this._template && this._template.pages) {
+      let newSection: SimpleInputInterface = {
+        title: 'Untitled',
+        inputs: [],
+        value: [],
+        type: 'meta',
+        index: this._template.pages[pageIndex].sections.length,
+      };
+      this._template.pages[pageIndex].sections.push(newSection);
+      this.metaSection = newSection;
+      this.hasMetaSection = true;
+      console.log(
+        'Meta added. Sections now: ' + this._template.pages[pageIndex].sections
+      );
+    }
+  }
+
   getSimpleInputs(pageIndex) {
     let simpleInputs: Object[] = [];
     if (this._template && this._template.pages) {
@@ -302,23 +390,79 @@ export class BuilderComponent implements OnInit {
     this.originalSectionIndex = this.sectionInEdit['index'];
     this.editSectionOpened = true;
   }
+
+  openEditPage(page: Page) {
+    this.editPageOpened = true;
+    console.log('Opening page');
+  }
+  closeEditPage() {
+    this.editPageOpened = false;
+  }
+  movePageUp() {
+    let currentIndex = this.currentPage.index;
+    this.movePage(currentIndex, currentIndex - 1);
+    this.resetPageIndices();
+  }
+  movePageDown() {
+    let currentIndex = this.currentPage.index;
+    this.movePage(currentIndex, currentIndex + 1);
+    this.resetPageIndices();
+  }
+  movePage(fromIndex: number, toIndex: number) {
+    console.log('Moving to ' + toIndex);
+    if (toIndex >= 0 && toIndex < this._template.pages.length) {
+      let arr = this._template.pages;
+      arr.splice(toIndex, 0, arr.splice(fromIndex, 1)[0]);
+    } else console.error("Can't move page. Out of bounds.");
+  }
+
+  resetPageIndices() {
+    this._template.pages.forEach((page, index) => {
+      page.index = index;
+    });
+  }
+
   finishEditSection() {
     console.log(this.sectionInEdit);
     this.moveSection(this.originalSectionIndex, this.sectionInEdit['index']);
-    this._template['pages'][this.currentPage.number]['sections'][
+    this._template['pages'][this.currentPage.index]['sections'][
       this.sectionInEdit['index']
     ] = this.sectionInEdit;
     //now reevaluate the 'index' section properties
     this.currentPage.sections.forEach((section, index) => {
       section['index'] = index;
     });
+
+    //we reload the preview area after each successful push
+    let refreshTemp = this.currentPage;
+
     this.editSectionOpened = false;
   }
 
   isDatatype(colIndex: number, type: string) {
-    if (this.sectionInEdit['columns'][colIndex]['type'] === type) {
+    if (
+      this.sectionInEdit['columns'] &&
+      this.sectionInEdit['columns'][colIndex]['type'] === type
+    ) {
+      return true;
+    }
+    if (
+      this.sectionInEdit['inputs'] &&
+      this.sectionInEdit['inputs'][colIndex]['type'] === type
+    ) {
       return true;
     } else return false;
+  }
+
+  isEqual(a, b) {
+    return a === b;
+  }
+
+  isSectionType(section, type) {
+    if (!section) {
+      return false;
+    }
+    return section['type'] === type;
   }
   isPlainDt(colIndex: number) {
     let type = this.sectionInEdit['columns'][colIndex]['type'];
@@ -471,23 +615,23 @@ export class BuilderComponent implements OnInit {
     } else return false;
   }
 
-  addTag() {
-    console.log(this.sectionInEdit);
-    (this.sectionInEdit['tags'] as Object[]).push({
+  addTag(input: Input, event: Event) {
+    event.stopPropagation();
+    console.log(input);
+    input.tags.push({
       icon: '❓',
       label: 'Untitled',
     });
-    console.log(this.sectionInEdit);
+    console.log(input);
   }
 
-  deleteTag(index: number) {
-    console.log((this.sectionInEdit['tags'] as Object[]).splice(index, 1));
+  deleteTag(input: Input, index: number) {
+    console.log(input.tags.splice(index, 1));
   }
 
-  editTagEmoji(tagIndex: number, eventData: CustomEvent) {
+  editTagEmoji(input: Input, tagIndex: number, eventData: CustomEvent) {
     console.log(tagIndex, eventData.detail);
-    (this.sectionInEdit as SectionInterface).tags[tagIndex]['icon'] =
-      eventData.detail['unicode'];
+    input.tags[tagIndex]['icon'] = eventData.detail['unicode'];
     console.log(this.sectionInEdit);
   }
 }

@@ -15,7 +15,6 @@ import { report, pages } from 'src/assets/dev/outline';
   styleUrls: ['./start.component.css'],
 })
 export class StartComponent implements OnInit {
-  templateNames: string[];
   detailState = false;
 
   //modal booleans
@@ -23,6 +22,9 @@ export class StartComponent implements OnInit {
   copyVisible: boolean = false;
   deleteVisible: boolean = false;
   exportVisible: boolean = false;
+
+  selectedTemplateName: string;
+  newTemplateName: string = '';
 
   //alert booleans
   emailSent: boolean = false;
@@ -34,6 +36,11 @@ export class StartComponent implements OnInit {
   selectedReport: Report;
   templateLoadStatuses: ClrLoadingState[];
   deleteLoading: ClrLoadingState;
+  templateModalVisible: boolean = false;
+  tempDuplicateVisible: boolean = false;
+
+  //from TemplateService
+  templates: Observable<Map<string, Report>>;
 
   constructor(
     public _TemplateService: TemplateService,
@@ -57,6 +64,7 @@ export class StartComponent implements OnInit {
           });
       }
     });
+    this.templates = this._TemplateService.templateObservable;
 
     //attach loading statuses to the templates in the 'new report' dropdown
     this.templateLoadStatuses = [];
@@ -73,9 +81,16 @@ export class StartComponent implements OnInit {
     this.exportVisible = false;
   }
 
+  isHidden(templateID: string) {
+    let templates = this._TemplateService.templateSnapshot;
+    if (templates && templates.get(templateID)) {
+      return templates.get(templateID).hidden;
+    } else return false;
+  }
+
   duplicateReport(report: Report) {
     console.log(report.id);
-    this._ReportService.duplicateReport(report).then(
+    this._ReportService.duplicateReport(report.id).then(
       (newID) => {
         this._ReportService
           .openReport(newID)
@@ -176,7 +191,36 @@ export class StartComponent implements OnInit {
     } else return false;
   }
 
-  openBuilder() {
-    this._Router.navigate(['builder']);
+  showTemplateModal() {
+    console.log(this._TemplateService.templateNames);
+    this.templateModalVisible = true;
+  }
+  hideTemplateModal() {
+    this.templateModalVisible = false;
+  }
+  showDuplicateTemplate(selectedTemplate) {
+    this.selectedTemplateName = selectedTemplate;
+    this.tempDuplicateVisible = true;
+  }
+  hideDuplicateTemplate() {
+    this.tempDuplicateVisible = false;
+  }
+  duplicateTemplate(selectedTemplateName, newTemplateName) {
+    this._TemplateService
+      .duplicateTemplate(selectedTemplateName, newTemplateName)
+      .then(() => {
+        this.tempDuplicateVisible = false;
+      });
+  }
+  deleteTemplate(templateID) {
+    this._TemplateService.deleteTemplate(templateID).then(
+      () => {
+        console.log('Success');
+        console.log(this._TemplateService.templateNames);
+      },
+      (reason) => {
+        console.log('Error ' + reason);
+      }
+    );
   }
 }
