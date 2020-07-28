@@ -10,122 +10,127 @@
       overflow-y: auto;
     "
   >
-    <form clrForm [formGroup]="tempPropsGroup" clrLayout="vertical">
-      <clr-input-container>
+    <div class="clr-row" style="margin: 1rem 0 1rem 0;">
+      <clr-input-container style="margin-top: 3rem;">
         <input
           class="templateTitle"
           clrInput
           placeholder="Untitled template"
           name="name"
-          formControlName="templateTitle"
+          *ngIf="_template"
+          [(ngModel)]="_template.templateID"
         />
+        <clr-control-helper>Template title</clr-control-helper>
       </clr-input-container>
-    </form>
-    <span *ngIf="pagesEmpty"
+    </div>
+
+    <span class="clr-row" *ngIf="pagesEmpty"
       ><clr-icon shape="help-info"></clr-icon><em>No pages yet.</em>
     </span>
-    <clr-tree *ngIf="_template">
-      <clr-tree-node *ngIf="_template.pages">
-        <h4 style="margin: 0;">Overview</h4>
-        <clr-tooltip>
-          <clr-icon
-            clrTooltipTrigger
-            shape="help-info"
-            size="16"
-            aria-label="Uniq tooltip 3"
-          ></clr-icon>
-          <clr-tooltip-content
-            clrPosition="bottom-right"
-            clrSize="md"
-            *clrIfOpen
-          >
-            <span
-              >Double click on a page or section below to open the properties
-              pane. Use the "+" buttons to add content.</span
+    <div class="clr-row" *ngIf="_template">
+      <clr-tree>
+        <clr-tree-node *ngIf="_template.pages">
+          <h4 style="margin: 0;">Overview</h4>
+          <clr-tooltip>
+            <clr-icon
+              clrTooltipTrigger
+              shape="help-info"
+              size="16"
+              aria-label="Uniq tooltip 3"
+            ></clr-icon>
+            <clr-tooltip-content
+              clrPosition="bottom-right"
+              clrSize="md"
+              *clrIfOpen
             >
-          </clr-tooltip-content>
-        </clr-tooltip>
-        <button
-          class="btn btn-sm btn-link btn-icon"
-          title="Add page"
-          (click)="addPage()"
-        >
-          <clr-icon shape="plus"></clr-icon>
-        </button>
-      </clr-tree-node>
-      <clr-tree-node
-        *ngFor="let page of _template.pages; index as i"
-        [(clrExpanded)]="pageExpansions[i]"
-        (click)="setCurrentPage(i)"
-      >
-        <div class="tree-text clr-row" (dblclick)="openEditPage(i)">
-          <div><clr-icon shape="file"></clr-icon> {{ page.title }}</div>
-        </div>
-        <clr-tree-node>
-          <p class="p4" style="margin: 0;"></p>
-          <button
-            class="btn btn-sm btn-link"
-            title="Add Meta Section"
-            (click)="addMetaSection(i)"
-            *ngIf="!hasMetaSection"
-          >
-            Add Meta Section
-            <clr-icon shape="plus"></clr-icon>
-          </button>
-        </clr-tree-node>
-        <clr-tree-node
-          *ngFor="let section of getSectionsByType(i, 'meta')"
-          style="width: 100%;"
-          (dblclick)="openEditSection(section)"
-        >
-          <div class="tree-text">{{ section.title }}</div>
-          <clr-icon
-            shape="flag"
-            class="is-solid is-error"
-            title="Meta!"
-          ></clr-icon>
-        </clr-tree-node>
-        <clr-tree-node>
-          <p class="p4" style="margin: 0;">Datagrids</p>
+              <span
+                >Double click on a page or section below to open the properties
+                pane. Use the "+" buttons to add content.</span
+              >
+            </clr-tooltip-content>
+          </clr-tooltip>
           <button
             class="btn btn-sm btn-link btn-icon"
-            title="Add Datagrid"
-            (click)="addDatagrid(i)"
-          >
-            <clr-icon shape="plus"></clr-icon>
-          </button>
-        </clr-tree-node>
-
-        <clr-tree-node
-          *ngFor="let section of getDatagrids(i)"
-          style="width: 100%;"
-          (dblclick)="openEditSection(section)"
-        >
-          <clr-icon shape="table"></clr-icon>
-          <div class="tree-text">{{ section.title }}</div>
-        </clr-tree-node>
-        <clr-tree-node>
-          <p class="p4" style="margin: 0;">SimpleInputs</p>
-          <button
-            class="btn btn-sm btn-link btn-icon"
-            title="Add Datagrid"
-            (click)="addSimpleInput(i)"
+            title="Add page"
+            (click)="addPage()"
           >
             <clr-icon shape="plus"></clr-icon>
           </button>
         </clr-tree-node>
         <clr-tree-node
-          *ngFor="let section of getSimpleInputs(i)"
-          style="width: 100%;"
-          (dblclick)="openEditSection(section)"
+          *ngFor="let page of _template.pages; index as i"
+          [(clrExpanded)]="pageExpansions[i]"
+          (click)="setCurrentPage(i)"
         >
-          <clr-icon shape="form"></clr-icon>
-          <div class="tree-text">
-            {{ section.title }}
+          <div class="tree-text clr-row" (dblclick)="openEditPage(i)">
+            <div><clr-icon shape="file"></clr-icon> {{ page.title }}</div>
           </div>
+          <clr-tree-node>
+            <p class="p4" style="margin: 0;"></p>
+            <button
+              class="btn btn-sm btn-link"
+              title="Add Meta Section"
+              (click)="addMetaSection(i)"
+              *ngIf="!hasMetaSection"
+            >
+              Add Meta Section
+              <clr-icon shape="plus"></clr-icon>
+            </button>
+          </clr-tree-node>
+          <clr-tree-node
+            *ngFor="let section of getSectionsByType(i, 'meta')"
+            style="width: 100%;"
+            (dblclick)="openEditSection(section)"
+          >
+            <div class="tree-text">{{ section.title }}</div>
+            <clr-icon
+              shape="flag"
+              class="is-solid is-error"
+              title="Meta!"
+            ></clr-icon>
+          </clr-tree-node>
+          <clr-tree-node>
+            <p class="p4" style="margin: 0;">Datagrids</p>
+            <button
+              class="btn btn-sm btn-link btn-icon"
+              title="Add Datagrid"
+              (click)="addDatagrid(i)"
+            >
+              <clr-icon shape="plus"></clr-icon>
+            </button>
+          </clr-tree-node>
+
+          <clr-tree-node
+            *ngFor="let section of getDatagrids(i)"
+            style="width: 100%;"
+            (dblclick)="openEditSection(section)"
+          >
+            <clr-icon shape="table"></clr-icon>
+            <div class="tree-text">{{ section.title }}</div>
+          </clr-tree-node>
+          <clr-tree-node>
+            <p class="p4" style="margin: 0;">SimpleInputs</p>
+            <button
+              class="btn btn-sm btn-link btn-icon"
+              title="Add Datagrid"
+              (click)="addSimpleInput(i)"
+            >
+              <clr-icon shape="plus"></clr-icon>
+            </button>
+          </clr-tree-node>
+          <clr-tree-node
+            *ngFor="let section of getSimpleInputs(i)"
+            style="width: 100%;"
+            (dblclick)="openEditSection(section)"
+          >
+            <clr-icon shape="form"></clr-icon>
+            <div class="tree-text">
+              {{ section.title }}
+            </div>
+          </clr-tree-node>
         </clr-tree-node>
-      </clr-tree-node>
-    </clr-tree>
+      </clr-tree>
+    </div>
   </div>
   <div class="clr-col preview-area" *ngIf="currentPage">
     <div class="clr-row">
@@ -206,7 +211,28 @@
                   </clr-stack-content>
                 </clr-stack-block>
                 <clr-stack-block>
-                  <clr-stack-label>Type</clr-stack-label>
+                  <clr-stack-label
+                    >Type<clr-tooltip>
+                      <clr-icon
+                        clrTooltipTrigger
+                        shape="help-info"
+                        size="16"
+                      ></clr-icon>
+                      <clr-tooltip-content
+                        clrPosition="right"
+                        clrSize="lg"
+                        *clrIfOpen
+                      >
+                        <span
+                          ><em>Datagrids</em> are tables, good for lots of
+                          data.<br /><em>SimpleInputs</em> are basic forms, good
+                          for a few questions.<br /><em>Meta sections</em> are
+                          SimpleInputs that link to properties in the report--
+                          i.e. coverage date.</span
+                        >
+                      </clr-tooltip-content>
+                    </clr-tooltip></clr-stack-label
+                  >
                   <clr-stack-content>
                     <select
                       [(ngModel)]="sectionInEdit['type']"
@@ -214,6 +240,7 @@
                     >
                       <option value="datagrid">Datagrid</option>
                       <option value="simple-input">SimpleInput</option>
+                      <option value="meta">Meta</option>
                     </select>
                   </clr-stack-content>
                 </clr-stack-block>
@@ -369,7 +396,9 @@
                         <label>Label</label>
                         <input clrInput [(ngModel)]="input['label']" />
                       </clr-input-container>
-                      <clr-select-container>
+                      <clr-select-container
+                        *ngIf="isSectionType(sectionInEdit, 'simple-input')"
+                      >
                         <label>Type</label>
                         <select [(ngModel)]="input['type']" clrSelect>
                           <option value="division-select"
@@ -379,12 +408,20 @@
                           <option value="number">Number</option>
                           <option value="date-select">Date</option>
                           <option value="tag-select">Tag Select</option>
+                          <option value="month-select">Month</option>
+                          <option value="textarea">Multiline text</option>
                         </select>
                       </clr-select-container>
 
-                      <clr-select-container>
+                      <clr-select-container
+                        *ngIf="isSectionType(sectionInEdit, 'meta')"
+                      >
                         <label>Link</label>
-                        <select [(ngModel)]="input['link']" clrSelect>
+                        <select
+                          [(ngModel)]="input['link']"
+                          (ngModelChange)="linkChanged(input, $event)"
+                          clrSelect
+                        >
                           <option value="coverageDate"
                             >Report coverage date</option
                           >
@@ -393,11 +430,7 @@
                           >
                           <option value="title">Report title</option>
                           <option value="subject">Report subject</option>
-                          <option
-                            value="tags"
-                            *ngIf="isEqual(input['type'], 'tag-select')"
-                            >Report tags</option
-                          >
+                          <option value="tags">Report tags</option>
                         </select>
                       </clr-select-container>
                     </clr-stack-content>
@@ -599,39 +632,47 @@
         </button>
       </div>
     </clr-modal>
-    <clr-modal [(clrModalOpen)]="editPageOpened" [clrModalSize]="'xl'">
+    <clr-modal [(clrModalOpen)]="editPageOpened">
       <h3 class="modal-title">Page properties</h3>
       <div class="modal-body" style="overflow: auto;">
-        <button
-          class="btn btn-link btn-sm"
-          title="Move up"
-          (click)="movePageUp()"
-          [disabled]="currentPage.index < 1"
-          style="margin: 0;"
-        >
-          <clr-icon shape="angle" dir="up"></clr-icon>
-        </button>
-        {{ currentPage.index + 1 }}/{{ _template.pages.length }}
-        <button
-          class="btn btn-link btn-sm"
-          title="Move down"
-          style="margin: 0;"
-          (click)="movePageDown()"
-          [disabled]="currentPage.index > _template.pages.length - 2"
-        >
-          <clr-icon shape="angle" dir="down"></clr-icon>
-        </button>
+        <div class="clr-col-12">
+          <div class="clr-row">
+            <clr-input-container>
+              <label>Page title</label>
+              <input clrInput [(ngModel)]="currentPage.title" />
+            </clr-input-container>
+          </div>
+          <div class="clr-row" style="padding-top: 1rem;">
+            <label class="clr-control-label">Page order </label>
+            <button
+              class="btn btn-link btn-sm"
+              title="Move up"
+              (click)="movePageUp()"
+              [disabled]="currentPage.index < 1"
+              style="margin: 0;"
+            >
+              <clr-icon shape="angle" dir="up"></clr-icon>
+            </button>
+            {{ currentPage.index + 1 }}/{{ _template.pages.length }}
+            <button
+              class="btn btn-link btn-sm"
+              title="Move down"
+              style="margin: 0;"
+              (click)="movePageDown()"
+              [disabled]="currentPage.index > _template.pages.length - 2"
+            >
+              <clr-icon shape="angle" dir="down"></clr-icon>
+            </button>
+          </div>
+        </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn" (click)="cancelEditSection()">
-          Cancel
-        </button>
         <button
           type="button"
           class="btn btn-primary"
-          (click)="finishEditSection()"
+          (click)="finishEditPage()"
         >
-          Apply changes
+          Finish
         </button>
       </div>
     </clr-modal>
@@ -640,7 +681,43 @@
     class="btn btn-primary builder-save-button"
     [disabled]="!templateValid"
     [title]="validMessage"
+    (click)="openSaveTemplate()"
   >
     <clr-icon shape="floppy"></clr-icon> Save template
   </button>
+  <clr-modal
+    [(clrModalOpen)]="saveTemplateOpen"
+    *ngIf="saveTemplateOpen"
+    [clrModalSize]="'lg'"
+  >
+    <h3 class="modal-title">Save template?</h3>
+    <div class="modal-body" style="overflow-y: auto;">
+      <b>Title: </b>{{ _template.templateID }} <br />
+      <span *ngIf="originalTemplateName"
+        ><b>Original title: </b>{{ originalTemplateName }} <br
+      /></span>
+      <b>Page count: </b>{{ _template.pages.length }} <br />
+      <hr />
+
+      <div style="overflow-y: auto; overflow-x: hidden; height: 75%;">
+        <b>Magic text (for nerds):</b>
+        <pre style="max-height: 400px; overflow-y: auto;">{{
+          getMagicText()
+        }}</pre>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn" (click)="cancelSaveTemplate()">
+        Cancel
+      </button>
+      <button
+        type="button"
+        class="btn btn-success"
+        [clrLoading]="saveLoadingStatus"
+        (click)="saveTemplate()"
+      >
+        Save template
+      </button>
+    </div>
+  </clr-modal>
 </div>

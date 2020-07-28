@@ -1,3 +1,5 @@
+import { Page } from './../interfaces/page';
+import { UnifiedReport } from './../interfaces/report';
 import { UserService } from './user.service';
 import { Report } from 'src/app/interfaces/report';
 import { Router } from '@angular/router';
@@ -178,6 +180,42 @@ export class TemplateService {
   newTemplate() {
     console.log('[Template Serv] Opening fresh template');
     this._Router.navigate(['builder']);
+  }
+  saveTemplate(template: UnifiedReport): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      console.log(
+        '[Template Serv] Saving template ' + template.templateID + '...'
+      );
+      let templateHeader: Report = {
+        id: template.id,
+        templateID: template.templateID,
+        pageCount: template.pageCount,
+        pageStatuses: template.pageStatuses,
+        completionStatus: template.completionStatus,
+      };
+      this._AngularFirestore
+        .doc<Report>('/templates/' + template.templateID)
+        .set(templateHeader)
+        .then(() => {
+          let pagePromises: Promise<void>[] = [];
+          template.pages.forEach((page) => {
+            pagePromises.push(
+              this._AngularFirestore
+                .doc<Page>(
+                  '/templates/' +
+                    template.templateID +
+                    '/pages/' +
+                    page.index.toString()
+                )
+                .set(page)
+            );
+          });
+          Promise.all(pagePromises).then(() => {
+            console.log('[Template Serv] Template saved.');
+            resolve();
+          }, reject);
+        }, reject);
+    });
   }
   markTemplateHidden(templateID: string): Promise<void> {
     return new Promise<void>((resolve, reject) => {});

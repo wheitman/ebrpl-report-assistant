@@ -1,3 +1,4 @@
+import { ClrLoadingState } from '@clr/angular';
 import { TemplateService } from './../../services/template.service';
 import { ConstantService } from './../../services/constant.service';
 import {
@@ -48,15 +49,18 @@ export class BuilderComponent implements OnInit {
   iconNames: string[];
   editSectionOpened: boolean = false;
   editPageOpened: boolean = false;
+  saveTemplateOpen: boolean = false;
   emojiPickerOpened: boolean = false;
-  sectionPropsForm: FormGroup = new FormGroup({
-    title: new FormControl(),
-    subtitle: new FormControl(),
-    type: new FormControl(),
-    columns: new FormControl(),
-    inputs: new FormControl(),
-    tags: new FormControl(),
-  });
+  originalTemplateName: string;
+  saveLoadingStatus: ClrLoadingState = ClrLoadingState.DEFAULT;
+  // sectionPropsForm: FormGroup = new FormGroup({
+  //   title: new FormControl(),
+  //   subtitle: new FormControl(),
+  //   type: new FormControl(),
+  //   columns: new FormControl(),
+  //   inputs: new FormControl(),
+  //   tags: new FormControl(),
+  // });
   inputsForm: FormGroup = new FormGroup({
     array: new FormArray([]),
   });
@@ -67,7 +71,6 @@ export class BuilderComponent implements OnInit {
   currentPage: Page;
   originalSectionIndex: number;
   sectionInEdit: Object;
-  templateValid: boolean;
   validMessage: string;
   constants$: Observable<Object>;
   divisions: Object[];
@@ -89,9 +92,9 @@ export class BuilderComponent implements OnInit {
       if (openTitle) {
         this.openTemplate(openTitle)
           .then(() => {
-            console.log(this._template);
+            this.originalTemplateName = this._template.templateID;
             this.hasMetaSection = this.findMetaSection();
-            console.log(this.hasMetaSection);
+            console.log(this._template);
           })
           .catch(() => {});
       } else {
@@ -106,7 +109,6 @@ export class BuilderComponent implements OnInit {
         this.templateChanged();
       }
     });
-    this.templateValid = this.getValidity();
     this.tempPropsGroup = new FormGroup({
       templateTitle: new FormControl(''),
     });
@@ -256,10 +258,22 @@ export class BuilderComponent implements OnInit {
     this.currentPage = this._template.pages[index];
   }
 
-  getValidity(): boolean {
-    this.validMessage = 'Missing required components.';
-    return false;
+  get templateValid() {
+    if (!this._template) {
+      this.validMessage = 'Template is missing.';
+      return false;
+    } else if (
+      !this._template.templateID ||
+      this._template.templateID.length < 1
+    ) {
+      this.validMessage = 'Template title is missing.';
+      return false;
+    } else {
+      this.validMessage = 'Ready to save.';
+      return true;
+    }
   }
+
   get pagesEmpty() {
     if (
       !this._template ||
@@ -318,6 +332,13 @@ export class BuilderComponent implements OnInit {
           this._template.pages[pageIndex].sections
       );
     }
+  }
+
+  getMagicText(): string {
+    if (!this._template) {
+      return 'No template open';
+    }
+    return JSON.stringify(this._template, null, 4);
   }
 
   getSectionsByType(pageIndex: number, type: string) {
@@ -383,6 +404,14 @@ export class BuilderComponent implements OnInit {
     this.editSectionOpened = false;
   }
 
+  openSaveTemplate() {
+    this.saveTemplateOpen = true;
+  }
+
+  cancelSaveTemplate() {
+    this.saveTemplateOpen = false;
+  }
+
   openEditSection(section: Object) {
     //deep copy the section
     this.sectionInEdit = JSON.parse(JSON.stringify(section));
@@ -416,6 +445,24 @@ export class BuilderComponent implements OnInit {
     } else console.error("Can't move page. Out of bounds.");
   }
 
+  linkChanged(input: Input, event) {
+    if (input.link === 'title') {
+      input.type = 'text';
+    } else if (input.link === 'coverageDate') {
+      input.type = 'month-select';
+    } else if (input.link === 'additionalInfo') {
+      input.type = 'textarea';
+    } else if (input.link === 'subject') {
+      input.type = 'text';
+    } else if (input.link === 'tags') {
+      input.type = 'tag-select';
+      if (!input.tags) {
+        input['tags'] = [];
+        console.log(input);
+      }
+    }
+  }
+
   resetPageIndices() {
     this._template.pages.forEach((page, index) => {
       page.index = index;
@@ -437,6 +484,10 @@ export class BuilderComponent implements OnInit {
     let refreshTemp = this.currentPage;
 
     this.editSectionOpened = false;
+  }
+
+  finishEditPage() {
+    this.editPageOpened = false;
   }
 
   isDatatype(colIndex: number, type: string) {
@@ -633,5 +684,23 @@ export class BuilderComponent implements OnInit {
     console.log(tagIndex, eventData.detail);
     input.tags[tagIndex]['icon'] = eventData.detail['unicode'];
     console.log(this.sectionInEdit);
+  }
+
+  saveTemplate() {
+    this.saveLoadingStatus = ClrLoadingState.LOADING;
+    this._TS
+      .saveTemplate(this._template)
+      .then(() => {
+        this.saveLoadingStatus = ClrLoadingState.SUCCESS;
+        setTimeout(() => {
+          this.saveTemplateOpen = false;
+        }, 500);
+        this._TS.openTemplate(this._template.templateID);
+      })
+      .catch((reason) => {
+        console.error('Save failed: ' + reason);
+        alert('Save failed: ' + reason);
+        this.saveLoadingStatus = ClrLoadingState.ERROR;
+      });
   }
 }
