@@ -2,7 +2,7 @@
   <label for="" class="p4">{{ label }}</label>
   <div class="clr-row clr-align-items-start" style="margin: 0;">
     <select clrSelect class="clr-col" formControlName="monthInput">
-      <option [value]="month" *ngFor="let month of _months">
+      <option [value]="month" *ngFor="let month of _monthNames">
         {{ month }}</option
       >
     </select>

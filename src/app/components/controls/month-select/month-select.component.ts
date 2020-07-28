@@ -27,16 +27,14 @@ import {
   ],
 })
 export class MonthSelectComponent implements OnInit, ControlValueAccessor {
-  @Input() label: string = 'Month: ';
+  @Input() label: string;
   year: number = new Date().getFullYear();
-  month: number;
+  monthIndex: number;
   dateString: string; //ISO date string
 
   formGroup: FormGroup;
 
-  onChange = (newDateString: string) => {
-    console.log(newDateString);
-  };
+  onChange = (newDateString: string) => {};
   onTouched: any = () => {};
 
   set value(newDateString: string) {
@@ -47,6 +45,14 @@ export class MonthSelectComponent implements OnInit, ControlValueAccessor {
 
   writeValue(date: string): void {
     this.dateString = date;
+    console.log(date);
+    this.year = new Date(date).getFullYear();
+    this.monthIndex = new Date(date).getMonth();
+    console.log(this._monthNames[this.monthIndex]);
+    this.formGroup.get('yearInput').setValue(this.year);
+    this.formGroup
+      .get('monthInput')
+      .setValue(this._monthNames[this.monthIndex]);
   }
 
   registerOnChange(fn: (newDateString: string) => void): void {
@@ -63,7 +69,7 @@ export class MonthSelectComponent implements OnInit, ControlValueAccessor {
     } else this.formGroup.enable();
   }
 
-  _months: string[] = [
+  _monthNames: string[] = [
     'January',
     'February',
     'March',
@@ -81,17 +87,23 @@ export class MonthSelectComponent implements OnInit, ControlValueAccessor {
 
   ngOnInit(): void {
     this.formGroup = new FormGroup({
-      monthInput: new FormControl(this._months[0]),
-      yearInput: new FormControl(this.year, [
-        Validators.min(1900),
-        Validators.max(2100),
-      ]),
+      monthInput: new FormControl(),
+      yearInput: new FormControl(this.year),
     });
+    console.log('Initial is ', this.monthIndex);
     this.formGroup.valueChanges.subscribe((newValue) => {
-      this.month = this._months.indexOf(newValue['monthInput']);
+      if (
+        this.monthIndex !== this._monthNames.indexOf(newValue['monthInput'])
+      ) {
+        console.log(this._monthNames.indexOf(newValue['monthInput']));
+        let monthIndex = this._monthNames.indexOf(newValue['monthInput']);
+        if (monthIndex > -1)
+          this.monthIndex = this._monthNames.indexOf(newValue['monthInput']);
+      }
+
       this.year = newValue['yearInput'];
       let date = new Date();
-      date.setMonth(this.month);
+      date.setMonth(this.monthIndex);
       date.setFullYear(this.year);
       this.dateString = date.toISOString();
       this.value = this.dateString;

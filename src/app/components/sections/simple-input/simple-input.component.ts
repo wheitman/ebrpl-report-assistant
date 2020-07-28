@@ -44,12 +44,10 @@ export class SimpleInputSection extends AbstractSection implements OnInit {
           });
           this.formArray.push(checkboxArray);
         } else if (input['type'] === 'month-select') {
-          let currentDate = new Date();
-          console.log('Current date: ', currentDate.toISOString());
+          console.log('Pushing date: ', savedData[index]);
           this.formArray.push(
             //push the current date
-
-            new FormControl(currentDate.toISOString())
+            new FormControl(savedData[index])
           );
         } else {
           this.formArray.push(new FormControl(savedData[index]));
