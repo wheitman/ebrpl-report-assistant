@@ -59,6 +59,37 @@ export class DatagridSection extends AbstractSection implements OnInit {
     return tagLabels.includes(tagObj['label']);
   }
 
+  convertISOtoTraditional(isoString: string) {
+    let date = new Date(isoString);
+    let year = date.getFullYear();
+    let month = (date.getMonth() + 1).toString();
+    let dt = date.getDate().toString();
+
+    if (date.getDate() < 10) {
+      dt = '0' + dt.toString();
+    }
+    if (date.getMonth() < 10) {
+      month = '0' + month;
+    }
+    let result = month + '/' + dt + '/' + year;
+    console.log('Converting: ' + isoString + ' to ' + result);
+    return result;
+  }
+
+  convertTraditionalToISO(inputString: string) {
+    let stringPieces = inputString.split('/');
+    let monthNum: number = +stringPieces[0] - 1;
+    let dateNum: number = +stringPieces[1];
+    let yearNum: number = +stringPieces[2];
+    let date = new Date();
+    date.setMonth(monthNum);
+    date.setDate(dateNum);
+    date.setFullYear(yearNum);
+    let result = date.toISOString();
+    console.log('Converting: ' + inputString + ' to ' + result);
+    return result;
+  }
+
   buildFormFromInterface(editData?: Object[]) {
     console.log(editData);
     let cols = this.interface.columns;
@@ -93,7 +124,15 @@ export class DatagridSection extends AbstractSection implements OnInit {
         } else {
           if (editData && editData[colIndex]) {
             console.log('Pushing ' + editData[colIndex]);
-            this.formArray.push(new FormControl(editData[colIndex]));
+            if (column.type === 'date-select') {
+              this.formArray.push(
+                new FormControl(
+                  this.convertISOtoTraditional(editData[colIndex] as string)
+                )
+              );
+            } else {
+              this.formArray.push(new FormControl(editData[colIndex]));
+            }
           } else {
             this.formArray.push(new FormControl());
           }
@@ -144,6 +183,8 @@ export class DatagridSection extends AbstractSection implements OnInit {
             tags.push(tag);
         });
         row.push({ tags: tags });
+      } else if (col.type === 'date-select') {
+        row.push(this.convertTraditionalToISO(this.formArray.at(index).value));
       } else {
         row.push(this.formArray.at(index).value);
       }
@@ -223,6 +264,8 @@ export class DatagridSection extends AbstractSection implements OnInit {
             tags.push(tag);
         });
         row.push({ tags: tags });
+      } else if (col.type === 'date-select') {
+        row.push(this.convertTraditionalToISO(this.formArray.at(index).value));
       } else {
         row.push(this.formArray.at(index).value);
       }
@@ -230,6 +273,13 @@ export class DatagridSection extends AbstractSection implements OnInit {
     console.log('Finished edits: ' + row);
     this.interface.value[rowIndex] = { row: row };
     this.sectionChanged.emit(this.interface);
+  }
+
+  isDate(colIndex) {
+    let type = this.interface.columns[colIndex].type;
+    if (type === 'date-select' || type === 'month-select') {
+      return true;
+    } else return false;
   }
 
   openAddModal() {

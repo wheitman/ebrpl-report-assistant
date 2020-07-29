@@ -23,6 +23,7 @@ import { AngularFireModule } from '@angular/fire';
 import { UserService } from './services/user.service';
 import { PreferencesComponent } from './components/preferences/preferences.component';
 import { BuilderComponent } from './components/builder/builder.component';
+import { ClipboardModule } from 'ngx-clipboard';
 
 @NgModule({
   declarations: [
@@ -46,6 +47,7 @@ import { BuilderComponent } from './components/builder/builder.component';
     BrowserAnimationsModule,
     ReactiveFormsModule,
     FormsModule,
+    ClipboardModule,
     AngularFireModule.initializeApp(environment.firebase),
   ],
   providers: [TemplateService, UserService, ConstantService, ReportService],

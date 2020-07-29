@@ -468,6 +468,12 @@ export class BuilderComponent implements OnInit {
     });
   }
 
+  resetSectionIndices() {
+    this.currentPage.sections.forEach((section: SectionInterface, index) => {
+      section.index = index;
+    });
+  }
+
   finishEditSection() {
     console.log(this.sectionInEdit);
     this.moveSection(this.originalSectionIndex, this.sectionInEdit['index']);
@@ -607,6 +613,16 @@ export class BuilderComponent implements OnInit {
     this.clearPrefill();
     (this.sectionInEdit['inputs'] as Object[]).splice(index, 1);
   }
+  deleteSection(section) {
+    if (
+      confirm('Are you sure you want to delete "' + section['title'] + '"?')
+    ) {
+      this.currentPage.sections.splice(section['index'], 1);
+      this.resetSectionIndices();
+      console.log('Section @ ' + section['index'] + ' deleted.');
+      this.cancelEditSection();
+    }
+  }
 
   addInput(event: Event) {
     event.stopPropagation();
@@ -614,11 +630,26 @@ export class BuilderComponent implements OnInit {
     if (!inputs) {
       inputs = [];
     }
-    inputs.push({
-      label: 'Untitled',
-      type: 'text',
-      links: [],
-    });
+    let val = this.sectionInEdit['value'] as Object[];
+    if (!val) {
+      val = [];
+    }
+    val.push(null);
+    if (this.sectionInEdit['type'] === 'meta') {
+      inputs.push({
+        label: 'Untitled',
+        type: 'text',
+        link: 'coverageDate', //default link
+        tags: [],
+      });
+    } else {
+      inputs.push({
+        label: 'Untitled',
+        type: 'text',
+        link: null, //default link
+        tags: [],
+      });
+    }
   }
 
   hoverEnterPageSB(pageIndex) {

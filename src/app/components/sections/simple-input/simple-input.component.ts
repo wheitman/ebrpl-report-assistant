@@ -26,6 +26,48 @@ export class SimpleInputSection extends AbstractSection implements OnInit {
     super();
   }
 
+  hasTag(tagArray: Object[], tagObj) {
+    let tagLabels: string[] = [];
+    if (tagArray) {
+      tagArray.forEach((tag) => {
+        tagLabels.push(tag['label']);
+      });
+    }
+
+    return tagLabels.includes(tagObj['label']);
+  }
+
+  convertISOtoTraditional(isoString: string) {
+    let date = new Date(isoString);
+    let year = date.getFullYear();
+    let month = (date.getMonth() + 1).toString();
+    let dt = date.getDate().toString();
+
+    if (date.getDate() < 10) {
+      dt = '0' + dt.toString();
+    }
+    if (date.getMonth() < 10) {
+      month = '0' + month;
+    }
+    let result = month + '/' + dt + '/' + year;
+    console.log('Converting: ' + isoString + ' to ' + result);
+    return result;
+  }
+
+  convertTraditionalToISO(inputString: string) {
+    let stringPieces = inputString.split('/');
+    let monthNum: number = +stringPieces[0] - 1;
+    let dateNum: number = +stringPieces[1];
+    let yearNum: number = +stringPieces[2];
+    let date = new Date();
+    date.setMonth(monthNum);
+    date.setDate(dateNum);
+    date.setFullYear(yearNum);
+    let result = date.toISOString();
+    console.log('Converting: ' + inputString + ' to ' + result);
+    return result;
+  }
+
   buildForm() {
     if (!this.inputs) {
       console.error('No inputs were found for ' + this.title);
@@ -39,15 +81,21 @@ export class SimpleInputSection extends AbstractSection implements OnInit {
         let savedData = this.interface.value;
         if (input['type'] === 'tag-select') {
           let checkboxArray = new FormArray([]);
+
           input.tags.forEach((tag) => {
-            checkboxArray.push(new FormControl(savedData[index]));
+            checkboxArray.push(
+              new FormControl(this.hasTag(savedData[index], tag))
+            );
           });
           this.formArray.push(checkboxArray);
         } else if (input['type'] === 'month-select') {
-          console.log('Pushing date: ', savedData[index]);
           this.formArray.push(
             //push the current date
             new FormControl(savedData[index])
+          );
+        } else if (input['typle'] === 'date-select') {
+          this.formArray.push(
+            new FormControl(this.convertISOtoTraditional(savedData[index]))
           );
         } else {
           this.formArray.push(new FormControl(savedData[index]));
@@ -61,10 +109,8 @@ export class SimpleInputSection extends AbstractSection implements OnInit {
           this.formArray.push(checkboxArray);
         } else if (input['type'] === 'month-select') {
           let currentDate = new Date();
-          console.log('Current date: ', currentDate.toISOString);
           this.formArray.push(
             //push the current date
-
             new FormControl(currentDate.toISOString())
           );
         } else {
@@ -72,6 +118,7 @@ export class SimpleInputSection extends AbstractSection implements OnInit {
         }
       }
     });
+    console.log(this.formArray);
   }
 
   ngOnInit(): void {
@@ -83,7 +130,7 @@ export class SimpleInputSection extends AbstractSection implements OnInit {
       },
       { updateOn: 'blur' }
     );
-    this.formArray.valueChanges.subscribe((newData) => {
+    this.formArray.valueChanges.subscribe((rawFormData: Object[]) => {
       if (this.interface.type === 'meta' && this._ReportService.report) {
         this.interface.inputs.forEach((inputObj: InputInterface, index) => {
           let link = inputObj.link;
@@ -103,8 +150,30 @@ export class SimpleInputSection extends AbstractSection implements OnInit {
         });
       }
 
-      // ResponseService.reportMetaObject = dataObj;
-      this.interface.value = newData;
+      //properly add tags from newData
+      console.log(rawFormData);
+      let processedVals: Object[] = [];
+      rawFormData.forEach((obj, index) => {
+        let type = this.interface.inputs[index].type;
+        if (type === 'tag-select') {
+          let checkTags: Object[] = [];
+          let tags = this.interface.inputs[index].tags;
+          (obj as Object[]).forEach((checked: boolean, tagIndex) => {
+            if (checked) {
+              checkTags.push(tags[tagIndex]);
+            }
+          });
+          processedVals.push(checkTags);
+        } else if (type === 'date-select') {
+          processedVals.push(
+            this.convertTraditionalToISO(rawFormData[index] as string)
+          );
+        } else {
+          processedVals.push(rawFormData[index]);
+        }
+      });
+      console.log(processedVals);
+      this.interface.value = processedVals;
       this.sectionChanged.emit(this.interface);
     });
   }

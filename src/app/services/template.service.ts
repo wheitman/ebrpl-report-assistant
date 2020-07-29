@@ -149,8 +149,33 @@ export class TemplateService {
             .doc('/templates/' + newTemplateID)
             .set(newTemplate)
             .then(() => {
-              console.log('Template duplicated successfully.');
-              resolve();
+              let pagePromises: Promise<void>[] = [];
+              for (let i = 0; i < newTemplate.pageCount; i++) {
+                this._AngularFirestore
+                  .doc<Page>(
+                    '/templates/' + templateID + '/pages/' + i.toString()
+                  )
+                  .valueChanges()
+                  .pipe(first())
+                  .subscribe((page) => {
+                    pagePromises.push(
+                      this._AngularFirestore
+                        .doc<Page>(
+                          '/templates/' +
+                            newTemplateID +
+                            '/pages/' +
+                            i.toString()
+                        )
+                        .set(page)
+                    );
+                  });
+              }
+
+              Promise.all(pagePromises).then(() => {
+                console.log('Template duplicated successfully.');
+                this.refreshTemplateList();
+                resolve();
+              }, reject);
             }, reject);
         }, reject);
     });

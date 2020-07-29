@@ -82,12 +82,14 @@
             style="width: 100%;"
             (dblclick)="openEditSection(section)"
           >
-            <div class="tree-text">{{ section.title }}</div>
-            <clr-icon
-              shape="flag"
-              class="is-solid is-error"
-              title="Meta!"
-            ></clr-icon>
+            <div class="tree-text">
+              {{ section.title
+              }}<clr-icon
+                shape="flag"
+                class="is-solid is-error"
+                title="Meta!"
+              ></clr-icon>
+            </div>
           </clr-tree-node>
           <clr-tree-node>
             <p class="p4" style="margin: 0;">Datagrids</p>
@@ -604,6 +606,9 @@
       <div class="modal-footer">
         <button type="button" class="btn" (click)="cancelEditSection()">
           Cancel
+        </button>
+        <button class="btn btn-warning-outline" (click)="deleteSection(sectionInEdit)">
+          Delete section
         </button>
         <button
           type="button"

@@ -12,9 +12,14 @@
       <button class="action-item" (click)="openEditModal(i)">Edit</button>
       <button class="action-item" (click)="deleteRow(i)">Delete</button>
     </clr-dg-action-overflow>
-    <clr-dg-cell *ngFor="let cell of row.row">
+    <clr-dg-cell *ngFor="let cell of row.row; index as i">
       <span *ngIf="!isTagObj(cell); else tagRenderer">
-        {{ cell }}
+        <span *ngIf="isDate(i); else plainCell">{{
+          cell | date: "MM/dd/yyyy"
+        }}</span>
+        <ng-template #plainCell>
+          {{ cell }}
+        </ng-template>
       </span>
       <ng-template #tagRenderer>
         <span *ngFor="let tag of cell.tags">

@@ -36,6 +36,7 @@ export class StartComponent implements OnInit {
   selectedReport: Report;
   templateLoadStatuses: ClrLoadingState[];
   deleteLoading: ClrLoadingState;
+  templateDupStatus: ClrLoadingState = ClrLoadingState.DEFAULT;
   templateModalVisible: boolean = false;
   tempDuplicateVisible: boolean = false;
 
@@ -301,9 +302,11 @@ export class StartComponent implements OnInit {
     this.tempDuplicateVisible = false;
   }
   duplicateTemplate(selectedTemplateName, newTemplateName) {
+    this.templateDupStatus = ClrLoadingState.LOADING;
     this._TemplateService
       .duplicateTemplate(selectedTemplateName, newTemplateName)
       .then(() => {
+        this.templateDupStatus = ClrLoadingState.SUCCESS;
         this.tempDuplicateVisible = false;
       });
   }

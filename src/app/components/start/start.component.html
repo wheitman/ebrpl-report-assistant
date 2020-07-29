@@ -67,7 +67,7 @@
     <div class="clr-row">
       <clr-datagrid style="width: 100%;">
         <clr-dg-placeholder>No reports found.</clr-dg-placeholder>
-
+        <clr-dg-column [clrDgField]="'templateID'">ID</clr-dg-column>
         <clr-dg-column [clrDgField]="'submitDate'">Submitted</clr-dg-column>
         <clr-dg-column [clrDgField]="'templateID'">ID</clr-dg-column>
         <clr-dg-column [clrDgField]="'id'">Template</clr-dg-column>
@@ -103,15 +103,16 @@
               Delete draft
             </button>
           </clr-dg-action-overflow>
+          <clr-dg-cell (click)="navigate(report)" class="clickable">{{
+            report.id
+          }}</clr-dg-cell>
           <clr-dg-cell (click)="navigate(report)" class="clickable"
             >{{ report.submitDate | date: "shortDate"
             }}<span *ngIf="!report.submitDate"
               ><em>Unsubmitted</em></span
             ></clr-dg-cell
           >
-          <clr-dg-cell (click)="navigate(report)" class="clickable">{{
-            report.id
-          }}</clr-dg-cell>
+
           <clr-dg-cell (click)="navigate(report)" class="clickable"
             >{{ report.templateID }}
             <span *ngIf="isUnfinished(report)" class="label label-warning"
@@ -207,6 +208,7 @@
             type="button"
             class="btn btn-primary"
             (click)="duplicateReport(selectedReport)"
+            [clrLoading]="templateDupStatus"
           >
             Duplicate
           </button>
