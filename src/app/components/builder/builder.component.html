@@ -87,7 +87,7 @@
               }}<clr-icon
                 shape="flag"
                 class="is-solid is-error"
-                title="Meta!"
+                title="Meta section"
               ></clr-icon>
             </div>
           </clr-tree-node>
@@ -386,12 +386,40 @@
                   >
                     <clr-stack-label>
                       Input {{ i + 1 }}
-                      <button
-                        class="btn btn-sm btn-link btn-icon"
-                        (click)="deleteInput(i)"
-                      >
-                        <clr-icon shape="trash"></clr-icon>
-                      </button>
+                      <clr-dropdown>
+                        <button clrDropdownTrigger>
+                          <clr-icon
+                            shape="ellipsis-vertical"
+                            size="16"
+                          ></clr-icon>
+                        </button>
+                        <clr-dropdown-menu *clrIfOpen>
+                          <div
+                            clrDropdownItem
+                            (click)="deleteInArray(i, sectionInEdit['inputs'])"
+                          >
+                            Delete input
+                          </div>
+                          <div
+                            clrDropdownItem
+                            *ngIf="i > 0"
+                            (click)="
+                              moveInArray(i, i - 1, sectionInEdit['inputs'])
+                            "
+                          >
+                            Move up
+                          </div>
+                          <div
+                            clrDropdownItem
+                            *ngIf="i < sectionInEdit['inputs'].length - 2"
+                            (click)="
+                              moveInArray(i, i + 1, sectionInEdit['inputs'])
+                            "
+                          >
+                            Move down
+                          </div>
+                        </clr-dropdown-menu>
+                      </clr-dropdown>
                     </clr-stack-label>
                     <clr-stack-content>
                       <clr-input-container>
@@ -460,23 +488,13 @@
                                 ></clr-icon>
                               </button>
                             </clr-accordion-title>
-                            <clr-accordion-content *clrIfExpanded>
+                            <clr-accordion-content *clrIfExpanded class="tagAccordion">
                               <label class="clr-control-label">Tag label</label>
                               <input clrInput [(ngModel)]="tag['label']" />
                               <label class="clr-control-label">Tag icon</label>
                               <emoji-picker
-                                style="max-height: 30rem;"
                                 (emoji-click)="editTagEmoji(input, i, $event)"
                               ></emoji-picker>
-                              <button
-                                class="btn btn-link btn-sm btn-icon"
-                                (click)="deleteTag(input, i)"
-                              >
-                                <clr-icon
-                                  shape="trash"
-                                  class="is-danger"
-                                ></clr-icon>
-                              </button>
                             </clr-accordion-content>
                           </clr-accordion-panel>
                         </clr-accordion>
@@ -497,7 +515,7 @@
             </clr-tab-content>
           </clr-tab>
           <clr-tab>
-            <button clrTabLink>Prefill</button>
+            <button clrTabLink>Preview & prefill</button>
             <clr-tab-content *clrIfActive="true">
               <p>
                 <clr-icon shape="help-info"></clr-icon> Prefill is the default
@@ -607,7 +625,10 @@
         <button type="button" class="btn" (click)="cancelEditSection()">
           Cancel
         </button>
-        <button class="btn btn-warning-outline" (click)="deleteSection(sectionInEdit)">
+        <button
+          class="btn btn-warning-outline"
+          (click)="deleteSection(sectionInEdit)"
+        >
           Delete section
         </button>
         <button
@@ -654,6 +675,13 @@
         </div>
       </div>
       <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-danger"
+          (click)="deletePage(currentPage.index)"
+        >
+          Delete page
+        </button>
         <button
           type="button"
           class="btn btn-primary"

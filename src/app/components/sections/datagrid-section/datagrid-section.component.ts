@@ -60,6 +60,9 @@ export class DatagridSection extends AbstractSection implements OnInit {
   }
 
   convertISOtoTraditional(isoString: string) {
+    if (!isoString) {
+      return null;
+    }
     let date = new Date(isoString);
     let year = date.getFullYear();
     let month = (date.getMonth() + 1).toString();
@@ -77,7 +80,14 @@ export class DatagridSection extends AbstractSection implements OnInit {
   }
 
   convertTraditionalToISO(inputString: string) {
+    if (!inputString) {
+      return null;
+    }
     let stringPieces = inputString.split('/');
+    if (stringPieces.length !== 3) {
+      console.warn('Invalid date: ' + inputString);
+      return null;
+    }
     let monthNum: number = +stringPieces[0] - 1;
     let dateNum: number = +stringPieces[1];
     let yearNum: number = +stringPieces[2];

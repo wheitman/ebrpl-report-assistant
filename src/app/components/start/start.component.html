@@ -67,10 +67,9 @@
     <div class="clr-row">
       <clr-datagrid style="width: 100%;">
         <clr-dg-placeholder>No reports found.</clr-dg-placeholder>
-        <clr-dg-column [clrDgField]="'templateID'">ID</clr-dg-column>
+        <clr-dg-column [clrDgField]="'id'">ID</clr-dg-column>
         <clr-dg-column [clrDgField]="'submitDate'">Submitted</clr-dg-column>
-        <clr-dg-column [clrDgField]="'templateID'">ID</clr-dg-column>
-        <clr-dg-column [clrDgField]="'id'">Template</clr-dg-column>
+        <clr-dg-column [clrDgField]="'templateID'">Template</clr-dg-column>
         <clr-dg-column [clrDgField]="'author'">Author</clr-dg-column>
         <clr-dg-column [clrDgField]="'coverageDate'"
           >Coverage date</clr-dg-column
@@ -82,25 +81,33 @@
         >
           <clr-dg-action-overflow>
             <button class="action-item" (click)="navigate(report)">
-              Open report
+              <clr-icon shape="login"></clr-icon> Open report
             </button>
             <button class="action-item" (click)="showCopy(report)">
-              Duplicate to new report
+              <clr-icon shape="copy"></clr-icon> Duplicate to new report
             </button>
             <button
               *ngIf="!isUnfinished(report) && isAdmin"
               class="action-item"
               (click)="showDelete(report)"
             >
-              Delete report
-              <span class="badge badge-light-blue" *ngIf="isAdmin">Admin</span>
+              <clr-icon shape="trash" class="is-danger"></clr-icon> Delete
+              report
+              <span class="badge badge-light-blue">Admin</span>
             </button>
             <button
               *ngIf="isUnfinished(report)"
               class="action-item"
               (click)="showDelete(report)"
             >
-              Delete draft
+              <clr-icon shape="trash" class="is-danger"></clr-icon> Delete draft
+            </button>
+            <button
+              *ngIf="isUnfinished(report)"
+              class="action-item"
+              (click)="copyMagic(report)"
+            >
+              <clr-icon shape="wand"></clr-icon> Copy magic text
             </button>
           </clr-dg-action-overflow>
           <clr-dg-cell (click)="navigate(report)" class="clickable">{{
@@ -149,7 +156,7 @@
             <option value="100">100</option>
             <option value="all">all</option>
           </select>
-          reports | {{ reports.length }} reports</clr-dg-footer
+          reports | {{ reports.length }} of {{ reportCount }}</clr-dg-footer
         >
       </clr-datagrid>
 

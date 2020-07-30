@@ -8,6 +8,7 @@ import { Component, OnInit } from '@angular/core';
 import { Report } from 'src/app/interfaces/report';
 import { User } from 'src/app/interfaces/user';
 import { report, pages } from 'src/assets/dev/outline';
+import { ClipboardService } from 'ngx-clipboard';
 
 @Component({
   selector: 'app-start',
@@ -40,6 +41,8 @@ export class StartComponent implements OnInit {
   templateModalVisible: boolean = false;
   tempDuplicateVisible: boolean = false;
 
+  reportCount: number = -1;
+
   _sizeLimit: string = '10';
 
   //from TemplateService
@@ -49,7 +52,8 @@ export class StartComponent implements OnInit {
     public _TemplateService: TemplateService,
     public _ReportService: ReportService,
     private _UserService: UserService,
-    private _Router: Router
+    private _Router: Router,
+    private _clipboardService: ClipboardService
   ) {}
 
   ngOnInit(): void {
@@ -102,6 +106,9 @@ export class StartComponent implements OnInit {
               });
           }
         }
+        this.getReportCount().then((count) => {
+          this.reportCount = count;
+        });
       }
     });
     this.templates = this._TemplateService.templateObservable;
@@ -115,6 +122,16 @@ export class StartComponent implements OnInit {
 
   get sizeLimit() {
     return this._sizeLimit;
+  }
+
+  getReportCount(): Promise<number> {
+    if (this._UserService.getUserSnapshot().role === 'admin') {
+      return this._ReportService.getFullReportCount();
+    } else {
+      return this._ReportService.getReportCountByBranch(
+        this._UserService.getUserSnapshot().branch
+      );
+    }
   }
 
   set sizeLimit(newLimit: string) {
@@ -232,6 +249,14 @@ export class StartComponent implements OnInit {
     this.selectedReport = report;
     this.deleteVisible = true;
   }
+
+  copyMagic(report: Report) {
+    this._ReportService.getMagicString(report.id).then((magicString) => {
+      this._clipboardService.copyFromContent(magicString);
+      alert('✅ Magic string copied to clipboard.');
+    });
+  }
+
   hideDelete() {
     this.deleteVisible = false;
   }

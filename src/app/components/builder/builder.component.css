@@ -28,12 +28,16 @@
 
 emoji-picker {
   width: 100%;
-  max-height: 16rem;
+  max-height: 15rem;
   --emoji-size: 1.2rem;
   --emoji-padding: 0.3rem;
   --input-font-size: 0.67rem;
   --input-line-height: 1rem;
   --num-columns: 8;
+}
+
+.tagAccordion {
+  height: 20rem;
 }
 
 .clr-form-control {

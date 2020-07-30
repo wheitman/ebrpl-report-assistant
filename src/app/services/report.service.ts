@@ -1,3 +1,4 @@
+import { UnifiedReport } from './../interfaces/report';
 import { UserService } from 'src/app/services/user.service';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { Router } from '@angular/router';
@@ -217,6 +218,57 @@ export class ReportService {
               }, reject);
           });
         }, reject);
+    });
+  }
+
+  //this returns the full JSON string of a report with all its pages
+  getMagicString(reportID): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      let fullReport: UnifiedReport;
+      let reportHeader: Report;
+      let pages: Page[] = [];
+      let pagePromises: Promise<void>[] = [];
+      this._AngularFirestore
+        .doc<Report>('/reports/' + reportID)
+        .get()
+        .pipe(first())
+        .subscribe((docSnap) => {
+          reportHeader = docSnap.data() as Report;
+          for (let i = 0; i < reportHeader.pageCount; i++) {
+            pagePromises.push(
+              new Promise<void>((resolve, reject) => {
+                this._AngularFirestore
+                  .doc('/reports/' + reportID + '/pages/' + i.toString())
+                  .get()
+                  .pipe(first())
+                  .subscribe((pageSnap) => {
+                    pages.push(pageSnap.data() as Page);
+                    resolve();
+                  }, reject);
+              })
+            );
+          }
+          //once all pages are finished loading
+          Promise.all(pagePromises).then(() => {
+            fullReport = {
+              id: reportHeader.id,
+              templateID: reportHeader.templateID,
+              title: reportHeader.title || null,
+              coverageDate: reportHeader.coverageDate || null,
+              submitDate: reportHeader.submitDate || null,
+              author: reportHeader.author || null,
+              branch: reportHeader.branch || null,
+              additionalInfo: reportHeader.additionalInfo || null,
+              pageStatuses: reportHeader.pageStatuses || null,
+              pageCount: reportHeader.pageCount,
+              completionStatus: reportHeader.completionStatus,
+              pages: pages,
+            };
+            let result = JSON.stringify(fullReport);
+            console.log(fullReport);
+            resolve(result);
+          });
+        });
     });
   }
 
@@ -507,6 +559,32 @@ export class ReportService {
       pages.forEach((page, index) => {
         pageCollection.doc(index.toString()).set(page);
       });
+    });
+  }
+
+  getFullReportCount(): Promise<number> {
+    console.log('[Report Serv] Getting full report count');
+    return new Promise<number>((resolve, reject) => {
+      this._AngularFirestore
+        .collection('/reports')
+        .get()
+        .pipe(first())
+        .subscribe((snapshot) => {
+          resolve(snapshot.size);
+        }, reject);
+    });
+  }
+
+  getReportCountByBranch(branchName: string): Promise<number> {
+    console.log('[Report Serv] Getting report count for ' + branchName);
+    return new Promise<number>((resolve, reject) => {
+      this._AngularFirestore
+        .collection('/reports', (ref) => ref.where('branch', '==', branchName))
+        .get()
+        .pipe(first())
+        .subscribe((snapshot) => {
+          resolve(snapshot.size);
+        }, reject);
     });
   }
 }

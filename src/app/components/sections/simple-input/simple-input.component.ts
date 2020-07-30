@@ -81,10 +81,11 @@ export class SimpleInputSection extends AbstractSection implements OnInit {
         let savedData = this.interface.value;
         if (input['type'] === 'tag-select') {
           let checkboxArray = new FormArray([]);
+          console.log(savedData);
 
           input.tags.forEach((tag) => {
             checkboxArray.push(
-              new FormControl(this.hasTag(savedData[index], tag))
+              new FormControl(this.hasTag(savedData[index]['tags'], tag))
             );
           });
           this.formArray.push(checkboxArray);
@@ -163,7 +164,7 @@ export class SimpleInputSection extends AbstractSection implements OnInit {
               checkTags.push(tags[tagIndex]);
             }
           });
-          processedVals.push(checkTags);
+          processedVals.push({ tags: checkTags });
         } else if (type === 'date-select') {
           processedVals.push(
             this.convertTraditionalToISO(rawFormData[index] as string)

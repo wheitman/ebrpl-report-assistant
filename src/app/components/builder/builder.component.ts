@@ -1,3 +1,4 @@
+import { UserService } from './../../services/user.service';
 import { ClrLoadingState } from '@clr/angular';
 import { TemplateService } from './../../services/template.service';
 import { ConstantService } from './../../services/constant.service';
@@ -9,7 +10,7 @@ import {
 } from './../../interfaces/sections';
 import { Report } from 'src/app/interfaces/report';
 import { AngularFirestore } from '@angular/fire/firestore';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { UnifiedReport } from './../../interfaces/report';
 import {
   FormGroup,
@@ -74,18 +75,26 @@ export class BuilderComponent implements OnInit {
   validMessage: string;
   constants$: Observable<Object>;
   divisions: Object[];
-  hasMetaSection: boolean;
   metaSection: SimpleInputInterface;
 
   constructor(
     public _ActivatedRoute: ActivatedRoute,
     public _AngularFirestore: AngularFirestore,
     public _ConstantService: ConstantService,
-    public _TS: TemplateService
+    public _TS: TemplateService,
+    public _UserService: UserService,
+    public _Router: Router
   ) {}
 
   ngOnInit(): void {
     this.constants$ = this._ConstantService.constants;
+    this._UserService.getUserObservable().subscribe((user) => {
+      console.log(user);
+      if (user && user.role !== 'admin') {
+        console.error('The Builder is for admins only. Redirecting home.');
+        this._Router.navigate(['']);
+      }
+    });
     this._ActivatedRoute.queryParamMap.subscribe((paramMap) => {
       let openTitle = paramMap.get('open');
       //if an existing template has been passed to the URL
@@ -93,7 +102,6 @@ export class BuilderComponent implements OnInit {
         this.openTemplate(openTitle)
           .then(() => {
             this.originalTemplateName = this._template.templateID;
-            this.hasMetaSection = this.findMetaSection();
             console.log(this._template);
           })
           .catch(() => {});
@@ -209,11 +217,10 @@ export class BuilderComponent implements OnInit {
     }
   }
 
-  findMetaSection(): boolean {
+  get hasMetaSection(): boolean {
     let hasMeta = false;
     this._template.pages.forEach((page) => {
       page.sections.forEach((section) => {
-        console.log(section['type']);
         if (section['type'] === 'meta') {
           this.metaSection = section as SimpleInputInterface;
           hasMeta = true;
@@ -251,6 +258,7 @@ export class BuilderComponent implements OnInit {
       index: this._template.pages.length,
       sections: [],
     });
+    this._template.pageCount++;
     console.log(this._template.pages.length);
   }
 
@@ -363,7 +371,6 @@ export class BuilderComponent implements OnInit {
       };
       this._template.pages[pageIndex].sections.push(newSection);
       this.metaSection = newSection;
-      this.hasMetaSection = true;
       console.log(
         'Meta added. Sections now: ' + this._template.pages[pageIndex].sections
       );
@@ -444,8 +451,20 @@ export class BuilderComponent implements OnInit {
       arr.splice(toIndex, 0, arr.splice(fromIndex, 1)[0]);
     } else console.error("Can't move page. Out of bounds.");
   }
+  moveInArray(fromIndex: number, toIndex: number, array: any[]) {
+    console.log('Moving to ' + toIndex);
+    if (toIndex >= 0 && toIndex < array.length) {
+      array.splice(toIndex, 0, array.splice(fromIndex, 1)[0]);
+    } else console.error("Can't move page. Out of bounds.");
+  }
+  deleteInArray(index: number, array: any[]) {
+    if (index >= 0 && index < array.length) {
+      array.splice(index, 1);
+    } else console.error("Can't delete element. Out of bounds.");
+  }
 
   linkChanged(input: Input, event) {
+    console.log('Link changed');
     if (input.link === 'title') {
       input.type = 'text';
     } else if (input.link === 'coverageDate') {
@@ -623,6 +642,25 @@ export class BuilderComponent implements OnInit {
       this.cancelEditSection();
     }
   }
+  deletePage(pageIndex) {
+    if (
+      confirm(
+        'Delete page ' +
+          (pageIndex + 1) +
+          ' (' +
+          this._template.pages[pageIndex].title +
+          ')?'
+      )
+    ) {
+      //close the current page if it's being deleted
+      if (this.currentPage.index === pageIndex) {
+        this.currentPage = null;
+      }
+      this._template.pages.splice(pageIndex, 1);
+      this._template.pageCount--;
+      this.closeEditPage();
+    }
+  }
 
   addInput(event: Event) {
     event.stopPropagation();
@@ -638,7 +676,7 @@ export class BuilderComponent implements OnInit {
     if (this.sectionInEdit['type'] === 'meta') {
       inputs.push({
         label: 'Untitled',
-        type: 'text',
+        type: 'month-select',
         link: 'coverageDate', //default link
         tags: [],
       });
