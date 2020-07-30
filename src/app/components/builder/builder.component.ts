@@ -765,7 +765,7 @@ export class BuilderComponent implements OnInit {
           value.push({ tags: col.tags || null });
         } else value.push(null);
       });
-      this.sectionInEdit['value'] = value;
+      this.sectionInEdit['value'] = [{ row: value }];
       console.log('Value refreshed: ');
       console.log(this.sectionInEdit['value']);
     } else {
@@ -777,6 +777,7 @@ export class BuilderComponent implements OnInit {
 
   typeChanged(field: Object, event: Event) {
     this.refreshValueFromFields();
+    console.log(this.sectionInEdit);
   }
 
   deleteTag(input: Input, index: number) {
