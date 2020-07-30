@@ -332,6 +332,7 @@
                       />
                       <select
                         [(ngModel)]="sectionInEdit['columns'][i]['type']"
+                        (ngModelChange)="typeChanged(col, $event)"
                         class="clr-select"
                       >
                         <option value="division-select">Division Select</option>
@@ -340,6 +341,53 @@
                         <option value="date-select">Date</option>
                         <option value="tag-select">Tag Select</option>
                       </select>
+                      <div
+                        class="clr-col"
+                        *ngIf="isEqual(col['type'], 'tag-select')"
+                      >
+                        <div class="clr-row">
+                          <label class="clr-control-label">Tags</label>
+                        </div>
+                        <clr-accordion>
+                          <clr-accordion-panel
+                            *ngFor="let tag of col['tags']; index as i"
+                          >
+                            <clr-accordion-title
+                              >{{ tag["icon"] }}
+                              {{ tag["label"] }}
+                              <button
+                                class="btn btn-link btn-sm btn-icon"
+                                (click)="deleteTag(col, i)"
+                                style="margin: 0;"
+                              >
+                                <clr-icon
+                                  shape="trash"
+                                  class="is-danger"
+                                ></clr-icon>
+                              </button>
+                            </clr-accordion-title>
+                            <clr-accordion-content
+                              *clrIfExpanded
+                              class="tagAccordion"
+                            >
+                              <label class="clr-control-label">Tag label</label>
+                              <input clrInput [(ngModel)]="tag['label']" />
+                              <label class="clr-control-label">Tag icon</label>
+                              <emoji-picker
+                                (emoji-click)="editTagEmoji(col, i, $event)"
+                              ></emoji-picker>
+                            </clr-accordion-content>
+                          </clr-accordion-panel>
+                        </clr-accordion>
+                        <div class="clr-row">
+                          <button
+                            class="btn btn-link btn-sm"
+                            (click)="addTag(col, $event)"
+                          >
+                            Add tag
+                          </button>
+                        </div>
+                      </div>
                     </clr-stack-content>
                   </clr-stack-block>
                 </clr-stack-block>
@@ -411,7 +459,7 @@
                           </div>
                           <div
                             clrDropdownItem
-                            *ngIf="i < sectionInEdit['inputs'].length - 2"
+                            *ngIf="i < sectionInEdit['inputs'].length - 1"
                             (click)="
                               moveInArray(i, i + 1, sectionInEdit['inputs'])
                             "
@@ -441,6 +489,57 @@
                           <option value="month-select">Month</option>
                           <option value="textarea">Multiline text</option>
                         </select>
+                        <div
+                          class="clr-col"
+                          *ngIf="isEqual(input['type'], 'tag-select')"
+                        >
+                          <div class="clr-row">
+                            <label class="clr-control-label">Tags</label>
+                          </div>
+                          <clr-accordion>
+                            <clr-accordion-panel
+                              *ngFor="let tag of input['tags']; index as i"
+                            >
+                              <clr-accordion-title
+                                >{{ tag["icon"] }}
+                                {{ tag["label"] }}
+                                <button
+                                  class="btn btn-link btn-sm btn-icon"
+                                  (click)="deleteTag(input, i)"
+                                  style="margin: 0;"
+                                >
+                                  <clr-icon
+                                    shape="trash"
+                                    class="is-danger"
+                                  ></clr-icon>
+                                </button>
+                              </clr-accordion-title>
+                              <clr-accordion-content
+                                *clrIfExpanded
+                                class="tagAccordion"
+                              >
+                                <label class="clr-control-label"
+                                  >Tag label</label
+                                >
+                                <input clrInput [(ngModel)]="tag['label']" />
+                                <label class="clr-control-label"
+                                  >Tag icon</label
+                                >
+                                <emoji-picker
+                                  (emoji-click)="editTagEmoji(input, i, $event)"
+                                ></emoji-picker>
+                              </clr-accordion-content>
+                            </clr-accordion-panel>
+                          </clr-accordion>
+                          <div class="clr-row">
+                            <button
+                              class="btn btn-link btn-sm"
+                              (click)="addTag(input, $event)"
+                            >
+                              Add tag
+                            </button>
+                          </div>
+                        </div>
                       </clr-select-container>
 
                       <clr-select-container
@@ -488,7 +587,10 @@
                                 ></clr-icon>
                               </button>
                             </clr-accordion-title>
-                            <clr-accordion-content *clrIfExpanded class="tagAccordion">
+                            <clr-accordion-content
+                              *clrIfExpanded
+                              class="tagAccordion"
+                            >
                               <label class="clr-control-label">Tag label</label>
                               <input clrInput [(ngModel)]="tag['label']" />
                               <label class="clr-control-label">Tag icon</label>

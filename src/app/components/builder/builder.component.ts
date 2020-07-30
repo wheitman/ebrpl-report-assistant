@@ -7,6 +7,7 @@ import {
   DatagridInterface,
   SectionInterface,
   Input,
+  Column,
 } from './../../interfaces/sections';
 import { Report } from 'src/app/interfaces/report';
 import { AngularFirestore } from '@angular/fire/firestore';
@@ -465,6 +466,7 @@ export class BuilderComponent implements OnInit {
 
   linkChanged(input: Input, event) {
     console.log('Link changed');
+    this.refreshValueFromFields();
     if (input.link === 'title') {
       input.type = 'text';
     } else if (input.link === 'coverageDate') {
@@ -608,7 +610,9 @@ export class BuilderComponent implements OnInit {
       (this.sectionInEdit['columns'] as Object[]).push({
         label: 'New column',
         type: 'text',
+        tags: [],
       });
+      //push an empty column to each row
       (this.sectionInEdit['value'] as Object[]).forEach((row) => {
         (row['row'] as Object[]).push('');
       });
@@ -668,11 +672,6 @@ export class BuilderComponent implements OnInit {
     if (!inputs) {
       inputs = [];
     }
-    let val = this.sectionInEdit['value'] as Object[];
-    if (!val) {
-      val = [];
-    }
-    val.push(null);
     if (this.sectionInEdit['type'] === 'meta') {
       inputs.push({
         label: 'Untitled',
@@ -688,6 +687,7 @@ export class BuilderComponent implements OnInit {
         tags: [],
       });
     }
+    this.refreshValueFromFields();
   }
 
   hoverEnterPageSB(pageIndex) {
@@ -698,21 +698,21 @@ export class BuilderComponent implements OnInit {
   }
 
   hasTagSelect(object: Object): boolean {
-    let hastg: boolean = false;
+    let hastag: boolean = false;
     if (object['inputs']) {
       (object['inputs'] as Object[]).forEach((input) => {
         if (input['type'] === 'tag-select') {
-          hastg = true;
+          hastag = true;
         }
       });
     } else if (object['columns']) {
       (object['columns'] as Object[]).forEach((col) => {
         if (col['type'] === 'tag-select') {
-          hastg = true;
+          hastag = true;
         }
       });
     }
-    return hastg;
+    return hastag;
   }
 
   hasTag(rowIndex: number, colIndex: number, tag: Object) {
@@ -734,23 +734,58 @@ export class BuilderComponent implements OnInit {
     } else return false;
   }
 
-  addTag(input: Input, event: Event) {
+  addTag(field: Object, event: Event) {
     event.stopPropagation();
-    console.log(input);
-    input.tags.push({
+    console.log(field);
+    if (!field['tags']) {
+      field['tags'] = [];
+    }
+    field['tags'].push({
       icon: '❓',
       label: 'Untitled',
     });
-    console.log(input);
+    console.log(field);
+    this.refreshValueFromFields();
+  }
+
+  refreshValueFromFields() {
+    let value = [];
+    if (this.sectionInEdit['inputs']) {
+      this.sectionInEdit['inputs'].forEach((input: Input) => {
+        if (input.type === 'tag-select') {
+          value.push({ tags: input.tags || null });
+        } else value.push(null);
+      });
+      this.sectionInEdit['value'] = value;
+      console.log('Value refreshed: ');
+      console.log(this.sectionInEdit['value']);
+    } else if (this.sectionInEdit['columns']) {
+      this.sectionInEdit['columns'].forEach((col: Column) => {
+        if (col.type === 'tag-select') {
+          value.push({ tags: col.tags || null });
+        } else value.push(null);
+      });
+      this.sectionInEdit['value'] = value;
+      console.log('Value refreshed: ');
+      console.log(this.sectionInEdit['value']);
+    } else {
+      console.error(
+        'Could not refresh value from fields: no columns or inputs were found.'
+      );
+    }
+  }
+
+  typeChanged(field: Object, event: Event) {
+    this.refreshValueFromFields();
   }
 
   deleteTag(input: Input, index: number) {
     console.log(input.tags.splice(index, 1));
   }
 
-  editTagEmoji(input: Input, tagIndex: number, eventData: CustomEvent) {
+  editTagEmoji(field: Object, tagIndex: number, eventData: CustomEvent) {
     console.log(tagIndex, eventData.detail);
-    input.tags[tagIndex]['icon'] = eventData.detail['unicode'];
+    field['tags'][tagIndex]['icon'] = eventData.detail['unicode'];
     console.log(this.sectionInEdit);
   }
 

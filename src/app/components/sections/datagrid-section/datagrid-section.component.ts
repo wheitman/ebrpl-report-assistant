@@ -129,6 +129,7 @@ export class DatagridSection extends AbstractSection implements OnInit {
               }
               tagArray.push(tagControl);
             });
+            console.log(tagArray.value);
             this.formArray.push(tagArray);
           }
         } else {
@@ -295,7 +296,6 @@ export class DatagridSection extends AbstractSection implements OnInit {
   openAddModal() {
     this.buildFormFromInterface();
     this.addModalOpened = true;
-    console.log(this.constants['divisions']);
   }
 
   addAnother() {
