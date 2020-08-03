@@ -185,20 +185,29 @@ export class TemplateService {
     return new Promise<void>((resolve, reject) => {
       let templateDoc = this._AngularFirestore.doc('/templates/' + templateID);
       let template = this._templates.get(templateID);
-      if (!template) {
+      let confirmation = prompt(
+        'Are you sure? To delete, type "confirm": ',
+        ''
+      );
+      if (!(confirmation && confirmation == 'confirm')) {
         reject();
       } else {
-        //delete all pages
-        for (let i = 0; i < template.pageCount; i++) {
-          let pageDoc = templateDoc.collection('pages').doc(i.toString());
-          pageDoc.delete();
-        }
+        if (!template) {
+          reject();
+        } else {
+          //delete all pages
+          for (let i = 0; i < template.pageCount; i++) {
+            this._AngularFirestore
+              .doc('/templates/' + templateID + '/pages/' + i.toString())
+              .delete();
+          }
 
-        templateDoc.delete().then(() => {
-          this.refreshTemplateList();
-          console.log('Deleted ' + templateDoc.ref.path);
-          resolve();
-        }, reject);
+          templateDoc.delete().then(() => {
+            this.refreshTemplateList();
+            console.log('Deleted ' + templateDoc.ref.path);
+            resolve();
+          }, reject);
+        }
       }
     });
   }

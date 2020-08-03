@@ -48,6 +48,12 @@ export class AbstractSection implements OnInit {
     subarrayIndex: number,
     array: FormArray
   ) {
+    if (!array || !array.controls) {
+      console.error(
+        '[Abstract Section] Form array is empty. Has it been built?'
+      );
+      return [];
+    }
     let checkboxArray = array.controls[arrayIndex] as FormArray;
     return checkboxArray.controls[subarrayIndex];
   }

@@ -65,15 +65,23 @@
       </clr-dropdown>
     </div>
     <div class="clr-row">
-      <clr-datagrid style="width: 100%;">
+      <clr-datagrid style="width: 100%;" [(clrDgSelected)]="selectedReports">
         <clr-dg-placeholder>No reports found.</clr-dg-placeholder>
-        <clr-dg-column [clrDgField]="'id'">ID</clr-dg-column>
-        <clr-dg-column [clrDgField]="'submitDate'">Submitted</clr-dg-column>
-        <clr-dg-column [clrDgField]="'templateID'">Template</clr-dg-column>
-        <clr-dg-column [clrDgField]="'author'">Author</clr-dg-column>
-        <clr-dg-column [clrDgField]="'coverageDate'"
-          >Coverage date</clr-dg-column
-        >
+        <clr-dg-column>ID</clr-dg-column>
+        <clr-dg-column>Submitted</clr-dg-column>
+        <clr-dg-column>Template</clr-dg-column>
+        <clr-dg-column>Author</clr-dg-column>
+        <clr-dg-column>Coverage date</clr-dg-column>
+
+        <clr-dg-action-bar>
+          <button
+            type="button"
+            class="btn btn-sm btn-secondary"
+            (click)="showFilterModal()"
+          >
+            <clr-icon shape="filter"></clr-icon> Filter reports
+          </button>
+        </clr-dg-action-bar>
 
         <clr-dg-row
           *clrDgItems="let report of reports; index as i"
@@ -189,6 +197,112 @@
             (click)="deleteReport(selectedReport)"
           >
             Delete
+          </button>
+        </div>
+      </clr-modal>
+      <clr-modal
+        [clrModalSize]="'lg'"
+        [(clrModalOpen)]="filterVisible"
+        *ngIf="filterVisible"
+      >
+        <h3 class="modal-title">
+          Filter reports
+        </h3>
+        <div class="modal-body">
+          <p class="p5">
+            Note: all fields are optional. Empty filters are not applied.
+          </p>
+          <form clrForm clrLayout="compact" [formGroup]="filterGroup">
+            <clr-input-container>
+              <label>Report ID</label>
+              <input
+                clrInput
+                type="text"
+                placeholder="All"
+                formControlName="idSearch"
+              />
+            </clr-input-container>
+            <clr-input-container>
+              <label>Author</label>
+              <input
+                clrInput
+                type="text"
+                placeholder="All"
+                formControlName="authorSearch"
+              />
+            </clr-input-container>
+            <clr-date-container>
+              <label>Coverage date from</label>
+              <input
+                type="date"
+                name="date"
+                formControlName="coverageFrom"
+                clrDate
+              />
+            </clr-date-container>
+            <clr-date-container>
+              <label>Coverage date to</label>
+              <input
+                type="date"
+                name="date"
+                formControlName="coverageTo"
+                clrDate
+              />
+            </clr-date-container>
+            <clr-select-container>
+              <label>Completion status</label>
+              <select
+                clrSelect
+                name="options"
+                formControlName="completionStatus"
+              >
+                <option value="All" selected="selected">All</option>
+                <option value="complete">Complete</option>
+                <option value="incomplete">Incomplete (draft)</option>
+              </select>
+            </clr-select-container>
+            <clr-select-container clrInline *ngIf="filterVisible">
+              <label>Template</label>
+              <select clrSelect formControlName="template">
+                <option value="All" selected="selected">All</option>
+                <option
+                  *ngFor="
+                    let templateID of _TemplateService.templateNames;
+                    index as i
+                  "
+                  [value]="templateID"
+                  >{{ templateID }}</option
+                >
+              </select>
+            </clr-select-container>
+            <clr-select-container clrInline *ngIf="isAdmin">
+              <label>Branch</label>
+              <select clrSelect formControlName="branch">
+                <option value="All" selected="selected">All</option>
+                <option
+                  *ngFor="let branch of _constants['branches']; index as i"
+                  [value]="branch"
+                  >{{ branch }}</option
+                >
+              </select>
+            </clr-select-container>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-outline"
+            (click)="clearFilters()"
+          >
+            Clear filters
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            [clrLoading]="filterLoading"
+            (click)="finishFilterModal()"
+          >
+            Finish
           </button>
         </div>
       </clr-modal>

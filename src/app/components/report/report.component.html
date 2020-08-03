@@ -27,16 +27,20 @@
         {{ (page$ | async)?.title }}
       </h1>
       <hr />
-      <datagrid-section
-        *ngFor="let section of datagrids"
-        [interface]="section"
-        (sectionChanged)="setSection(section, $event)"
-      ></datagrid-section>
-      <simple-input
-        *ngFor="let section of simpleInputs"
-        [interface]="section"
-        (sectionChanged)="setSection(section, $event)"
-      ></simple-input>
+      <div *ngFor="let section of currentSections">
+        <datagrid-section
+          *ngIf="isDatagrid(section); else simpleInput"
+          [interface]="section"
+          (sectionChanged)="setSection(section, $event)"
+        >
+        </datagrid-section>
+        <ng-template #simpleInput>
+          <simple-input
+            [interface]="section"
+            (sectionChanged)="setSection(section, $event)"
+          ></simple-input>
+        </ng-template>
+      </div>
       <div class="clr-col-md-6 clr-offset-md-3 clr-align-self-end">
         <clr-icon shape="help-info"></clr-icon
         ><em>Try the buttons below to continue the report.</em>

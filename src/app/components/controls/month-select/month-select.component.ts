@@ -44,8 +44,12 @@ export class MonthSelectComponent implements OnInit, ControlValueAccessor {
   }
 
   writeValue(date: string): void {
+    if (!date) {
+      date = new Date().toISOString();
+    }
     this.dateString = date;
     console.log(date);
+
     this.year = new Date(date).getFullYear();
     this.monthIndex = new Date(date).getMonth();
     console.log(this._monthNames[this.monthIndex]);
@@ -91,6 +95,9 @@ export class MonthSelectComponent implements OnInit, ControlValueAccessor {
       yearInput: new FormControl(this.year),
     });
     console.log('Initial is ', this.monthIndex);
+    if (!this.monthIndex) {
+      this.dateString;
+    }
     this.formGroup.valueChanges.subscribe((newValue) => {
       if (
         this.monthIndex !== this._monthNames.indexOf(newValue['monthInput'])

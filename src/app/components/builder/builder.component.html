@@ -238,6 +238,7 @@
                   <clr-stack-content>
                     <select
                       [(ngModel)]="sectionInEdit['type']"
+                      (ngModelChange)="sectionTypeChanged(sectionInEdit)"
                       class="clr-select"
                     >
                       <option value="datagrid">Datagrid</option>
@@ -301,7 +302,9 @@
                     </clr-tooltip>
                   </clr-stack-label>
                   <clr-stack-content>
-                    {{ sectionInEdit["columns"].length }} columns
+                    <span *ngIf="sectionInEdit['columns']"
+                      >{{ sectionInEdit["columns"].length }} columns</span
+                    >
                     <button
                       class="btn btn-sm btn-link btn-icon"
                       title="Add column"
@@ -478,7 +481,11 @@
                         *ngIf="isSectionType(sectionInEdit, 'simple-input')"
                       >
                         <label>Type</label>
-                        <select [(ngModel)]="input['type']" clrSelect>
+                        <select
+                          [(ngModel)]="input['type']"
+                          (ngModelChange)="typeChanged(input, $event)"
+                          clrSelect
+                        >
                           <option value="division-select"
                             >Division Select</option
                           >

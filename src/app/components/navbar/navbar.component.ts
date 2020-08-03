@@ -28,6 +28,10 @@ export class NavbarComponent implements OnInit {
     this._ReportService.getReportObservable().subscribe((observer) => {
       this.report = observer;
     });
+    this.vw = Math.max(
+      document.documentElement.clientWidth || 0,
+      window.innerWidth || 0
+    );
     window.onresize = (event) => {
       this.vw = Math.max(
         document.documentElement.clientWidth || 0,

@@ -119,6 +119,12 @@ export class ReportComponent implements OnInit, OnDestroy {
       : false;
   }
 
+  isDatagrid(section: Object) {
+    if (!section || section['type'] !== 'datagrid') {
+      return false;
+    } else return true;
+  }
+
   get reportFullyComplete() {
     let fullyComplete = true;
     if (this._ReportService.report) {
@@ -189,6 +195,10 @@ export class ReportComponent implements OnInit, OnDestroy {
     if (this._ReportService.page) {
       return this._ReportService.page.index;
     } else return null;
+  }
+
+  get currentSections() {
+    return this._ReportService.page.sections;
   }
 
   //return minutes since last save

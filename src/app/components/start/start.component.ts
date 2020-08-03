@@ -1,3 +1,12 @@
+import { AngularFirestore } from '@angular/fire/firestore';
+import { ConstantService } from './../../services/constant.service';
+import {
+  FormGroup,
+  FormBuilder,
+  FormArray,
+  AbstractControl,
+  FormControl,
+} from '@angular/forms';
 import { Router } from '@angular/router';
 import { ClrLoadingState } from '@clr/angular';
 import { ReportService } from 'src/app/services/report.service';
@@ -23,6 +32,7 @@ export class StartComponent implements OnInit {
   copyVisible: boolean = false;
   deleteVisible: boolean = false;
   exportVisible: boolean = false;
+  filterVisible: boolean = false;
 
   selectedTemplateName: string;
   newTemplateName: string = '';
@@ -37,23 +47,35 @@ export class StartComponent implements OnInit {
   selectedReport: Report;
   templateLoadStatuses: ClrLoadingState[];
   deleteLoading: ClrLoadingState;
+  filterLoading: ClrLoadingState = ClrLoadingState.DEFAULT;
   templateDupStatus: ClrLoadingState = ClrLoadingState.DEFAULT;
   templateModalVisible: boolean = false;
   tempDuplicateVisible: boolean = false;
 
   reportCount: number = -1;
+  selectedReports: Report[] = [];
 
   _sizeLimit: string = '10';
 
+  _constants: Object;
+
   //from TemplateService
   templates: Observable<Map<string, Report>>;
+
+  //for the filter tool
+  filterGroup: FormGroup;
+  selectedTemplates: string[] = [];
+  selectedBranches: string[] = [];
 
   constructor(
     public _TemplateService: TemplateService,
     public _ReportService: ReportService,
     private _UserService: UserService,
     private _Router: Router,
-    private _clipboardService: ClipboardService
+    private _clipboardService: ClipboardService,
+    private fb: FormBuilder,
+    private constantService: ConstantService,
+    private afs: AngularFirestore
   ) {}
 
   ngOnInit(): void {
@@ -117,6 +139,20 @@ export class StartComponent implements OnInit {
     this.templateLoadStatuses = [];
     this._TemplateService.templateNames.forEach(() => {
       this.templateLoadStatuses.push(ClrLoadingState.DEFAULT);
+    });
+
+    //subscribe to constants
+    this.constantService.constants.subscribe((constObj) => {
+      this._constants = constObj;
+    });
+    this.filterGroup = this.fb.group({
+      idSearch: [''],
+      completionStatus: ['All'],
+      template: ['All'],
+      authorSearch: [''],
+      coverageFrom: [''],
+      coverageTo: [''],
+      branch: ['All'],
     });
   }
 
@@ -229,20 +265,229 @@ export class StartComponent implements OnInit {
     this.copyVisible = false;
   }
 
+  showFilterModal() {
+    console.log('Showing filter modal');
+
+    this.filterVisible = true;
+  }
+
+  applyFilter(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      this.refreshReports().then(() => {
+        let result = this.reports;
+        let filters = this.filterGroup.value;
+        if (filters.idSearch && filters.idSearch.length > 0) {
+          result = result.filter((report) =>
+            report.id.includes(filters.idSearch)
+          );
+        }
+        if (filters.completionStatus && filters.completionStatus !== 'All') {
+          result = result.filter(
+            (report) => report.completionStatus === filters.completionStatus
+          );
+        }
+        if (filters.template && filters.template !== 'All') {
+          result = result.filter(
+            (report) => report.templateID === filters.template
+          );
+        }
+        if (filters.authorSearch && filters.authorSearch.length > 0) {
+          result = result.filter(
+            (report) =>
+              report.author && report.author.includes(filters.authorSearch)
+          );
+        }
+        if (filters.branch && filters.branch !== 'All') {
+          result = result.filter(
+            (report) => report.branch && report.branch === filters.branch
+          );
+        }
+        if (filters.completionStatus && filters.completionStatus !== 'All') {
+          result = result.filter(
+            (report) =>
+              report.completionStatus &&
+              report.completionStatus === filters.completionStatus
+          );
+        }
+        if (filters.coverageFrom && filters.coverageFrom.length > 0) {
+          result = result.filter(
+            (report) =>
+              report.coverageDate &&
+              report.coverageDate >=
+                this.convertTraditionalToISO(filters.coverageFrom)
+          );
+        }
+        if (filters.coverageTo && filters.coverageTo.length > 0) {
+          result = result.filter(
+            (report) =>
+              report.coverageDate &&
+              report.coverageDate <=
+                this.convertTraditionalToISO(filters.coverageTo)
+          );
+        }
+        this.reports = result;
+        console.log(result);
+        resolve();
+      });
+    });
+  }
+
+  refreshReports(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      if (this._UserService.getUserSnapshot().role === 'admin') {
+        //then load all reports, within quantity limit
+        if (this._sizeLimit !== 'all') {
+          this._ReportService
+            .fetchAllReportsWithLimit(+this._sizeLimit)
+            .then((reports) => {
+              this.reports = reports;
+              console.log(reports);
+              resolve();
+            })
+            .catch(() => {
+              console.error(
+                'Could not fetch reports for ' +
+                  this._UserService.getUserSnapshot().email
+              );
+              reject();
+            });
+        } else {
+          this._ReportService
+            .fetchAllReports()
+            .then((reports) => {
+              this.reports = reports;
+              console.log(reports);
+              resolve();
+            })
+            .catch(() => {
+              console.error(
+                'Could not fetch reports for ' +
+                  this._UserService.getUserSnapshot().email
+              );
+              reject();
+            });
+        }
+      }
+    });
+  }
+
+  convertTraditionalToISO(inputString: string) {
+    if (!inputString) {
+      return null;
+    }
+    let stringPieces = inputString.split('/');
+    if (stringPieces.length !== 3) {
+      console.warn('Invalid date: ' + inputString);
+      return null;
+    }
+    let monthNum: number = +stringPieces[0] - 1;
+    let dateNum: number = +stringPieces[1];
+    let yearNum: number = +stringPieces[2];
+    let date = new Date();
+    date.setMonth(monthNum);
+    date.setDate(dateNum);
+    date.setFullYear(yearNum);
+    let result = date.toISOString();
+    console.log('Converting: ' + inputString + ' to ' + result);
+    return result;
+  }
+
+  getTemplateCBArray(index: number) {
+    if (!(this.filterGroup.get('templateCBs') as FormArray)) {
+      return null;
+    }
+    return (this.filterGroup.get('templatesCBs') as FormArray).controls[index];
+  }
+
+  getBranchCBArray(index: number) {
+    if (!this.filterGroup.get('branchCBs')) {
+      return null;
+    }
+    return (this.filterGroup.get('branchCBs') as FormArray).controls[index];
+  }
+
+  clearFilters() {
+    this.filterGroup = this.fb.group({
+      idSearch: [''],
+      completionStatus: ['All'],
+      template: ['All'],
+      authorSearch: [''],
+      coverageFrom: [''],
+      coverageTo: [''],
+      branch: ['All'],
+    });
+  }
+
+  finishFilterModal() {
+    this.filterLoading = ClrLoadingState.LOADING;
+    console.log(this.filterGroup.value);
+    this.applyFilter()
+      .then(() => {
+        this.filterLoading = ClrLoadingState.SUCCESS;
+        this.hideFilterModal();
+      })
+      .catch((reason) => {
+        console.error('Filter application failed: ' + reason);
+        this.filterLoading = ClrLoadingState.ERROR;
+      });
+  }
+
+  hideFilterModal() {
+    this.filterVisible = false;
+  }
+
   deleteReport(report: Report) {
     this.deleteLoading = ClrLoadingState.LOADING;
     this._ReportService.deleteReport(report).then(() => {
       let user = this._UserService.getUserSnapshot();
-      this._ReportService
-        .fetchReportsByBranch(user.branch)
-        .then((reports) => {
-          this.reports = reports;
-          this.deleteLoading = ClrLoadingState.SUCCESS;
-          this.hideDelete();
-        })
-        .catch(() => {
-          console.error('Could not fetch reports for ' + user.email);
-        });
+      if (user.role === 'admin') {
+        //then load all reports, within quantity limit
+        if (this._sizeLimit !== 'all') {
+          this._ReportService
+            .fetchAllReportsWithLimit(+this._sizeLimit)
+            .then((reports) => {
+              this.reports = reports;
+              console.log(reports);
+            })
+            .catch(() => {
+              console.error('Could not fetch reports for ' + user.email);
+            });
+        } else {
+          this._ReportService
+            .fetchAllReports()
+            .then((reports) => {
+              this.reports = reports;
+              console.log(reports);
+            })
+            .catch(() => {
+              console.error('Could not fetch reports for ' + user.email);
+            });
+        }
+      } else {
+        if (this._sizeLimit !== 'all') {
+          this._ReportService
+            .fetchReportsByBranchWithLimit(user.branch, +this._sizeLimit)
+            .then((reports) => {
+              this.reports = reports;
+              console.log(reports);
+            })
+            .catch(() => {
+              console.error('Could not fetch reports for ' + user.email);
+            });
+        } else {
+          this._ReportService
+            .fetchReportsByBranch(user.branch)
+            .then((reports) => {
+              this.reports = reports;
+              console.log(reports);
+            })
+            .catch(() => {
+              console.error('Could not fetch reports for ' + user.email);
+            });
+        }
+      }
+      this.deleteLoading = ClrLoadingState.SUCCESS;
+      this.deleteVisible = false;
     });
   }
   showDelete(report: Report) {
@@ -280,6 +525,8 @@ export class StartComponent implements OnInit {
         this._ReportService
           .openReport(newID)
           .then(() => {
+            console.log('Created report: ');
+            console.log(this._ReportService.report);
             this._Router.navigate(['report', newID, 0]);
           })
           .catch((reason) => {

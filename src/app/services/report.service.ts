@@ -283,13 +283,24 @@ export class ReportService {
   }
 
   deleteReport(report: Report): Promise<void> {
-    let reportDoc = this._AngularFirestore.doc('/reports/' + report.id);
-    //delete all pages
-    for (let i = 0; i < report.pageCount; i++) {
-      let pageDoc = reportDoc.collection('pages').doc(i.toString());
-      pageDoc.delete();
-    }
-    return reportDoc.delete();
+    return new Promise<void>((resolve, reject) => {
+      let reportDoc = this._AngularFirestore.doc('/reports/' + report.id);
+      //delete all pages
+      for (let i = 0; i < report.pageCount; i++) {
+        let pageDoc = reportDoc.collection('pages').doc(i.toString());
+        pageDoc.delete();
+      }
+      reportDoc.delete().then(
+        () => {
+          console.log('Report deleted');
+          resolve();
+        },
+        (reason) => {
+          console.error('Deletion failed: ' + reason);
+          reject();
+        }
+      );
+    });
   }
 
   openPage(pageNumber: number): Promise<void> {
@@ -488,7 +499,8 @@ export class ReportService {
     ) {
       return new Promise<Report[]>((resolve, reject) => {
         let queryCollection = this._AngularFirestore.collection<Report>(
-          '/reports'
+          '/reports',
+          (ref) => ref.orderBy('id')
         );
         queryCollection
           .valueChanges()
@@ -506,7 +518,7 @@ export class ReportService {
     return new Promise<Report[]>((resolve, reject) => {
       let queryCollection = this._AngularFirestore.collection<Report>(
         '/reports',
-        (ref) => ref.limit(sizeLimit)
+        (ref) => ref.limit(sizeLimit).orderBy('id')
       );
       queryCollection
         .valueChanges()
@@ -524,7 +536,8 @@ export class ReportService {
     return new Promise<Report[]>((resolve, reject) => {
       let queryCollection = this._AngularFirestore.collection<Report>(
         '/reports',
-        (ref) => ref.where('branch', '==', branch).limit(sizeLimit)
+        (ref) =>
+          ref.where('branch', '==', branch).limit(sizeLimit).orderBy('id')
       );
       queryCollection
         .valueChanges()
@@ -539,7 +552,7 @@ export class ReportService {
     return new Promise<Report[]>((resolve, reject) => {
       let queryCollection = this._AngularFirestore.collection<Report>(
         '/reports',
-        (ref) => ref.where('branch', '==', branch)
+        (ref) => ref.where('branch', '==', branch).orderBy('id')
       );
       queryCollection
         .valueChanges()

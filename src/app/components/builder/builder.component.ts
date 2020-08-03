@@ -259,6 +259,10 @@ export class BuilderComponent implements OnInit {
       index: this._template.pages.length,
       sections: [],
     });
+    if (!this._template.pageStatuses) {
+      this._template.pageStatuses = [];
+    }
+    this._template.pageStatuses.push('incomplete');
     this._template.pageCount++;
     console.log(this._template.pages.length);
   }
@@ -407,6 +411,20 @@ export class BuilderComponent implements OnInit {
     }
   }
 
+  sectionTypeChanged(section) {
+    if (section.type === 'simple-input') {
+      if (!section['inputs']) {
+        section['inputs'] = [];
+      }
+    } else if (section.type === 'datagrid') {
+      if (!section['columns']) {
+        section['columns'] = [];
+      }
+    } else {
+      console.error('New section type unrecognized: ' + section.type);
+    }
+  }
+
   setSection(section: Object, data: Object) {}
   cancelEditSection() {
     this.editSectionOpened = false;
@@ -466,7 +484,7 @@ export class BuilderComponent implements OnInit {
 
   linkChanged(input: Input, event) {
     console.log('Link changed');
-    this.refreshValueFromFields();
+
     if (input.link === 'title') {
       input.type = 'text';
     } else if (input.link === 'coverageDate') {
@@ -481,6 +499,7 @@ export class BuilderComponent implements OnInit {
         input['tags'] = [];
       }
     }
+    this.refreshValueFromFields();
   }
 
   resetPageIndices() {
@@ -753,7 +772,7 @@ export class BuilderComponent implements OnInit {
     if (this.sectionInEdit['inputs']) {
       this.sectionInEdit['inputs'].forEach((input: Input) => {
         if (input.type === 'tag-select') {
-          value.push({ tags: input.tags || null });
+          value.push({ tags: [] });
         } else value.push(null);
       });
       this.sectionInEdit['value'] = value;
@@ -762,7 +781,7 @@ export class BuilderComponent implements OnInit {
     } else if (this.sectionInEdit['columns']) {
       this.sectionInEdit['columns'].forEach((col: Column) => {
         if (col.type === 'tag-select') {
-          value.push({ tags: col.tags || null });
+          value.push({ tags: [] });
         } else value.push(null);
       });
       this.sectionInEdit['value'] = [{ row: value }];

@@ -85,7 +85,9 @@ export class SimpleInputSection extends AbstractSection implements OnInit {
 
           input.tags.forEach((tag) => {
             checkboxArray.push(
-              new FormControl(this.hasTag(savedData[index]['tags'], tag))
+              savedData[index]
+                ? new FormControl(this.hasTag(savedData[index]['tags'], tag))
+                : new FormControl()
             );
           });
           this.formArray.push(checkboxArray);
