@@ -301,7 +301,7 @@
               <label>Has tag</label>
               <select clrSelect formControlName="tag">
                 <option value="All" selected="selected">All</option>
-                <option *ngFor="let tag of allTags; index as i" [value]="tag"
+                <option *ngFor="let tag of allTags; index as i" [value]="tag['label']"
                   >{{ tag["icon"] }} {{ tag["label"] }}</option
                 >
               </select>

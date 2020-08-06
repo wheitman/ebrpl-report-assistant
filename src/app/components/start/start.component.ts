@@ -92,6 +92,7 @@ export class StartComponent implements OnInit {
               .fetchAllReportsWithLimit(+this._sizeLimit)
               .then((reports) => {
                 this.reports = reports;
+                this.getAllTagsFromReports();
                 console.log(reports);
               })
               .catch(() => {
@@ -115,6 +116,7 @@ export class StartComponent implements OnInit {
               .fetchReportsByBranchWithLimit(user.branch, +this._sizeLimit)
               .then((reports) => {
                 this.reports = reports;
+                this.getAllTagsFromReports();
                 console.log(reports);
               })
               .catch(() => {
@@ -125,6 +127,7 @@ export class StartComponent implements OnInit {
               .fetchReportsByBranch(user.branch)
               .then((reports) => {
                 this.reports = reports;
+                this.getAllTagsFromReports();
                 console.log(reports);
               })
               .catch(() => {
@@ -132,6 +135,7 @@ export class StartComponent implements OnInit {
               });
           }
         }
+
         this.getReportCount().then((count) => {
           this.reportCount = count;
         });
@@ -332,8 +336,8 @@ export class StartComponent implements OnInit {
                 tagLabels.push(tag['label']);
               });
               console.warn(tagLabels);
-              console.warn(filters.tag);
-              return tagLabels.includes(filters.tag['label']);
+              console.warn(this.filterGroup.value);
+              return tagLabels.includes(filters.tag);
             }
           });
         }
