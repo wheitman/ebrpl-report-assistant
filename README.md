@@ -1,5 +1,6 @@
-# ReportAssistant
+# EBRPL Report Assistant
 
+An online Single Page Application for creating, managing, and storing branch reports. Made for the East Baton Rouge Parish Library. Uses Firebase as the backend, Angular as the frontend.
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 9.1.8.
 
 ## Development server
