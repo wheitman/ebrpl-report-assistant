@@ -31,11 +31,6 @@ import { first } from 'rxjs/operators';
 import 'emoji-picker-element';
 import { Observable } from 'rxjs';
 
-import {
-  report as outlineReport,
-  pages as outlinePages,
-} from 'src/assets/dev/outline';
-
 @Component({
   selector: 'app-builder',
   templateUrl: './builder.component.html',

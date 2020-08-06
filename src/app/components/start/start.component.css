@@ -6,3 +6,9 @@ clr-dropdown {
   border-radius: 5px;
   border: 1px solid gray;
 }
+
+.btn-magic {
+  border-color: purple;
+  color: white;
+  background-color: purple;
+}

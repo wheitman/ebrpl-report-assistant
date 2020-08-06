@@ -16,7 +16,6 @@ import { TemplateService } from '../../services/template.service';
 import { Component, OnInit } from '@angular/core';
 import { Report } from 'src/app/interfaces/report';
 import { User } from 'src/app/interfaces/user';
-import { report, pages } from 'src/assets/dev/outline';
 import { ClipboardService } from 'ngx-clipboard';
 
 @Component({
@@ -45,10 +44,7 @@ export class StartComponent implements OnInit {
   showUnverifiedAlert: boolean;
   reports: Report[] = [];
   selectedReport: Report;
-  templateLoadStatuses: ClrLoadingState[];
-  deleteLoading: ClrLoadingState;
-  filterLoading: ClrLoadingState = ClrLoadingState.DEFAULT;
-  templateDupStatus: ClrLoadingState = ClrLoadingState.DEFAULT;
+
   templateModalVisible: boolean = false;
   tempDuplicateVisible: boolean = false;
 
@@ -66,6 +62,14 @@ export class StartComponent implements OnInit {
   filterGroup: FormGroup;
   selectedTemplates: string[] = [];
   selectedBranches: string[] = [];
+  allTags: Object[] = [];
+
+  //button loading states
+  templateLoadStatuses: ClrLoadingState[];
+  deleteLoading: ClrLoadingState;
+  filterLoading: ClrLoadingState = ClrLoadingState.DEFAULT;
+  magicLoading: ClrLoadingState = ClrLoadingState.DEFAULT;
+  templateDupStatus: ClrLoadingState = ClrLoadingState.DEFAULT;
 
   constructor(
     public _TemplateService: TemplateService,
@@ -74,8 +78,7 @@ export class StartComponent implements OnInit {
     private _Router: Router,
     private _clipboardService: ClipboardService,
     private fb: FormBuilder,
-    private constantService: ConstantService,
-    private afs: AngularFirestore
+    private constantService: ConstantService
   ) {}
 
   ngOnInit(): void {
@@ -99,6 +102,7 @@ export class StartComponent implements OnInit {
               .fetchAllReports()
               .then((reports) => {
                 this.reports = reports;
+                this.getAllTagsFromReports();
                 console.log(reports);
               })
               .catch(() => {
@@ -153,6 +157,7 @@ export class StartComponent implements OnInit {
       coverageFrom: [''],
       coverageTo: [''],
       branch: ['All'],
+      tag: ['All'],
     });
   }
 
@@ -168,6 +173,23 @@ export class StartComponent implements OnInit {
         this._UserService.getUserSnapshot().branch
       );
     }
+  }
+
+  getAllTagsFromReports() {
+    let tags: Object[] = [];
+    let tagLabels: string[] = [];
+    this.reports.forEach((report) => {
+      if (report.tags) {
+        report.tags.forEach((tag) => {
+          if (!tagLabels.includes(tag['label'])) {
+            tags.push(tag);
+            tagLabels.push(tag['label']);
+          }
+        });
+      }
+    });
+    console.log(tags);
+    this.allTags = tags;
   }
 
   set sizeLimit(newLimit: string) {
@@ -302,6 +324,19 @@ export class StartComponent implements OnInit {
             (report) => report.branch && report.branch === filters.branch
           );
         }
+        if (filters.tag && filters.tag !== 'All') {
+          result = result.filter((report) => {
+            if (report.tags) {
+              let tagLabels: string[] = [];
+              report.tags.forEach((tag) => {
+                tagLabels.push(tag['label']);
+              });
+              console.warn(tagLabels);
+              console.warn(filters.tag);
+              return tagLabels.includes(filters.tag['label']);
+            }
+          });
+        }
         if (filters.completionStatus && filters.completionStatus !== 'All') {
           result = result.filter(
             (report) =>
@@ -356,6 +391,7 @@ export class StartComponent implements OnInit {
             .fetchAllReports()
             .then((reports) => {
               this.reports = reports;
+              this.getAllTagsFromReports();
               console.log(reports);
               resolve();
             })
@@ -495,10 +531,13 @@ export class StartComponent implements OnInit {
     this.deleteVisible = true;
   }
 
-  copyMagic(report: Report) {
-    this._ReportService.getMagicString(report.id).then((magicString) => {
-      this._clipboardService.copyFromContent(magicString);
-      alert('✅ Magic string copied to clipboard.');
+  copyMagic(reportList: Report[]) {
+    this.magicLoading = ClrLoadingState.LOADING;
+    this._ReportService.getMagicString(reportList).then((stringResult) => {
+      console.log(stringResult);
+      this._clipboardService.copyFromContent(stringResult);
+      this.magicLoading = ClrLoadingState.SUCCESS;
+      alert('🔮 Magic string copied to clipboard.');
     });
   }
 

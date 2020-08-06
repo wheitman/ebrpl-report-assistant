@@ -4,7 +4,7 @@ export interface Report {
   templateID: string;
   title?: string;
   category?: string;
-  tags?: string[];
+  tags?: Object[];
   hidden?: boolean;
   coverageDate?: string;
   submitDate?: string;
@@ -24,6 +24,8 @@ export interface UnifiedReport {
   id: string;
   templateID: string;
   title?: string;
+  tags?: string;
+  category?: string;
   coverageDate?: string;
   submitDate?: string;
   author?: string;

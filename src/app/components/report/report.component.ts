@@ -259,4 +259,38 @@ export class ReportComponent implements OnInit, OnDestroy {
       return false;
     }
   }
+
+  duplicateCurrentReport() {
+    let report = this._ReportService.report;
+    console.log(report.id);
+    this._ReportService.duplicateReport(report.id).then(
+      (newID) => {
+        alert('Report successfully duplicated. Moving to new report...');
+        this._ReportService
+          .openReport(newID)
+          .then(() => {
+            this._Router.navigate(['report', newID, 0]);
+          })
+          .catch((reason) => {
+            console.error(
+              'Error opening new report with ID ' + newID + ': ' + reason
+            );
+          });
+      },
+      () => {
+        console.error('Error duplicating report ' + report.id);
+      }
+    );
+  }
+
+  get submitted(): boolean {
+    if (
+      this._ReportService.report &&
+      this._ReportService.report.completionStatus === 'complete'
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }

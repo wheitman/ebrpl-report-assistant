@@ -81,6 +81,16 @@
           >
             <clr-icon shape="filter"></clr-icon> Filter reports
           </button>
+          <button
+            *ngIf="selectedReports.length > 0"
+            type="button"
+            class="btn btn-sm btn-magic"
+            (click)="copyMagic(selectedReports)"
+            [clrLoading]="magicLoading"
+          >
+            <clr-icon shape="wand"></clr-icon> Copy magic for
+            {{ selectedReports.length }} reports
+          </button>
         </clr-dg-action-bar>
 
         <clr-dg-row
@@ -110,11 +120,7 @@
             >
               <clr-icon shape="trash" class="is-danger"></clr-icon> Delete draft
             </button>
-            <button
-              *ngIf="isUnfinished(report)"
-              class="action-item"
-              (click)="copyMagic(report)"
-            >
+            <button class="action-item" (click)="copyMagic([report])">
               <clr-icon shape="wand"></clr-icon> Copy magic text
             </button>
           </clr-dg-action-overflow>
@@ -135,9 +141,14 @@
             >
           </clr-dg-cell>
 
-          <clr-dg-cell (click)="navigate(report)" class="clickable">{{
-            report.author
-          }}</clr-dg-cell>
+          <clr-dg-cell (click)="navigate(report)" class="clickable">
+            <span *ngIf="report.tags; else noTags">
+              <span *ngFor="let tag of report.tags" [title]="tag['label']">{{
+                tag["icon"]
+              }}</span>
+            </span>
+            <ng-template #noTags><em>No tags</em></ng-template>
+          </clr-dg-cell>
           <clr-dg-cell (click)="navigate(report)" class="clickable">{{
             report.coverageDate | date: "MMMM 	’yy"
           }}</clr-dg-cell>
@@ -283,6 +294,15 @@
                   *ngFor="let branch of _constants['branches']; index as i"
                   [value]="branch"
                   >{{ branch }}</option
+                >
+              </select>
+            </clr-select-container>
+            <clr-select-container clrInline *ngIf="isAdmin">
+              <label>Has tag</label>
+              <select clrSelect formControlName="tag">
+                <option value="All" selected="selected">All</option>
+                <option *ngFor="let tag of allTags; index as i" [value]="tag"
+                  >{{ tag["icon"] }} {{ tag["label"] }}</option
                 >
               </select>
             </clr-select-container>

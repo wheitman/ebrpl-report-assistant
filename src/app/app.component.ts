@@ -1,7 +1,8 @@
+import { config } from './../assets/env';
 import { TemplateService } from './services/template.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
-import { report, pages } from 'src/assets/dev/outline';
+import * as firebase from 'firebase/app';
 
 @Component({
   selector: 'app-root',

@@ -4,23 +4,33 @@
     [class.block-clicks]="!editable"
   >
     <div class="clr-col clr-col-lg-10 clr-col-xl-8 sectionCol">
-      <clr-alert [clrAlertClosable]="false" *ngIf="!editable">
-        <clr-alert-item>
-          <span class="alert-text">
-            You're viewing a submitted report. It cannot be edited.
-          </span>
-        </clr-alert-item>
-      </clr-alert>
       <clr-alert
         [clrAlertClosable]="false"
         [clrAlertType]="'warning'"
-        *ngIf="adminSubmitted"
-        [clrAlertIcon]="'administrator'"
+        *ngIf="submitted"
+        [clrAlertIcon]="'warning-standard'"
       >
         <clr-alert-item>
           <span class="alert-text">
-            You're viewing a submitted report. Only admins can edit it.
+            This report has been marked complete. You can still edit it, but
+            consider creating a duplicate instead.
           </span>
+          <div class="alert-actions">
+            <clr-dropdown>
+              <button class="dropdown-toggle" clrDropdownTrigger>
+                Actions
+                <clr-icon shape="caret down"></clr-icon>
+              </button>
+              <clr-dropdown-menu clrPosition="bottom-right">
+                <a
+                  (click)="duplicateCurrentReport()"
+                  class="dropdown-item"
+                  clrDropdownItem
+                  >Duplicate this report</a
+                >
+              </clr-dropdown-menu>
+            </clr-dropdown>
+          </div>
         </clr-alert-item>
       </clr-alert>
       <h1>
@@ -49,7 +59,7 @@
     </div>
   </div>
   <clr-modal [(clrModalOpen)]="submitConfirmationVisible">
-    <h3 class="modal-title">Ready to submit?</h3>
+    <h3 class="modal-title">All finished?</h3>
     <div class="modal-body">
       <clr-alert
         *ngIf="!reportFullyComplete"
@@ -63,8 +73,9 @@
         </clr-alert-item>
       </clr-alert>
       <hr />
-      Once a report is submitted, <b>it cannot be edited again</b>. Double-check
-      to make sure that all sections are filled out.
+      <b>Marking a report as complete</b> indicates that all data inside should
+      be considered final. You can still edit the report after it's been marked
+      complete.
     </div>
     <div class="modal-footer">
       <button
@@ -80,7 +91,7 @@
         (click)="submitReport()"
         [clrLoading]="submitButtonState"
       >
-        Submit
+        Mark as complete
       </button>
     </div>
   </clr-modal>
@@ -169,7 +180,7 @@
           [clrLoading]="submitButtonState"
           *ngIf="editable"
         >
-          Finish report<clr-icon shape="step-forward-2"></clr-icon>
+          Finish<clr-icon shape="step-forward-2"></clr-icon>
         </button>
       </div>
     </div>

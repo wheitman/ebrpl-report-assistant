@@ -148,7 +148,22 @@ export class SimpleInputSection extends AbstractSection implements OnInit {
           } else if (link === 'subject') {
             this._ReportService.setSubject(this.formArray.value[index]);
           } else if (link === 'tags') {
-            this._ReportService.setTags(this.formArray.value[index]);
+            let tagArr: Object[] = [];
+            console.warn(this.formArray.value[index]);
+            (this.formArray.value[index] as Object[]).forEach(
+              (tagBool, tagIndex) => {
+                // if the tag is checked, add it
+                if (tagBool) {
+                  if (inputObj.tags && inputObj.tags[tagIndex]) {
+                    tagArr.push(inputObj['tags'][tagIndex]);
+                    console.warn(
+                      'Pushing ' + inputObj['tags'][tagIndex]['icon']
+                    );
+                  }
+                }
+              }
+            );
+            this._ReportService.setTags(tagArr);
           }
         });
       }

@@ -1,0 +1,1472 @@
+[
+  {
+    "id": "2ado",
+    "templateID": "Branch Usage",
+    "title": null,
+    "coverageDate": "2020-07-02T21:12:19.056Z",
+    "submitDate": null,
+    "author": "jconnors@ebrpl.com",
+    "branch": "Main Library",
+    "additionalInfo": null,
+    "pageStatuses": [
+      "incomplete",
+      "incomplete",
+      "incomplete",
+      "incomplete",
+      "incomplete"
+    ],
+    "pageCount": 5,
+    "completionStatus": "incomplete",
+    "pages": [
+      {
+        "sections": [
+          {
+            "value": ["2020-07-02T21:12:19.056Z", null],
+            "inputs": [
+              {
+                "type": "month-select",
+                "label": "This report is for the month of:",
+                "link": "coverageDate",
+                "tags": []
+              },
+              {
+                "link": "additionalInfo",
+                "type": "textarea",
+                "tags": [],
+                "label": "Additional info (optional):"
+              }
+            ],
+            "title": "Basic information",
+            "type": "meta",
+            "index": 0
+          }
+        ],
+        "index": 0,
+        "title": "Start"
+      },
+      {
+        "sections": [
+          {
+            "subtitle": "Presented or co-sponsored by the library. Includes story/crafts, LEGO storytime, Tax Assistance.",
+            "columns": [
+              { "type": "division-select", "tags": [], "label": "Division" },
+              { "label": "Date", "tags": [], "type": "date-select" },
+              { "type": "text", "tags": [], "label": "Title" },
+              { "tags": [], "label": "Attendance", "type": "number" },
+              {
+                "tags": [
+                  { "label": "STEM/STEAM", "icon": "🧪" },
+                  { "icon": "🌐", "label": "Digital Literacy/Database Use" },
+                  { "icon": "❤️", "label": "Health and Wellness" },
+                  { "icon": "💻️", "label": "Portable device" },
+                  { "label": "Digital lab program", "icon": "👩‍💻" },
+                  { "label": "Innovation/Maker Space", "icon": "🚀" }
+                ],
+                "label": "Tags",
+                "type": "tag-select"
+              }
+            ],
+            "value": [
+              { "row": [null, null, null, null, { "tags": [] }] },
+              {
+                "row": [
+                  "Adults",
+                  "2020-07-01T21:14:22.317Z",
+                  "test1",
+                  20,
+                  { "tags": [{ "icon": "🧪", "label": "STEM/STEAM" }] }
+                ]
+              }
+            ],
+            "type": "datagrid",
+            "title": "Regular programs",
+            "index": 0
+          },
+          {
+            "value": [null, null],
+            "columns": [],
+            "inputs": [
+              {
+                "link": null,
+                "label": "Number of programs",
+                "tags": [],
+                "type": "number"
+              },
+              {
+                "tags": [],
+                "link": null,
+                "type": "number",
+                "label": "Attendance"
+              }
+            ],
+            "type": "simple-input",
+            "title": "Storytimes",
+            "index": 1
+          },
+          {
+            "columns": [
+              { "type": "division-select", "tags": [], "label": "Division" },
+              { "type": "date-select", "tags": [], "label": "Date" },
+              { "label": "Title", "type": "text", "tags": [] },
+              { "type": "number", "tags": [], "label": "Attendance" },
+              { "type": "number", "label": "Hours", "tags": [] },
+              {
+                "type": "tag-select",
+                "label": "Tags",
+                "tags": [
+                  {
+                    "label": "Portable device (including iPads and laptops)",
+                    "icon": "💻️"
+                  },
+                  { "label": "Digital lab program", "icon": "👩‍💻" },
+                  { "icon": "🚀", "label": "Innovation/Maker Space" }
+                ]
+              }
+            ],
+            "title": "Computer classes",
+            "subtitle": "Includes teaching or using computer applications, digital literacy, etc.",
+            "type": "datagrid",
+            "value": [
+              { "row": [null, null, null, null, null, { "tags": [] }] }
+            ],
+            "index": 2
+          },
+          {
+            "columns": [
+              { "label": "Division", "type": "division-select", "tags": [] },
+              { "tags": [], "type": "date-select", "label": "Date" },
+              { "label": "Club/title or topic", "tags": [], "type": "text" },
+              { "type": "number", "tags": [], "label": "Attendance" }
+            ],
+            "value": [{ "row": [null, null, null, null] }],
+            "subtitle": "Held in the library, sponsored by the library",
+            "type": "datagrid",
+            "index": 3,
+            "title": "Book clubs"
+          },
+          {
+            "value": [],
+            "inputs": [],
+            "index": 4,
+            "type": "datagrid",
+            "title": "Tours",
+            "columns": [
+              { "label": "Division", "type": "division-select", "tags": [] },
+              { "tags": [], "type": "date-select", "label": "Date" },
+              {
+                "tags": [],
+                "label": "Group and topic (if any)",
+                "type": "text"
+              },
+              { "type": "number", "tags": [], "label": "Attendance" }
+            ]
+          },
+          {
+            "columns": [
+              { "type": "division-select", "label": "Division", "tags": [] },
+              { "type": "date-select", "tags": [], "label": "Date" },
+              { "type": "text", "tags": [], "label": "Title" },
+              { "type": "number", "label": "Attendance", "tags": [] }
+            ],
+            "type": "datagrid",
+            "index": 5,
+            "value": [{ "row": [null, null, null, null] }],
+            "title": "Demonstrations"
+          },
+          {
+            "value": [{ "row": [null, null, null] }],
+            "columns": [
+              { "type": "division-select", "tags": [], "label": "Division" },
+              { "type": "number", "label": "Number of sessions", "tags": [] },
+              { "tags": [], "label": "Attendance", "type": "number" }
+            ],
+            "subtitle": "Takes place in the library, but not organized or taught by the library",
+            "title": "Tutoring",
+            "index": 6,
+            "type": "datagrid"
+          },
+          {
+            "columns": [
+              { "label": "Division", "tags": [], "type": "division-select" },
+              { "tags": [], "label": "Number of sessions", "type": "number" },
+              { "tags": [], "label": "Attendance", "type": "number" }
+            ],
+            "type": "datagrid",
+            "subtitle": "Occupational instruction classes 'working' for you or group home visiting the library. Not a formal tour.",
+            "title": "Special education",
+            "value": [{ "row": [null, null, null] }],
+            "index": 7
+          }
+        ],
+        "index": 1,
+        "title": "Programs in the library"
+      },
+      {
+        "index": 2,
+        "sections": [
+          {
+            "index": 0,
+            "type": "datagrid",
+            "title": "Room Usage",
+            "value": [
+              {
+                "row": [null, "Group Study Room/Alternative Meeting Room", null]
+              },
+              { "row": [null, "Quiet Reading Room", null] },
+              { "row": [null, "Teen Study Room", null] },
+              { "row": [null, "Children's Study Room", null] },
+              { "row": [null, "Digital Lab", null] },
+              { "row": [null, "Innovation Space", null] }
+            ],
+            "columns": [
+              { "type": "number", "label": "Number of uses", "tags": [] },
+              { "label": "Room", "type": "text", "tags": [] },
+              { "type": "text", "tags": [], "label": "Attendance" }
+            ]
+          },
+          {
+            "inputs": [
+              {
+                "link": null,
+                "type": "number",
+                "label": "Number of groups",
+                "tags": []
+              },
+              {
+                "tags": [],
+                "label": "Attendance",
+                "type": "number",
+                "link": null
+              }
+            ],
+            "index": 1,
+            "value": [null, null],
+            "title": "Civic groups and organizations using meeting rooms",
+            "type": "simple-input"
+          },
+          {
+            "subtitle": "Not involved in formal instruction or scheduled tours. Includes group homes, classes, and exam proctoring.",
+            "type": "datagrid",
+            "value": [{ "row": [null, null, null] }],
+            "index": 2,
+            "columns": [
+              { "type": "division-select", "label": "Division", "tags": [] },
+              {
+                "label": "Number of classes/exams",
+                "type": "number",
+                "tags": []
+              },
+              { "tags": [], "label": "Attendance", "type": "number" }
+            ],
+            "title": "Impromptu group meetings in the library"
+          }
+        ],
+        "title": "Other library events"
+      },
+      {
+        "index": 3,
+        "title": "Staff presentations and events outside the library",
+        "sections": [
+          {
+            "columns": [
+              { "tags": [], "type": "division-select", "label": "Division" },
+              { "type": "date-select", "tags": [], "label": "Date" },
+              { "tags": [], "label": "Title", "type": "text" },
+              { "tags": [], "type": "number", "label": "Attendance" }
+            ],
+            "value": [{ "row": [null, null, null, null] }],
+            "index": 0,
+            "title": "Speech or lecture",
+            "type": "datagrid"
+          },
+          {
+            "type": "datagrid",
+            "index": 1,
+            "value": [{ "row": [null, null, null, null] }],
+            "columns": [
+              { "type": "division-select", "tags": [], "label": "Division" },
+              { "tags": [], "type": "date-select", "label": "Date" },
+              { "type": "text", "label": "Title", "tags": [] },
+              { "tags": [], "type": "number", "label": "Attendance" }
+            ],
+            "title": "Storytimes and other performances"
+          },
+          {
+            "title": "Booktalks",
+            "value": [
+              { "row": ["Book Clubs", null, null] },
+              { "row": ["Elementary school", null, null] },
+              { "row": ["Middle school", null, null] },
+              { "row": ["High school", null, null] },
+              { "row": ["College", null, null] },
+              { "row": ["Other", null, null] }
+            ],
+            "index": 2,
+            "type": "datagrid",
+            "columns": [
+              { "tags": [], "label": "Category", "type": "text" },
+              { "tags": [], "type": "number", "label": "Total # of talks" },
+              { "tags": [], "type": "number", "label": "Attendance" }
+            ]
+          },
+          {
+            "title": "Research talks",
+            "type": "datagrid",
+            "value": [
+              { "row": ["Elementary school", null, null] },
+              { "row": ["Middle school", null, null] },
+              { "row": ["High school", null, null] },
+              { "row": ["College", null, null] },
+              { "row": ["Other", null, null] }
+            ],
+            "index": 3,
+            "columns": [
+              { "tags": [], "label": "Category", "type": "text" },
+              { "tags": [], "type": "number", "label": "Total # of talks" },
+              { "label": "Attendance", "tags": [], "type": "number" }
+            ]
+          },
+          {
+            "type": "datagrid",
+            "columns": [
+              { "type": "date-select", "label": "Date", "tags": [] },
+              { "type": "text", "label": "Title", "tags": [] },
+              { "tags": [], "label": "Attendance", "type": "number" }
+            ],
+            "value": [{ "row": [null, null, null] }],
+            "index": 4,
+            "title": "Promotional events"
+          },
+          {
+            "index": 5,
+            "value": [{ "row": [null, null, null] }],
+            "type": "datagrid",
+            "columns": [
+              { "tags": [], "type": "date-select", "label": "Date" },
+              { "tags": [], "type": "text", "label": "Title" },
+              { "type": "number", "label": "Attendance", "tags": [] }
+            ],
+            "title": "Community meetings attended by staff representing the library"
+          },
+          {
+            "value": [{ "row": [null, null, null] }],
+            "title": "Media presentations",
+            "index": 6,
+            "columns": [
+              { "label": "Date", "type": "date-select", "tags": [] },
+              { "label": "Title", "tags": [], "type": "text" },
+              { "type": "number", "tags": [], "label": "Attendance" }
+            ],
+            "type": "datagrid"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "title": "Other categories tracked",
+        "sections": [
+          {
+            "index": 0,
+            "type": "datagrid",
+            "title": "Volunteers",
+            "value": [
+              { "row": ["Adult", null, null] },
+              { "row": ["Teen", null, null] },
+              { "row": ["Children", null, null] }
+            ],
+            "columns": [
+              { "label": "Category", "tags": [], "type": "text" },
+              { "type": "number", "label": "# of volunteers", "tags": [] },
+              { "type": "number", "label": "Total hours worked", "tags": [] }
+            ]
+          },
+          {
+            "value": [],
+            "columns": [
+              { "type": "division-select", "label": "Division", "tags": [] },
+              { "tags": [], "type": "date-select", "label": "Date" },
+              { "tags": [], "label": "Contact name", "type": "text" }
+            ],
+            "title": "Outreach contacts to area businesses and organizations",
+            "index": 1,
+            "type": "datagrid"
+          },
+          {
+            "subtitle": "Not just for book displays",
+            "title": "Displays and exhibits",
+            "type": "datagrid",
+            "index": 2,
+            "columns": [
+              { "label": "Division", "tags": [], "type": "division-select" },
+              { "tags": [], "label": "Title", "type": "text" }
+            ],
+            "value": []
+          },
+          {
+            "value": [null],
+            "title": "Drive-thru window total",
+            "type": "simple-input",
+            "index": 3,
+            "inputs": [
+              { "link": null, "type": "number", "tags": [], "label": "Total" }
+            ]
+          },
+          {
+            "type": "simple-input",
+            "inputs": [
+              {
+                "type": "number",
+                "label": "# of books",
+                "link": null,
+                "tags": []
+              },
+              {
+                "tags": [],
+                "link": null,
+                "label": "# of magazines",
+                "type": "number"
+              }
+            ],
+            "value": [null, null],
+            "title": "Books and magazines read in-house",
+            "index": 4
+          },
+          {
+            "type": "datagrid",
+            "columns": [
+              { "label": "Division", "tags": [], "type": "division-select" },
+              { "label": "Total", "tags": [], "type": "number" },
+              { "tags": [], "label": "Title", "type": "text" }
+            ],
+            "title": "Miscellaneous tracked items",
+            "value": [
+              { "row": [null, null, "Coloring pages"] },
+              { "row": [null, null, "Reading Dogs"] },
+              { "row": [null, null, "Read to your bunny"] }
+            ],
+            "index": 5
+          },
+          {
+            "value": [],
+            "columns": [
+              { "tags": [], "type": "division-select", "label": "Division" },
+              { "label": "Date", "type": "date-select", "tags": [] },
+              { "label": "Title", "tags": [], "type": "text" },
+              { "label": "Attendance", "tags": [], "type": "number" },
+              { "tags": [], "label": "Hours", "type": "number" },
+              {
+                "type": "tag-select",
+                "tags": [
+                  {
+                    "label": "Portable device (including iPads and laptops)",
+                    "icon": "💻️"
+                  },
+                  { "label": "Digital lab program", "icon": "👩‍💻" },
+                  { "icon": "🚀", "label": "Innovation/Maker Space" }
+                ],
+                "label": "Tags"
+              }
+            ],
+            "subtitle": "Including training via webinar or personal online training. Not including personal Ethics or Sexual Harassment Prevention Training.",
+            "index": 6,
+            "type": "datagrid",
+            "title": "Training - in-house for staff"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dby4",
+    "templateID": "Branch Usage",
+    "title": null,
+    "coverageDate": null,
+    "submitDate": null,
+    "author": "wheitman9312@gmail.com",
+    "branch": "Baker Branch",
+    "additionalInfo": null,
+    "pageStatuses": [
+      "incomplete",
+      "incomplete",
+      "incomplete",
+      "incomplete",
+      "incomplete"
+    ],
+    "pageCount": 5,
+    "completionStatus": "incomplete",
+    "pages": [
+      {
+        "index": 0,
+        "title": "Start",
+        "sections": [
+          {
+            "title": "Basic information",
+            "inputs": [
+              {
+                "type": "month-select",
+                "link": "coverageDate",
+                "label": "This report is for the month of:",
+                "tags": []
+              },
+              {
+                "tags": [],
+                "label": "Additional info (optional):",
+                "link": "additionalInfo",
+                "type": "textarea"
+              }
+            ],
+            "value": [null, null, null],
+            "type": "meta",
+            "index": 0
+          }
+        ]
+      },
+      {
+        "title": "Programs in the library",
+        "index": 1,
+        "sections": [
+          {
+            "title": "Regular programs",
+            "type": "datagrid",
+            "subtitle": "Presented or co-sponsored by the library. Includes story/crafts, LEGO storytime, Tax Assistance.",
+            "index": 0,
+            "columns": [
+              { "type": "division-select", "label": "Division", "tags": [] },
+              { "tags": [], "label": "Date", "type": "date-select" },
+              { "label": "Title", "tags": [], "type": "text" },
+              { "type": "number", "label": "Attendance", "tags": [] },
+              {
+                "type": "tag-select",
+                "label": "Tags",
+                "tags": [
+                  { "icon": "🧪", "label": "STEM/STEAM" },
+                  { "icon": "🌐", "label": "Digital Literacy/Database Use" },
+                  { "icon": "❤️", "label": "Health and Wellness" },
+                  { "label": "Portable device", "icon": "💻️" },
+                  { "icon": "👩‍💻", "label": "Digital lab program" },
+                  { "icon": "🚀", "label": "Innovation/Maker Space" }
+                ]
+              }
+            ],
+            "value": [{ "row": [null, null, null, null, { "tags": [] }] }]
+          },
+          {
+            "title": "Storytimes",
+            "type": "simple-input",
+            "columns": [],
+            "inputs": [
+              {
+                "link": null,
+                "type": "number",
+                "label": "Number of programs",
+                "tags": []
+              },
+              {
+                "type": "number",
+                "tags": [],
+                "label": "Attendance",
+                "link": null
+              }
+            ],
+            "index": 1,
+            "value": [null, null]
+          },
+          {
+            "subtitle": "Includes teaching or using computer applications, digital literacy, etc.",
+            "columns": [
+              { "type": "division-select", "tags": [], "label": "Division" },
+              { "label": "Date", "tags": [], "type": "date-select" },
+              { "type": "text", "label": "Title", "tags": [] },
+              { "tags": [], "type": "number", "label": "Attendance" },
+              { "type": "number", "tags": [], "label": "Hours" },
+              {
+                "label": "Tags",
+                "tags": [
+                  {
+                    "icon": "💻️",
+                    "label": "Portable device (including iPads and laptops)"
+                  },
+                  { "icon": "👩‍💻", "label": "Digital lab program" },
+                  { "label": "Innovation/Maker Space", "icon": "🚀" }
+                ],
+                "type": "tag-select"
+              }
+            ],
+            "value": [
+              { "row": [null, null, null, null, null, { "tags": [] }] }
+            ],
+            "type": "datagrid",
+            "title": "Computer classes",
+            "index": 2
+          },
+          {
+            "value": [{ "row": [null, null, null, null] }],
+            "type": "datagrid",
+            "title": "Book clubs",
+            "subtitle": "Held in the library, sponsored by the library",
+            "columns": [
+              { "tags": [], "label": "Division", "type": "division-select" },
+              { "tags": [], "label": "Date", "type": "date-select" },
+              { "label": "Club/title or topic", "tags": [], "type": "text" },
+              { "type": "number", "tags": [], "label": "Attendance" }
+            ],
+            "index": 3
+          },
+          {
+            "inputs": [],
+            "title": "Tours",
+            "type": "datagrid",
+            "columns": [
+              { "label": "Division", "tags": [], "type": "division-select" },
+              { "label": "Date", "tags": [], "type": "date-select" },
+              {
+                "type": "text",
+                "label": "Group and topic (if any)",
+                "tags": []
+              },
+              { "type": "number", "tags": [], "label": "Attendance" }
+            ],
+            "value": [],
+            "index": 4
+          },
+          {
+            "value": [{ "row": [null, null, null, null] }],
+            "columns": [
+              { "label": "Division", "tags": [], "type": "division-select" },
+              { "label": "Date", "type": "date-select", "tags": [] },
+              { "type": "text", "tags": [], "label": "Title" },
+              { "label": "Attendance", "tags": [], "type": "number" }
+            ],
+            "index": 5,
+            "type": "datagrid",
+            "title": "Demonstrations"
+          },
+          {
+            "value": [{ "row": [null, null, null] }],
+            "index": 6,
+            "title": "Tutoring",
+            "subtitle": "Takes place in the library, but not organized or taught by the library",
+            "type": "datagrid",
+            "columns": [
+              { "type": "division-select", "tags": [], "label": "Division" },
+              { "tags": [], "label": "Number of sessions", "type": "number" },
+              { "type": "number", "label": "Attendance", "tags": [] }
+            ]
+          },
+          {
+            "index": 7,
+            "columns": [
+              { "type": "division-select", "tags": [], "label": "Division" },
+              { "type": "number", "tags": [], "label": "Number of sessions" },
+              { "tags": [], "type": "number", "label": "Attendance" }
+            ],
+            "value": [{ "row": [null, null, null] }],
+            "type": "datagrid",
+            "title": "Special education",
+            "subtitle": "Occupational instruction classes 'working' for you or group home visiting the library. Not a formal tour."
+          }
+        ]
+      },
+      {
+        "title": "Other library events",
+        "index": 2,
+        "sections": [
+          {
+            "title": "Room Usage",
+            "value": [
+              {
+                "row": [null, "Group Study Room/Alternative Meeting Room", null]
+              },
+              { "row": [null, "Quiet Reading Room", null] },
+              { "row": [null, "Teen Study Room", null] },
+              { "row": [null, "Children's Study Room", null] },
+              { "row": [null, "Digital Lab", null] },
+              { "row": [null, "Innovation Space", null] }
+            ],
+            "columns": [
+              { "type": "number", "label": "Number of uses", "tags": [] },
+              { "tags": [], "type": "text", "label": "Room" },
+              { "tags": [], "type": "text", "label": "Attendance" }
+            ],
+            "type": "datagrid",
+            "index": 0
+          },
+          {
+            "value": [null, null],
+            "type": "simple-input",
+            "title": "Civic groups and organizations using meeting rooms",
+            "inputs": [
+              {
+                "type": "number",
+                "tags": [],
+                "label": "Number of groups",
+                "link": null
+              },
+              {
+                "tags": [],
+                "type": "number",
+                "link": null,
+                "label": "Attendance"
+              }
+            ],
+            "index": 1
+          },
+          {
+            "type": "datagrid",
+            "columns": [
+              { "tags": [], "type": "division-select", "label": "Division" },
+              {
+                "label": "Number of classes/exams",
+                "type": "number",
+                "tags": []
+              },
+              { "tags": [], "type": "number", "label": "Attendance" }
+            ],
+            "subtitle": "Not involved in formal instruction or scheduled tours. Includes group homes, classes, and exam proctoring.",
+            "title": "Impromptu group meetings in the library",
+            "index": 2,
+            "value": [{ "row": [null, null, null] }]
+          }
+        ]
+      },
+      {
+        "sections": [
+          {
+            "value": [{ "row": [null, null, null, null] }],
+            "title": "Speech or lecture",
+            "type": "datagrid",
+            "columns": [
+              { "type": "division-select", "tags": [], "label": "Division" },
+              { "label": "Date", "type": "date-select", "tags": [] },
+              { "tags": [], "label": "Title", "type": "text" },
+              { "tags": [], "type": "number", "label": "Attendance" }
+            ],
+            "index": 0
+          },
+          {
+            "title": "Storytimes and other performances",
+            "index": 1,
+            "type": "datagrid",
+            "columns": [
+              { "tags": [], "type": "division-select", "label": "Division" },
+              { "label": "Date", "tags": [], "type": "date-select" },
+              { "type": "text", "tags": [], "label": "Title" },
+              { "type": "number", "label": "Attendance", "tags": [] }
+            ],
+            "value": [{ "row": [null, null, null, null] }]
+          },
+          {
+            "index": 2,
+            "columns": [
+              { "type": "text", "tags": [], "label": "Category" },
+              { "type": "number", "tags": [], "label": "Total # of talks" },
+              { "label": "Attendance", "tags": [], "type": "number" }
+            ],
+            "type": "datagrid",
+            "value": [
+              { "row": ["Book Clubs", null, null] },
+              { "row": ["Elementary school", null, null] },
+              { "row": ["Middle school", null, null] },
+              { "row": ["High school", null, null] },
+              { "row": ["College", null, null] },
+              { "row": ["Other", null, null] }
+            ],
+            "title": "Booktalks"
+          },
+          {
+            "columns": [
+              { "type": "text", "tags": [], "label": "Category" },
+              { "label": "Total # of talks", "tags": [], "type": "number" },
+              { "type": "number", "tags": [], "label": "Attendance" }
+            ],
+            "value": [
+              { "row": ["Elementary school", null, null] },
+              { "row": ["Middle school", null, null] },
+              { "row": ["High school", null, null] },
+              { "row": ["College", null, null] },
+              { "row": ["Other", null, null] }
+            ],
+            "index": 3,
+            "title": "Research talks",
+            "type": "datagrid"
+          },
+          {
+            "title": "Promotional events",
+            "columns": [
+              { "type": "date-select", "label": "Date", "tags": [] },
+              { "type": "text", "label": "Title", "tags": [] },
+              { "label": "Attendance", "type": "number", "tags": [] }
+            ],
+            "index": 4,
+            "type": "datagrid",
+            "value": [{ "row": [null, null, null] }]
+          },
+          {
+            "index": 5,
+            "columns": [
+              { "label": "Date", "type": "date-select", "tags": [] },
+              { "tags": [], "type": "text", "label": "Title" },
+              { "tags": [], "label": "Attendance", "type": "number" }
+            ],
+            "type": "datagrid",
+            "value": [{ "row": [null, null, null] }],
+            "title": "Community meetings attended by staff representing the library"
+          },
+          {
+            "index": 6,
+            "value": [{ "row": [null, null, null] }],
+            "type": "datagrid",
+            "columns": [
+              { "label": "Date", "tags": [], "type": "date-select" },
+              { "type": "text", "label": "Title", "tags": [] },
+              { "tags": [], "type": "number", "label": "Attendance" }
+            ],
+            "title": "Media presentations"
+          }
+        ],
+        "index": 3,
+        "title": "Staff presentations and events outside the library"
+      },
+      {
+        "title": "Other categories tracked",
+        "index": 4,
+        "sections": [
+          {
+            "type": "datagrid",
+            "columns": [
+              { "tags": [], "label": "Category", "type": "text" },
+              { "tags": [], "type": "number", "label": "# of volunteers" },
+              { "tags": [], "type": "number", "label": "Total hours worked" }
+            ],
+            "title": "Volunteers",
+            "index": 0,
+            "value": [
+              { "row": ["Adult", null, null] },
+              { "row": ["Teen", null, null] },
+              { "row": ["Children", null, null] }
+            ]
+          },
+          {
+            "value": [],
+            "index": 1,
+            "type": "datagrid",
+            "columns": [
+              { "type": "division-select", "tags": [], "label": "Division" },
+              { "tags": [], "label": "Date", "type": "date-select" },
+              { "tags": [], "label": "Contact name", "type": "text" }
+            ],
+            "title": "Outreach contacts to area businesses and organizations"
+          },
+          {
+            "title": "Displays and exhibits",
+            "index": 2,
+            "type": "datagrid",
+            "subtitle": "Not just for book displays",
+            "value": [],
+            "columns": [
+              { "label": "Division", "type": "division-select", "tags": [] },
+              { "type": "text", "tags": [], "label": "Title" }
+            ]
+          },
+          {
+            "value": [null],
+            "type": "simple-input",
+            "title": "Drive-thru window total",
+            "index": 3,
+            "inputs": [
+              { "type": "number", "label": "Total", "tags": [], "link": null }
+            ]
+          },
+          {
+            "inputs": [
+              {
+                "tags": [],
+                "type": "number",
+                "link": null,
+                "label": "# of books"
+              },
+              {
+                "tags": [],
+                "link": null,
+                "label": "# of magazines",
+                "type": "number"
+              }
+            ],
+            "value": [null, null],
+            "index": 4,
+            "type": "simple-input",
+            "title": "Books and magazines read in-house"
+          },
+          {
+            "value": [
+              { "row": [null, null, "Coloring pages"] },
+              { "row": [null, null, "Reading Dogs"] },
+              { "row": [null, null, "Read to your bunny"] }
+            ],
+            "title": "Miscellaneous tracked items",
+            "columns": [
+              { "type": "division-select", "tags": [], "label": "Division" },
+              { "tags": [], "label": "Total", "type": "number" },
+              { "type": "text", "tags": [], "label": "Title" }
+            ],
+            "type": "datagrid",
+            "index": 5
+          },
+          {
+            "columns": [
+              { "type": "division-select", "tags": [], "label": "Division" },
+              { "tags": [], "type": "date-select", "label": "Date" },
+              { "label": "Title", "type": "text", "tags": [] },
+              { "label": "Attendance", "type": "number", "tags": [] },
+              { "type": "number", "label": "Hours", "tags": [] },
+              {
+                "label": "Tags",
+                "tags": [
+                  {
+                    "icon": "💻️",
+                    "label": "Portable device (including iPads and laptops)"
+                  },
+                  { "icon": "👩‍💻", "label": "Digital lab program" },
+                  { "icon": "🚀", "label": "Innovation/Maker Space" }
+                ],
+                "type": "tag-select"
+              }
+            ],
+            "subtitle": "Including training via webinar or personal online training. Not including personal Ethics or Sexual Harassment Prevention Training.",
+            "type": "datagrid",
+            "title": "Training - in-house for staff",
+            "value": [],
+            "index": 6
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ehqg",
+    "templateID": "Branch Usage",
+    "title": null,
+    "coverageDate": "2020-07-02T20:20:48.567Z",
+    "submitDate": null,
+    "author": "jconnors@ebrpl.com",
+    "branch": "Main Library",
+    "additionalInfo": null,
+    "pageStatuses": [
+      "incomplete",
+      "incomplete",
+      "incomplete",
+      "incomplete",
+      "incomplete"
+    ],
+    "pageCount": 5,
+    "completionStatus": "incomplete",
+    "pages": [
+      {
+        "title": "Start",
+        "index": 0,
+        "sections": [
+          {
+            "index": 0,
+            "value": ["2020-07-02T20:20:48.567Z", null],
+            "inputs": [
+              {
+                "link": "coverageDate",
+                "tags": [],
+                "label": "This report is for the month of:",
+                "type": "month-select"
+              },
+              {
+                "tags": [],
+                "link": "additionalInfo",
+                "type": "textarea",
+                "label": "Additional info (optional):"
+              }
+            ],
+            "type": "meta",
+            "title": "Basic information"
+          }
+        ]
+      },
+      {
+        "index": 1,
+        "sections": [
+          {
+            "type": "datagrid",
+            "value": [
+              {
+                "row": [
+                  "Adults",
+                  "2020-08-06T21:18:10.414Z",
+                  "Test programaug",
+                  25,
+                  {
+                    "tags": [
+                      { "label": "STEM/STEAM", "icon": "🧪" },
+                      { "label": "Portable device", "icon": "💻️" }
+                    ]
+                  }
+                ]
+              },
+              {
+                "row": [
+                  "Children",
+                  "2020-08-06T21:18:28.853Z",
+                  "testch",
+                  22,
+                  { "tags": [] }
+                ]
+              },
+              {
+                "row": [
+                  "Teens",
+                  "2020-07-09T20:22:52.238Z",
+                  "test2teen",
+                  1,
+                  { "tags": [{ "label": "Health and Wellness", "icon": "❤️" }] }
+                ]
+              },
+              {
+                "row": [
+                  "Adults",
+                  "2020-07-15T20:23:10.934Z",
+                  "test3ad",
+                  5,
+                  { "tags": [{ "label": "Health and Wellness", "icon": "❤️" }] }
+                ]
+              },
+              {
+                "row": [
+                  "Adults",
+                  "2020-07-23T20:30:19.320Z",
+                  "walking group",
+                  2,
+                  { "tags": [] }
+                ]
+              }
+            ],
+            "index": 0,
+            "subtitle": "Presented or co-sponsored by the library. Includes story/crafts, LEGO storytime, Tax Assistance.",
+            "title": "Regular programs",
+            "columns": [
+              { "label": "Division", "type": "division-select", "tags": [] },
+              { "label": "Date", "type": "date-select", "tags": [] },
+              { "label": "Title", "tags": [], "type": "text" },
+              { "type": "number", "tags": [], "label": "Attendance" },
+              {
+                "type": "tag-select",
+                "label": "Tags",
+                "tags": [
+                  { "label": "STEM/STEAM", "icon": "🧪" },
+                  { "icon": "🌐", "label": "Digital Literacy/Database Use" },
+                  { "label": "Health and Wellness", "icon": "❤️" },
+                  { "icon": "💻️", "label": "Portable device" },
+                  { "label": "Digital lab program", "icon": "👩‍💻" },
+                  { "label": "Innovation/Maker Space", "icon": "🚀" }
+                ]
+              }
+            ]
+          },
+          {
+            "index": 1,
+            "value": [3, 34],
+            "title": "Storytimes",
+            "columns": [],
+            "inputs": [
+              {
+                "type": "number",
+                "tags": [],
+                "label": "Number of programs",
+                "link": null
+              },
+              {
+                "type": "number",
+                "label": "Attendance",
+                "tags": [],
+                "link": null
+              }
+            ],
+            "type": "simple-input"
+          },
+          {
+            "index": 2,
+            "type": "datagrid",
+            "value": [
+              { "row": [null, null, null, null, null, { "tags": [] }] },
+              {
+                "row": [
+                  "20-Somethings",
+                  "2020-07-09T20:31:05.390Z",
+                  "t",
+                  3,
+                  3,
+                  { "tags": [{ "label": "Digital lab program", "icon": "👩‍💻" }] }
+                ]
+              }
+            ],
+            "columns": [
+              { "tags": [], "type": "division-select", "label": "Division" },
+              { "label": "Date", "type": "date-select", "tags": [] },
+              { "tags": [], "label": "Title", "type": "text" },
+              { "label": "Attendance", "type": "number", "tags": [] },
+              { "type": "number", "label": "Hours", "tags": [] },
+              {
+                "tags": [
+                  {
+                    "label": "Portable device (including iPads and laptops)",
+                    "icon": "💻️"
+                  },
+                  { "icon": "👩‍💻", "label": "Digital lab program" },
+                  { "label": "Innovation/Maker Space", "icon": "🚀" }
+                ],
+                "type": "tag-select",
+                "label": "Tags"
+              }
+            ],
+            "title": "Computer classes",
+            "subtitle": "Includes teaching or using computer applications, digital literacy, etc."
+          },
+          {
+            "index": 3,
+            "subtitle": "Held in the library, sponsored by the library",
+            "type": "datagrid",
+            "columns": [
+              { "label": "Division", "type": "division-select", "tags": [] },
+              { "tags": [], "label": "Date", "type": "date-select" },
+              { "tags": [], "type": "text", "label": "Club/title or topic" },
+              { "type": "number", "label": "Attendance", "tags": [] }
+            ],
+            "value": [{ "row": [null, null, null, null] }],
+            "title": "Book clubs"
+          },
+          {
+            "value": [],
+            "inputs": [],
+            "index": 4,
+            "title": "Tours",
+            "type": "datagrid",
+            "columns": [
+              { "label": "Division", "type": "division-select", "tags": [] },
+              { "tags": [], "type": "date-select", "label": "Date" },
+              {
+                "type": "text",
+                "tags": [],
+                "label": "Group and topic (if any)"
+              },
+              { "type": "number", "tags": [], "label": "Attendance" }
+            ]
+          },
+          {
+            "type": "datagrid",
+            "index": 5,
+            "value": [{ "row": [null, null, null, null] }],
+            "title": "Demonstrations",
+            "columns": [
+              { "type": "division-select", "label": "Division", "tags": [] },
+              { "type": "date-select", "label": "Date", "tags": [] },
+              { "type": "text", "label": "Title", "tags": [] },
+              { "label": "Attendance", "tags": [], "type": "number" }
+            ]
+          },
+          {
+            "index": 6,
+            "columns": [
+              { "type": "division-select", "label": "Division", "tags": [] },
+              { "tags": [], "type": "number", "label": "Number of sessions" },
+              { "label": "Attendance", "tags": [], "type": "number" }
+            ],
+            "subtitle": "Takes place in the library, but not organized or taught by the library",
+            "type": "datagrid",
+            "value": [{ "row": [null, null, null] }],
+            "title": "Tutoring"
+          },
+          {
+            "value": [{ "row": [null, null, null] }],
+            "title": "Special education",
+            "index": 7,
+            "subtitle": "Occupational instruction classes 'working' for you or group home visiting the library. Not a formal tour.",
+            "columns": [
+              { "tags": [], "label": "Division", "type": "division-select" },
+              { "tags": [], "type": "number", "label": "Number of sessions" },
+              { "label": "Attendance", "tags": [], "type": "number" }
+            ],
+            "type": "datagrid"
+          }
+        ],
+        "title": "Programs in the library"
+      },
+      {
+        "index": 2,
+        "title": "Other library events",
+        "sections": [
+          {
+            "index": 0,
+            "columns": [
+              { "label": "Number of uses", "type": "number", "tags": [] },
+              { "label": "Room", "type": "text", "tags": [] },
+              { "tags": [], "label": "Attendance", "type": "text" }
+            ],
+            "type": "datagrid",
+            "title": "Room Usage",
+            "value": [
+              {
+                "row": [null, "Group Study Room/Alternative Meeting Room", null]
+              },
+              { "row": [null, "Quiet Reading Room", null] },
+              { "row": [null, "Teen Study Room", null] },
+              { "row": [null, "Children's Study Room", null] },
+              { "row": [null, "Digital Lab", null] },
+              { "row": [null, "Innovation Space", null] }
+            ]
+          },
+          {
+            "value": [null, null],
+            "inputs": [
+              {
+                "link": null,
+                "label": "Number of groups",
+                "tags": [],
+                "type": "number"
+              },
+              {
+                "link": null,
+                "tags": [],
+                "type": "number",
+                "label": "Attendance"
+              }
+            ],
+            "type": "simple-input",
+            "index": 1,
+            "title": "Civic groups and organizations using meeting rooms"
+          },
+          {
+            "value": [{ "row": [null, null, null] }],
+            "title": "Impromptu group meetings in the library",
+            "subtitle": "Not involved in formal instruction or scheduled tours. Includes group homes, classes, and exam proctoring.",
+            "columns": [
+              { "label": "Division", "type": "division-select", "tags": [] },
+              {
+                "type": "number",
+                "label": "Number of classes/exams",
+                "tags": []
+              },
+              { "tags": [], "label": "Attendance", "type": "number" }
+            ],
+            "type": "datagrid",
+            "index": 2
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "title": "Staff presentations and events outside the library",
+        "sections": [
+          {
+            "value": [{ "row": [null, null, null, null] }],
+            "type": "datagrid",
+            "columns": [
+              { "label": "Division", "type": "division-select", "tags": [] },
+              { "label": "Date", "tags": [], "type": "date-select" },
+              { "label": "Title", "type": "text", "tags": [] },
+              { "label": "Attendance", "tags": [], "type": "number" }
+            ],
+            "title": "Speech or lecture",
+            "index": 0
+          },
+          {
+            "type": "datagrid",
+            "title": "Storytimes and other performances",
+            "index": 1,
+            "value": [{ "row": [null, null, null, null] }],
+            "columns": [
+              { "type": "division-select", "tags": [], "label": "Division" },
+              { "tags": [], "type": "date-select", "label": "Date" },
+              { "type": "text", "label": "Title", "tags": [] },
+              { "type": "number", "label": "Attendance", "tags": [] }
+            ]
+          },
+          {
+            "columns": [
+              { "type": "text", "label": "Category", "tags": [] },
+              { "type": "number", "label": "Total # of talks", "tags": [] },
+              { "tags": [], "label": "Attendance", "type": "number" }
+            ],
+            "title": "Booktalks",
+            "value": [
+              { "row": ["Book Clubs", 6, 25] },
+              { "row": ["Elementary school", null, null] },
+              { "row": ["Middle school", null, null] },
+              { "row": ["High school", null, null] },
+              { "row": ["College", null, null] },
+              { "row": ["JDC", 5, 44] }
+            ],
+            "type": "datagrid",
+            "index": 2
+          },
+          {
+            "value": [
+              { "row": ["Elementary school", null, null] },
+              { "row": ["Middle school", null, null] },
+              { "row": ["High school", null, null] },
+              { "row": ["College", null, null] },
+              { "row": ["Other", null, null] }
+            ],
+            "type": "datagrid",
+            "title": "Research talks",
+            "columns": [
+              { "label": "Category", "tags": [], "type": "text" },
+              { "tags": [], "type": "number", "label": "Total # of talks" },
+              { "label": "Attendance", "type": "number", "tags": [] }
+            ],
+            "index": 3
+          },
+          {
+            "type": "datagrid",
+            "value": [{ "row": [null, null, null] }],
+            "columns": [
+              { "type": "date-select", "label": "Date", "tags": [] },
+              { "tags": [], "type": "text", "label": "Title" },
+              { "type": "number", "tags": [], "label": "Attendance" }
+            ],
+            "title": "Promotional events",
+            "index": 4
+          },
+          {
+            "index": 5,
+            "columns": [
+              { "type": "date-select", "label": "Date", "tags": [] },
+              { "label": "Title", "type": "text", "tags": [] },
+              { "tags": [], "label": "Attendance", "type": "number" }
+            ],
+            "title": "Community meetings attended by staff representing the library",
+            "type": "datagrid",
+            "value": [{ "row": [null, null, null] }]
+          },
+          {
+            "title": "Media presentations",
+            "type": "datagrid",
+            "index": 6,
+            "value": [{ "row": [null, null, null] }],
+            "columns": [
+              { "label": "Date", "type": "date-select", "tags": [] },
+              { "tags": [], "type": "text", "label": "Title" },
+              { "tags": [], "label": "Attendance", "type": "number" }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Other categories tracked",
+        "index": 4,
+        "sections": [
+          {
+            "index": 0,
+            "columns": [
+              { "tags": [], "label": "Category", "type": "text" },
+              { "tags": [], "label": "# of volunteers", "type": "number" },
+              { "label": "Total hours worked", "tags": [], "type": "number" }
+            ],
+            "value": [
+              { "row": ["Adult", null, null] },
+              { "row": ["Teen", null, null] },
+              { "row": ["Children", null, null] }
+            ],
+            "type": "datagrid",
+            "title": "Volunteers"
+          },
+          {
+            "type": "datagrid",
+            "index": 1,
+            "columns": [
+              { "type": "division-select", "tags": [], "label": "Division" },
+              { "tags": [], "label": "Date", "type": "date-select" },
+              { "type": "text", "tags": [], "label": "Contact name" }
+            ],
+            "title": "Outreach contacts to area businesses and organizations",
+            "value": []
+          },
+          {
+            "columns": [
+              { "type": "division-select", "tags": [], "label": "Division" },
+              { "label": "Title", "type": "text", "tags": [] }
+            ],
+            "subtitle": "Not just for book displays",
+            "title": "Displays and exhibits",
+            "index": 2,
+            "value": [],
+            "type": "datagrid"
+          },
+          {
+            "index": 3,
+            "value": [null],
+            "title": "Drive-thru window total",
+            "inputs": [
+              { "link": null, "tags": [], "label": "Total", "type": "number" }
+            ],
+            "type": "simple-input"
+          },
+          {
+            "type": "simple-input",
+            "value": [null, null],
+            "inputs": [
+              {
+                "label": "# of books",
+                "link": null,
+                "type": "number",
+                "tags": []
+              },
+              {
+                "tags": [],
+                "label": "# of magazines",
+                "link": null,
+                "type": "number"
+              }
+            ],
+            "index": 4,
+            "title": "Books and magazines read in-house"
+          },
+          {
+            "columns": [
+              { "tags": [], "label": "Division", "type": "division-select" },
+              { "tags": [], "type": "number", "label": "Total" },
+              { "type": "text", "tags": [], "label": "Title" }
+            ],
+            "title": "Miscellaneous tracked items",
+            "value": [
+              { "row": [null, null, "Coloring pages"] },
+              { "row": [null, null, "Reading Dogs"] },
+              { "row": [null, null, "Read to your bunny"] }
+            ],
+            "index": 5,
+            "type": "datagrid"
+          },
+          {
+            "columns": [
+              { "type": "division-select", "label": "Division", "tags": [] },
+              { "type": "date-select", "tags": [], "label": "Date" },
+              { "label": "Title", "type": "text", "tags": [] },
+              { "tags": [], "label": "Attendance", "type": "number" },
+              { "tags": [], "type": "number", "label": "Hours" },
+              {
+                "tags": [
+                  {
+                    "icon": "💻️",
+                    "label": "Portable device (including iPads and laptops)"
+                  },
+                  { "label": "Digital lab program", "icon": "👩‍💻" },
+                  { "label": "Innovation/Maker Space", "icon": "🚀" }
+                ],
+                "type": "tag-select",
+                "label": "Tags"
+              }
+            ],
+            "value": [],
+            "title": "Training - in-house for staff",
+            "type": "datagrid",
+            "subtitle": "Including training via webinar or personal online training. Not including personal Ethics or Sexual Harassment Prevention Training.",
+            "index": 6
+          }
+        ]
+      }
+    ]
+  }
+]

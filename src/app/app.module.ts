@@ -1,6 +1,6 @@
 import { ConstantService } from './services/constant.service';
 import { ReportService } from 'src/app/services/report.service';
-import { environment } from './../environments/environment';
+import { config } from './../assets/env';
 import { TemplateService } from './services/template.service';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
@@ -48,7 +48,7 @@ import { ClipboardModule } from 'ngx-clipboard';
     ReactiveFormsModule,
     FormsModule,
     ClipboardModule,
-    AngularFireModule.initializeApp(environment.firebase),
+    AngularFireModule.initializeApp(config.firebase),
   ],
   providers: [TemplateService, UserService, ConstantService, ReportService],
   bootstrap: [AppComponent],
