@@ -1,0 +1,221 @@
+{
+  "reports": [
+    {
+      "id": "e6ls",
+      "templateID": "Patron survey",
+      "title": "Baker Branch patron survey",
+      "coverageDate": "2020-07-05T16:04:05.924Z",
+      "submitDate": "2020-08-05T16:06:21.623Z",
+      "author": "will.heitman@utdallas.edu",
+      "branch": "Baker Branch",
+      "additionalInfo": null,
+      "pageStatuses": ["complete", "complete", "complete"],
+      "pageCount": 3,
+      "completionStatus": "complete",
+      "pages": [
+        {
+          "index": 0,
+          "title": "Basics",
+          "sections": [
+            {
+              "type": "meta",
+              "value": [
+                "Baker Branch patron survey",
+                {
+                  "tags": [
+                    { "icon": "🥔", "label": "Free food" },
+                    { "icon": "🌅", "label": "Summer" }
+                  ]
+                },
+                "2020-07-05T16:04:05.924Z"
+              ],
+              "index": 0,
+              "inputs": [
+                {
+                  "type": "text",
+                  "label": "Survey title",
+                  "tags": [],
+                  "link": "title"
+                },
+                {
+                  "label": "Tags",
+                  "type": "tag-select",
+                  "link": "tags",
+                  "tags": [
+                    { "icon": "🥔", "label": "Free food" },
+                    { "icon": "🐶", "label": "Pets allowed" },
+                    { "label": "Summer", "icon": "🌅" },
+                    { "label": "Winter", "icon": "❄️" }
+                  ]
+                },
+                {
+                  "tags": [],
+                  "link": "coverageDate",
+                  "label": "Survey month",
+                  "type": "month-select"
+                }
+              ],
+              "title": "Report information"
+            }
+          ]
+        },
+        {
+          "title": "Holidays",
+          "index": 1,
+          "sections": [
+            {
+              "title": "Favorite holiday",
+              "columns": [
+                { "type": "text", "tags": [], "label": "Patron asked" },
+                { "tags": [], "label": "Date asked", "type": "date-select" },
+                { "label": "Favorite holiday", "type": "text", "tags": [] },
+                {
+                  "type": "tag-select",
+                  "tags": [
+                    { "icon": "😱", "label": "Spooky" },
+                    { "icon": "😄", "label": "Joyful" },
+                    { "label": "Family", "icon": "👪️" }
+                  ],
+                  "label": "Holiday tags"
+                }
+              ],
+              "value": [
+                {
+                  "row": [
+                    "Joyce Roberts",
+                    "2020-08-19T16:04:23.481Z",
+                    "Halloween",
+                    {
+                      "tags": [
+                        { "icon": "😱", "label": "Spooky" },
+                        { "icon": "😄", "label": "Joyful" },
+                        { "icon": "👪️", "label": "Family" }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "row": [
+                    "Mary Kennedy",
+                    "2020-08-03T16:05:07.703Z",
+                    "Hanukkuh",
+                    {
+                      "tags": [
+                        { "icon": "😄", "label": "Joyful" },
+                        { "label": "Family", "icon": "👪️" }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "index": 0,
+              "type": "datagrid"
+            },
+            {
+              "value": [45, 12],
+              "title": "\"Do you prefer winter holidays or summer holidays?\"",
+              "inputs": [
+                {
+                  "label": "Prefer winter holidays",
+                  "tags": [],
+                  "type": "number",
+                  "link": null
+                },
+                {
+                  "link": null,
+                  "type": "number",
+                  "label": "Prefer summer holidays",
+                  "tags": []
+                }
+              ],
+              "index": 1,
+              "type": "simple-input"
+            }
+          ]
+        },
+        {
+          "sections": [
+            {
+              "type": "datagrid",
+              "subtitle": "What is your favorite genre of book?",
+              "value": [
+                {
+                  "row": [
+                    "Horror",
+                    34,
+                    { "tags": [{ "label": "Thrilling", "icon": "😲" }] }
+                  ]
+                },
+                {
+                  "row": [
+                    "Suspense/thriller",
+                    87,
+                    { "tags": [{ "icon": "😲", "label": "Thrilling" }] }
+                  ]
+                },
+                {
+                  "row": [
+                    "Crime and detective",
+                    0,
+                    { "tags": [{ "icon": "😲", "label": "Thrilling" }] }
+                  ]
+                },
+                {
+                  "row": [
+                    "Fantasy",
+                    145,
+                    {
+                      "tags": [
+                        { "label": "Magic", "icon": "🧙" },
+                        { "label": "Thrilling", "icon": "😲" }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "row": [
+                    "Fairy tale",
+                    34,
+                    { "tags": [{ "icon": "🧙", "label": "Magic" }] }
+                  ]
+                },
+                { "row": ["Reference books", 6, { "tags": [] }] }
+              ],
+              "columns": [
+                { "label": "Genre", "tags": [], "type": "text" },
+                { "label": "Count", "type": "number", "tags": [] },
+                {
+                  "label": "Genre categories",
+                  "tags": [
+                    { "label": "Magic", "icon": "🧙" },
+                    { "icon": "😲", "label": "Thrilling" },
+                    { "icon": "🤡", "label": "Humorous" }
+                  ],
+                  "type": "tag-select"
+                }
+              ],
+              "title": "Favorite genres",
+              "index": 0
+            },
+            {
+              "value": ["Lots of people like fantasy books."],
+              "inputs": [
+                {
+                  "type": "textarea",
+                  "label": "Observations about genre question",
+                  "tags": [],
+                  "link": null
+                }
+              ],
+              "type": "simple-input",
+              "index": 1,
+              "title": "Observations"
+            }
+          ],
+          "title": "Reading preferences",
+          "index": 2
+        }
+      ]
+    }
+  ]
+}
