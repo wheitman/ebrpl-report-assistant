@@ -1,3 +1,7 @@
+> Note after the fact: This was a single page application (SPA) that I wrote for the East Baton Rouge Parish Library system. It's old, and its dependencies have a comical amount of ___security vulnerabilities___ that appeared with age. It used Firebase for authentication and database services. Using some (pretty neat) wizards, it generated an Excel spreadsheet in a standardized format that was then sent to the library system's central office. I wish I could add screenshots, but I deleted my own account when I transferred ownership to the library.
+
+<img width="1200" alt="image" src="https://user-images.githubusercontent.com/16737488/208779812-5973e0a5-6d37-4094-95d9-59ef070afb98.png">
+
 # EBRPL Report Assistant
 
 An online Single Page Application for creating, managing, and storing branch reports. Made for the East Baton Rouge Parish Library. Uses Firebase as the backend, Angular as the frontend.
